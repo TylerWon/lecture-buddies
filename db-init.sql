@@ -89,7 +89,7 @@ CREATE TABLE likes (
 CREATE TYPE PLATFORM AS ENUM ('Facebook', 'Instagram', 'LinkedIn', 'Twitter');
 
 CREATE TABLE social_medias (
-	socialmedia_id SERIAL PRIMARY KEY,  
+	social_media_id SERIAL PRIMARY KEY,  
 	student_id INTEGER,
     platform PLATFORM,
     url VARCHAR(2048),
