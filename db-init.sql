@@ -1,7 +1,9 @@
 -- Preqrequsites: Install postgresql
 -- 
--- This script creates a database called "lecture_buddies" and creates the tables for the database
+-- This script creates a database called "lecture_buddies" and creates the tables for it
 -- To execute this script, run the command: psql -U postgres -a -f ./db-init.sql
+-- 
+-- Note: Any database roles with permissions to the lecture_buddies database will need to be regranted permissions after running this script
 
 DROP DATABASE IF EXISTS lecture_buddies;
 CREATE DATABASE lecture_buddies;
