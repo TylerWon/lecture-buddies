@@ -48,7 +48,9 @@ CREATE TABLE sections (
 CREATE TABLE users (
 	user_id SERIAL PRIMARY KEY,
 	email VARCHAR(254) UNIQUE,
-	password VARCHAR(100)
+	password BYTEA,
+	salt BYTEA,
+	token VARCHAR(100)
 );
 
 CREATE TABLE students (
@@ -60,6 +62,7 @@ CREATE TABLE students (
 	faculty VARCHAR(150),
 	major VARCHAR(150),
 	profile_photo_url VARCHAR(2048),
+	bio VARCHAR(500),
 	FOREIGN KEY (school_id) REFERENCES schools
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
