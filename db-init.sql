@@ -12,17 +12,25 @@ CREATE DATABASE lecture_buddies;
 
 CREATE TABLE schools (
 	school_id SERIAL PRIMARY KEY,
-	name VARCHAR(150) UNIQUE,
+	school_name VARCHAR(150) UNIQUE,
 	logo_url VARCHAR(2048)
+);
+
+CREATE TABLE subjects (
+	subject_id SERIAL PRIMARY KEY,
+	school_id INTEGER,
+	subject_name VARCHAR(10),
+	FOREIGN KEY (school_id) REFERENCES schools
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 );
 
 CREATE TABLE courses (
 	course_id SERIAL PRIMARY KEY,
-    school_id INTEGER,
-	dept VARCHAR(10),
+    subject_id INTEGER,
     course_number VARCHAR(10),
 	course_name VARCHAR(150),
-	FOREIGN KEY (school_id) REFERENCES schools
+	FOREIGN KEY (subject_id) REFERENCES subjects
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
