@@ -1,4 +1,4 @@
--- Preqrequsites: Install postgresql
+-- Prerequsites: Install postgresql
 -- 
 -- This script creates a database called "lecture_buddies" and creates the tables for it
 -- To execute this script, run the command: psql -U postgres -a -f ./db-init.sql
@@ -20,8 +20,8 @@ CREATE TABLE courses (
 	course_id SERIAL PRIMARY KEY,
     school_id INTEGER,
 	dept VARCHAR(10),
-    number VARCHAR(10),
-	name VARCHAR(150),
+    course_number VARCHAR(10),
+	course_name VARCHAR(150),
 	FOREIGN KEY (school_id) REFERENCES schools
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
@@ -30,8 +30,8 @@ CREATE TABLE courses (
 CREATE TABLE sections (
 	section_id SERIAL PRIMARY KEY,
 	course_id INTEGER,
-	number VARCHAR(10),
-	term VARCHAR(10),
+	section_number VARCHAR(10),
+	section_term VARCHAR(10),
 	FOREIGN KEY (course_id) REFERENCES courses
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
@@ -74,7 +74,7 @@ CREATE TABLE enrols (
 
 CREATE TABLE interests (
 	interest_id SERIAL PRIMARY KEY,
-	name VARCHAR(50) UNIQUE
+	interest_name VARCHAR(50) UNIQUE
 );
 
 CREATE TABLE likes (
@@ -102,7 +102,7 @@ CREATE TABLE social_medias (
 
 CREATE TABLE conversations (
 	conversation_id SERIAL PRIMARY KEY,
-	name CHAR(150)
+	conversation_name CHAR(150)
 );
 
 CREATE TABLE conversation_members (
@@ -121,7 +121,7 @@ CREATE TABLE messages (
 	message_id SERIAL PRIMARY KEY,
 	conversation_id INTEGER,
 	author_id INTEGER,
-	content TEXT,
+	message_content TEXT,
 	sent_datetime TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (conversation_id) REFERENCES conversations
 		ON DELETE CASCADE
