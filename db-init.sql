@@ -47,7 +47,7 @@ CREATE TABLE sections (
 
 CREATE TABLE users (
 	user_id SERIAL PRIMARY KEY,
-	email VARCHAR(254) UNIQUE,
+	username VARCHAR(254) UNIQUE,
 	password BYTEA,
 	salt BYTEA,
 	token VARCHAR(100)
