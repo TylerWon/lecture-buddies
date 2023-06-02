@@ -42,7 +42,12 @@ passport.deserializeUser((user, cb) => {
 const login = passport.authenticate("local", { successRedirect: "/" }); // TODO: redirect to /courses
 
 const logout = (req, res, next) => {
-    res.send("Not implemented");
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        res.send("Logout successful");
+    });
 };
 
 const signup = (req, res, next) => {
