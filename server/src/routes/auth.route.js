@@ -3,7 +3,8 @@ const router = express.Router();
 
 const authController = require("../controllers/auth.controller");
 
-router.post("/login", authController.login, (req, res) => res.send("Login successful")); // Provide additional function because authController.login calls the next function in the stack when authentication is successful
+// Provide additional function because authController.login needs to call the next function in the stack when authentication is successful (otherwise it hangs due to passport.authenticate())
+router.post("/login", authController.login, (req, res, next) => res.send("Login successful"));
 router.post("/logout", authController.logout);
 router.post("/signup", authController.signup);
 
