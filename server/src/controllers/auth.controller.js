@@ -1,5 +1,4 @@
-const db = require("../db");
-const express = require("express");
+const db = require("../configs/db.config");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const crypto = require("crypto");
@@ -40,15 +39,18 @@ passport.deserializeUser((user, cb) => {
 });
 
 // Controllers
-const login = passport.authenticate("local");
+function login(req, res, next) {
+    passport.authenticate("local");
+    next();
+}
 
-const logout = (req, res, next) => {
+function logout(req, res, next) {
     res.send("Not implemented");
-};
+}
 
-const signup = (req, res, next) => {
+function signup(req, res, next) {
     res.send("Not implemented");
-};
+}
 
 module.exports = {
     login,

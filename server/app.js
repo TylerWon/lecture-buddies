@@ -1,5 +1,5 @@
 require("dotenv").config();
-const db = require("./db");
+const db = require("./src/configs/db.config");
 
 // Express
 const express = require("express");
@@ -33,7 +33,7 @@ app.use(
 app.use(passport.session());
 
 // Routes
-const authRouter = require("./routes/auth");
+const authRouter = require("./src/routes/auth.route");
 
 app.use("/auth", authRouter);
 
