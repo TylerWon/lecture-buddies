@@ -35,7 +35,17 @@ app.use(
 );
 app.use(passport.session());
 
+// error handling
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    console.error(err.message, err.stack);
+    res.status(statusCode).json({ message: err.message });
+
+    return;
+});
+
 // Routes
 app.use("/auth", authRouter);
+app.get("/", (req, res) => res.send("Hello World!"));
 
 app.listen(port, () => console.log(`app listening on port ${port}`));
