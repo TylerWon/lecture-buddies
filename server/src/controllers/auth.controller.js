@@ -4,11 +4,13 @@ const LocalStrategy = require("passport-local");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
+const queries = require("../utils/queries");
+
 // Passport strategy for authentication with username and password
 passport.use(
     new LocalStrategy(async (username, password, cb) => {
         try {
-            const user = await db.oneOrNone("SELECT * FROM users WHERE username = $1", [username]);
+            const user = await db.oneOrNone(queries.users.getUser, [username]);
 
             if (!user) {
                 return cb(null, false); // authentication failure - username incorrect
@@ -59,10 +61,7 @@ const signup = async (req, res, next) => {
     try {
         const hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
         const token = jwt.sign({ username: username }, process.env.JWT_SECRET);
-        const user = await db.one(
-            "INSERT INTO users(username, password, salt, token) VALUES($1, $2, $3, $4) RETURNING user_id, token",
-            [username, hashedPassword, salt, token]
-        );
+        const user = await db.one(queries.users.createUser, [username, hashedPassword, salt, token]);
 
         req.login(user, (err) => {
             if (err) {
