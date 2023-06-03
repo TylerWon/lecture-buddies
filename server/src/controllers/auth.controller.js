@@ -66,13 +66,13 @@ const signup = async (req, res, next) => {
         hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
         token = jwt.sign({ username: username }, process.env.JWT_SECRET);
     } catch (err) {
-        next(err); // error when computing hashed password or token
+        return next(err); // error when computing hashed password or token
     }
 
     try {
         user = await db.one(queries.users.createUser, [username, hashedPassword, salt, token]);
     } catch (err) {
-        res.status(400).send("Username already exists");
+        return res.status(400).send("Username already exists");
     }
 
     req.login(user, (err) => {
