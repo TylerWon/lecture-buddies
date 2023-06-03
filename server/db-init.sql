@@ -50,7 +50,7 @@ CREATE TABLE users (
 	username VARCHAR(254) UNIQUE,
 	password BYTEA,
 	salt BYTEA,
-	token VARCHAR(100)
+	token VARCHAR(250)
 );
 
 CREATE TABLE students (

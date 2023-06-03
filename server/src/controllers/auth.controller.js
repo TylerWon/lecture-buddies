@@ -2,12 +2,13 @@ const db = require("../configs/db.config");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 
 // Passport strategy for authentication with username and password
 passport.use(
     new LocalStrategy(async (username, password, cb) => {
         try {
-            const user = await db.oneOrNone("SELECT * FROM users WHERE username = $1", username);
+            const user = await db.oneOrNone("SELECT * FROM users WHERE username = $1", [username]);
 
             if (!user) {
                 return cb(null, false); // authentication failure - username incorrect
@@ -50,8 +51,29 @@ const logout = (req, res, next) => {
     });
 };
 
-const signup = (req, res, next) => {
-    res.send("Not implemented");
+const signup = async (req, res, next) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    const salt = crypto.randomBytes(16);
+
+    try {
+        const hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
+        const token = jwt.sign({ username: username }, process.env.JWT_SECRET);
+        const user = await db.one(
+            "INSERT INTO users(username, password, salt, token) VALUES($1, $2, $3, $4) RETURNING user_id, token",
+            [username, hashedPassword, salt, token]
+        );
+
+        req.login(user, (err) => {
+            if (err) {
+                return next(err);
+            }
+
+            res.send("Sign up successful");
+        });
+    } catch (err) {
+        next(err);
+    }
 };
 
 module.exports = {
