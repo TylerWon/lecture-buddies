@@ -1,9 +1,9 @@
-const db = require("../configs/db.config");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
+const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
 // Passport strategy for authentication with username and password
@@ -11,7 +11,7 @@ passport.use(
     new LocalStrategy(async (username, password, cb) => {
         let hashedPassword;
 
-        const user = await db.oneOrNone(queries.users.getUser, [username]);
+        const user = await db.oneOrNone(queries.users.getUserByUsername, [username]);
         if (!user) {
             return cb(null, false); // authentication failure - username incorrect
         }
@@ -72,7 +72,7 @@ const signup = async (req, res, next) => {
     try {
         user = await db.one(queries.users.createUser, [username, hashedPassword, salt, token]);
     } catch (err) {
-        return res.status(400).send("Username already exists");
+        return res.status(400).send("An account with that username already exists");
     }
 
     req.login(user, (err) => {
