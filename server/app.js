@@ -8,6 +8,7 @@ const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 
 const authRouter = require("./src/routes/auth.route");
+const schoolRouter = require("./src/routes/school.route");
 
 // Express
 const app = express();
@@ -37,6 +38,7 @@ app.use(passport.session());
 
 // Routes
 app.use("/auth", authRouter);
+app.use("/schools", schoolRouter);
 app.get("/", (req, res) => res.send("Hello World!"));
 
 app.listen(port, () => console.log(`app listening on port ${port}`));
