@@ -18,7 +18,7 @@ const getSchools = async (req, res, next) => {
 };
 
 /**
- * Gets all subjects for a school
+ * Gets the subjects for a school
  *
  * @param {number} req.params.school_id - The school's ID
  *

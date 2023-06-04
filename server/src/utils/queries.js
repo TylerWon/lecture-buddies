@@ -7,6 +7,12 @@ const queries = {
         getSchools: "SELECT * FROM schools",
         getSubjectsForSchool: "SELECT * FROM subjects WHERE school_id = $1",
     },
+    subjects: {
+        getCoursesForSubject: "SELECT * FROM courses WHERE subject_id = $1",
+    },
+    courses: {
+        getSectionsForCourse: "SELECT * FROM sections WHERE course_id = $1",
+    },
 };
 
 module.exports = queries;

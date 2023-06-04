@@ -9,6 +9,8 @@ const pgSession = require("connect-pg-simple")(session);
 
 const authRouter = require("./src/routes/auth.route");
 const schoolRouter = require("./src/routes/school.route");
+const subjectRouter = require("./src/routes/subject.route");
+const courseRouter = require("./src/routes/course.route");
 
 // Express
 const app = express();
@@ -39,6 +41,8 @@ app.use(passport.session());
 // Routes
 app.use("/auth", authRouter);
 app.use("/schools", schoolRouter);
+app.use("/subjects", subjectRouter);
+app.use("/courses", courseRouter);
 app.get("/", (req, res) => res.send("Hello World!"));
 
 app.listen(port, () => console.log(`app listening on port ${port}`));
