@@ -43,9 +43,26 @@ passport.deserializeUser((user, cb) => {
     });
 });
 
-// Controllers
+/**
+ * Logs a user in
+ *
+ * @param {string} req.body.username - The user's email
+ * @param {string} req.body.password - The user's password
+ *
+ * @returns
+ * - 200 OK if login successful
+ * - 401 Unauthorized if login unsuccessful
+ * - 500 Internal Server Error if unexpected error
+ */
 const login = passport.authenticate("local", { successRedirect: "/" }); // TODO: redirect to /courses
 
+/**
+ * Logs a user out
+ *
+ * @returns
+ * - 200 OK if logout successful
+ * - 500 Internal Server Error if unexpected error
+ */
 const logout = (req, res, next) => {
     req.logout((err) => {
         if (err) {
@@ -56,6 +73,16 @@ const logout = (req, res, next) => {
     });
 };
 
+/**
+ * Registers a user
+ * @param {string} req.body.username - The user's email
+ * @param {string} req.body.password - The user's password
+ *
+ * @returns
+ * - 200 OK if sign up successful
+ * - 400 Bad Request if an account with the username already exists
+ * - 500 Internal Server Error if unexpected error
+ */
 const signup = async (req, res, next) => {
     let token, hashedPassword, user;
     const username = req.body.username;
