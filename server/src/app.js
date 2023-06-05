@@ -1,20 +1,18 @@
 require("dotenv").config();
 
-const db = require("./src/configs/db.config");
+const db = require("./configs/db.config");
 const express = require("express");
 const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 
-const authRouter = require("./src/routes/auth.route");
-const schoolRouter = require("./src/routes/school.route");
-const subjectRouter = require("./src/routes/subject.route");
-const courseRouter = require("./src/routes/course.route");
+const authRouter = require("./routes/auth.route");
+const schoolRouter = require("./routes/school.route");
+const subjectRouter = require("./routes/subject.route");
+const courseRouter = require("./routes/course.route");
 
-// Express
 const app = express();
-const port = 8000;
 
 // Middleware
 // logs requests
@@ -45,4 +43,4 @@ app.use("/subjects", subjectRouter);
 app.use("/courses", courseRouter);
 app.get("/", (req, res) => res.send("Hello World!"));
 
-app.listen(port, () => console.log(`app listening on port ${port}`));
+module.exports = app;
