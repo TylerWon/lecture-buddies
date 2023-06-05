@@ -8,6 +8,7 @@ describe("api tests", () => {
     let school;
     let subject;
     let course;
+    let section;
 
     beforeAll(async () => {
         school = await db.one(queries.schools.createSchool, ["University of British Columbia", "www.ubc.ca/logo.png"]);
@@ -17,12 +18,15 @@ describe("api tests", () => {
             "110",
             "Computation, Programs, and Programming",
         ]);
+        section = await db.one(queries.sections.createSection, [course.course_id, "001", "2023W1"]);
     });
 
     afterAll(async () => {
         await db.none(queries.schools.deleteSchool, [school.school_id]);
         await db.none(queries.subjects.deleteSubject, [subject.subject_id]);
         await db.none(queries.courses.deleteCourse, [course.course_id]);
+        await db.none(queries.sections.deleteSection, [section.section_id]);
+
         db.$pool.end();
     });
 
@@ -39,6 +43,21 @@ describe("api tests", () => {
         expect(response.body).toEqual(expectedBody);
     }
 
+    describe("course routes tests", () => {
+        describe("/courses/{course_id}/sections", () => {
+            test("GET - should return the sections for a course", async () => {
+                await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, 200, [
+                    {
+                        section_id: section.section_id,
+                        course_id: course.course_id,
+                        section_number: section.section_number,
+                        section_term: section.section_term,
+                    },
+                ]);
+            });
+        });
+    });
+
     describe("school routes tests", () => {
         describe("/schools", () => {
             test("GET - should return all schools", async () => {
@@ -53,7 +72,7 @@ describe("api tests", () => {
         });
 
         describe("/schools/{school_id}/subjects", () => {
-            test("GET - should return subjects for a school", async () => {
+            test("GET - should return the subjects for a school", async () => {
                 await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, 200, [
                     {
                         subject_id: subject.subject_id,
@@ -67,7 +86,7 @@ describe("api tests", () => {
 
     describe("subject routes tests", () => {
         describe("/subjects/{subject_id}/courses", () => {
-            test("GET - should return courses for a subject", async () => {
+            test("GET - should return the courses for a subject", async () => {
                 await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, 200, [
                     {
                         course_id: course.course_id,
