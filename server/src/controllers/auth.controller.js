@@ -81,12 +81,13 @@ const logout = (req, res, next) => {
             return next(err);
         }
 
-        res.send("Logout successful");
+        return res.json({ message: "Logout successful" });
     });
 };
 
 /**
  * Registers a user
+ *
  * @param {string} req.body.username - The user's email
  * @param {string} req.body.password - The user's password
  *
@@ -111,7 +112,7 @@ const signup = async (req, res, next) => {
     try {
         user = await db.one(queries.users.createUser, [username, hashedPassword, salt, token]);
     } catch (err) {
-        return res.status(400).send("An account with that username already exists");
+        return res.status(400).json({ message: "An account with that username already exists" });
     }
 
     req.login(user, (err) => {
@@ -119,7 +120,7 @@ const signup = async (req, res, next) => {
             return next(err);
         }
 
-        res.send("Sign up successful");
+        return res.json({ user_id: user.user_id, token: user.token });
     });
 };
 
