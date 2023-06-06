@@ -54,7 +54,19 @@ passport.deserializeUser((user, cb) => {
  * - 401 Unauthorized if login unsuccessful
  * - 500 Internal Server Error if unexpected error
  */
-const login = passport.authenticate("local", { successRedirect: "/" }); // TODO: redirect to /courses
+const login = passport.authenticate("local");
+
+/**
+ * Runs after a successful login. Sends information about the user who just logged in
+ *
+ * @returns 200 OK
+ */
+const afterLogin = (req, res, next) => {
+    return res.json({
+        user_id: req.user.user_id,
+        token: req.user.token,
+    });
+};
 
 /**
  * Logs a user out
@@ -113,6 +125,7 @@ const signup = async (req, res, next) => {
 
 module.exports = {
     login,
+    afterLogin,
     logout,
     signup,
 };
