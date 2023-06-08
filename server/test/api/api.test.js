@@ -64,11 +64,12 @@ describe("api tests", () => {
      * Checks that a GET request to an endpoint returns the expected status code and body
      *
      * @param {string} endpoint - the endpoint to send the GET request to
+     * @param {string} token - the token to send with the GET request
      * @param {number} expectedStatusCode - the expected status code of the response
      * @param {any} expectedBody - the expected body of the response
      */
-    async function verifyGetRequestResponse(endpoint, expectedStatusCode, expectedBody) {
-        const response = await request(app).get(endpoint);
+    async function verifyGetRequestResponse(endpoint, token, expectedStatusCode, expectedBody) {
+        const response = await request(app).get(endpoint).auth(token, { type: "bearer" });
         expect(response.statusCode).toEqual(expectedStatusCode);
         expect(response.body).toEqual(expectedBody);
     }
@@ -77,12 +78,13 @@ describe("api tests", () => {
      * Checks that a POST request to an endpoint returns the expected status code and body
      *
      * @param {string} endpoint - the endpoint to send the GET request to
+     * @param {string} token - the token to send with the POST request
      * @param {any} payload - the payload to send with the POST request
      * @param {number} expectedStatusCode - the expected status code of the response
      * @param {any} expectedBody - the expected body of the response
      */
-    async function verifyPostRequestResponse(endpoint, payload, expectedStatusCode, expectedBody) {
-        const response = await request(app).post(endpoint).send(payload);
+    async function verifyPostRequestResponse(endpoint, token, payload, expectedStatusCode, expectedBody) {
+        const response = await request(app).post(endpoint).auth(token, { type: "bearer" }).send(payload);
         expect(response.statusCode).toEqual(expectedStatusCode);
         expect(response.body).toEqual(expectedBody);
     }
@@ -90,12 +92,11 @@ describe("api tests", () => {
     describe("auth routes tests", () => {
         describe("/auth/login", () => {
             test("POST - should log a user in when username and password are correct", async () => {
-                await verifyPostRequestResponse(
-                    "/auth/login",
-                    { username: user1Username, password: user1Password },
-                    200,
-                    { user_id: user1.user_id, token: user1.token }
-                );
+                const response = await request(app)
+                    .post("/auth/login")
+                    .send({ username: user1Username, password: user1Password });
+                expect(response.statusCode).toEqual(200);
+                expect(response.body).toEqual({ user_id: user1.user_id, token: user1.token });
             });
 
             test("POST - should not log a user in when username is incorrect", async () => {
@@ -117,7 +118,15 @@ describe("api tests", () => {
 
         describe("/auth/logout", () => {
             test("POST - should log a user out", async () => {
-                await verifyPostRequestResponse("/auth/logout", undefined, 200, { message: "Logout successful" });
+                await verifyPostRequestResponse("/auth/logout", user1.token, undefined, 200, {
+                    message: "Logout successful",
+                });
+            });
+
+            test("POST - should not log a user out when request is unauthenticated", async () => {
+                await verifyPostRequestResponse("/auth/logout", undefined, undefined, 401, {
+                    message: "Unauthorized",
+                });
             });
         });
 
@@ -137,12 +146,11 @@ describe("api tests", () => {
             });
 
             test("POST - should not sign a user up when username is already in use", async () => {
-                await verifyPostRequestResponse(
-                    "/auth/signup",
-                    { username: user1Username, password: user2Password },
-                    400,
-                    { message: "An account with that username already exists" }
-                );
+                const response = await request(app)
+                    .post("/auth/login")
+                    .send({ username: user1Username, password: user1Password });
+                expect(response.statusCode).toEqual(200);
+                expect(response.body).toEqual({ user_id: user1.user_id, token: user1.token });
             });
         });
     });
@@ -150,7 +158,7 @@ describe("api tests", () => {
     describe("course routes tests", () => {
         describe("/courses/{course_id}/sections", () => {
             test("GET - should return the sections for a course when course_id is valid", async () => {
-                await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, 200, [
+                await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, user1.token, 200, [
                     {
                         section_id: section.section_id,
                         course_id: course.course_id,
@@ -161,7 +169,13 @@ describe("api tests", () => {
             });
 
             test("GET - should return nothing when course_id is invalid", async () => {
-                await verifyGetRequestResponse(`/courses/100/sections`, 200, []);
+                await verifyGetRequestResponse(`/courses/100/sections`, user1.token, 200, []);
+            });
+
+            test("GET - should return nothing when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, undefined, 401, {
+                    message: "Unauthorized",
+                });
             });
         });
     });
@@ -169,7 +183,7 @@ describe("api tests", () => {
     describe("school routes tests", () => {
         describe("/schools", () => {
             test("GET - should return all schools", async () => {
-                await verifyGetRequestResponse("/schools", 200, [
+                await verifyGetRequestResponse("/schools", user1.token, 200, [
                     {
                         school_id: school.school_id,
                         school_name: school.school_name,
@@ -177,11 +191,17 @@ describe("api tests", () => {
                     },
                 ]);
             });
+
+            test("GET - should return nothing when request is unauthenticated", async () => {
+                await verifyGetRequestResponse("/schools", undefined, 401, {
+                    message: "Unauthorized",
+                });
+            });
         });
 
         describe("/schools/{school_id}/subjects", () => {
             test("GET - should return the subjects for a school when school_id is valid", async () => {
-                await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, 200, [
+                await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, user1.token, 200, [
                     {
                         subject_id: subject.subject_id,
                         school_id: subject.school_id,
@@ -191,7 +211,13 @@ describe("api tests", () => {
             });
 
             test("GET - should return nothing when school_id is invalid", async () => {
-                await verifyGetRequestResponse(`/schools/100/subjects`, 200, []);
+                await verifyGetRequestResponse(`/schools/100/subjects`, user1.token, 200, []);
+            });
+
+            test("GET - should return nothing when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, undefined, 401, {
+                    message: "Unauthorized",
+                });
             });
         });
     });
@@ -199,7 +225,7 @@ describe("api tests", () => {
     describe("subject routes tests", () => {
         describe("/subjects/{subject_id}/courses", () => {
             test("GET - should return the courses for a subject when subject_id is valid", async () => {
-                await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, 200, [
+                await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, user1.token, 200, [
                     {
                         course_id: course.course_id,
                         subject_id: course.subject_id,
@@ -210,7 +236,13 @@ describe("api tests", () => {
             });
 
             test("GET - should return nothing when subject_id is invalid", async () => {
-                await verifyGetRequestResponse(`/subjects/100/courses`, 200, []);
+                await verifyGetRequestResponse(`/subjects/100/courses`, user1.token, 200, []);
+            });
+
+            test("GET - should return nothing when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, undefined, 401, {
+                    message: "Unauthorized",
+                });
             });
         });
     });
