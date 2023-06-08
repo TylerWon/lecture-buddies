@@ -50,9 +50,9 @@ passport.deserializeUser((user, cb) => {
  * @param {string} req.body.password - The user's password
  *
  * @returns
- * - 200 OK if login successful
  * - 401 Unauthorized if login unsuccessful
  * - 500 Internal Server Error if unexpected error
+ * - Otherwise, calls the next middleware function in the stack
  */
 const login = passport.authenticate("local");
 
