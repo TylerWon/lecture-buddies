@@ -77,7 +77,7 @@ describe("api tests", () => {
     }
 
     /**
-     * Checks that a POST request to an endpoint returns the expected status code and body
+     * Checks that a POST request to an endpoint that requires authentiation returns the expected status code and body
      *
      * @param {string} endpoint - the endpoint to send the GET request to
      * @param {string} token - the token to send with the POST request
@@ -85,34 +85,87 @@ describe("api tests", () => {
      * @param {number} expectedStatusCode - the expected status code of the response
      * @param {any} expectedBody - the expected body of the response
      */
-    async function verifyPostRequestResponse(endpoint, token, payload, expectedStatusCode, expectedBody) {
+    async function verifyPostRequestResponseWithAuth(endpoint, token, payload, expectedStatusCode, expectedBody) {
         const response = await request(app).post(endpoint).auth(token, { type: "bearer" }).send(payload);
+        expect(response.statusCode).toEqual(expectedStatusCode);
+        expect(response.body).toEqual(expectedBody);
+    }
+
+    /**
+     * Checks that a POST request to an endpoint returns the expected status code and body
+     *
+     * @param {string} endpoint - the endpoint to send the GET request to
+     * @param {any} payload - the payload to send with the POST request
+     * @param {number} expectedStatusCode - the expected status code of the response
+     * @param {any} expectedBody - the expected body of the response
+     */
+    async function verifyPostRequestResponseWithoutAuth(endpoint, payload, expectedStatusCode, expectedBody) {
+        const response = await request(app).post(endpoint).send(payload);
         expect(response.statusCode).toEqual(expectedStatusCode);
         expect(response.body).toEqual(expectedBody);
     }
 
     describe("auth routes tests", () => {
         describe("/auth/login", () => {
+            let payload;
+
+            beforeEach(() => {
+                payload = {
+                    username: user1Username,
+                    password: user1Password,
+                };
+            });
+
             test("POST - should log a user in when username and password are correct", async () => {
-                const response = await request(app)
-                    .post("/auth/login")
-                    .send({ username: user1Username, password: user1Password });
-                expect(response.statusCode).toEqual(200);
-                expect(response.body).toEqual({ user_id: user1.user_id, token: user1.token });
+                verifyPostRequestResponseWithoutAuth("/auth/login", payload, 200, {
+                    user_id: user1.user_id,
+                    token: user1.token,
+                });
+            });
+
+            test("POST - should not log a user in when missing some fields", async () => {
+                delete payload.username;
+
+                verifyPostRequestResponseWithoutAuth("/auth/login", payload, 400, {
+                    errors: [
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "username",
+                            message: "username is a required field",
+                        },
+                    ],
+                });
+            });
+
+            test("POST - should not log a user in when some fields are the wrong type", async () => {
+                payload.password = 12345678;
+
+                verifyPostRequestResponseWithoutAuth("/auth/login", payload, 400, {
+                    errors: [
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "password",
+                            value: payload.password,
+                            message: "password must be a string",
+                        },
+                    ],
+                });
             });
 
             test("POST - should not log a user in when username is incorrect", async () => {
-                const response = await request(app)
-                    .post("/auth/login")
-                    .send({ username: "test@test.com", password: user1Password });
+                payload.username = "test@test.com";
+
+                const response = await request(app).post("/auth/login").send(payload);
                 expect(response.statusCode).toEqual(401);
                 expect(response.text).toEqual("Unauthorized");
             });
 
             test("POST - should not log a user in when password is incorrect", async () => {
-                const response = await request(app)
-                    .post("/auth/login")
-                    .send({ username: user1Username, password: "abcdef" });
+                payload.password = "abcdef";
+
+                const response = await request(app).post("/auth/login").send(payload);
                 expect(response.statusCode).toEqual(401);
                 expect(response.text).toEqual("Unauthorized");
             });
@@ -120,39 +173,42 @@ describe("api tests", () => {
 
         describe("/auth/logout", () => {
             test("POST - should log a user out", async () => {
-                await verifyPostRequestResponse("/auth/logout", user1.token, undefined, 200, {
+                await verifyPostRequestResponseWithAuth("/auth/logout", user1.token, undefined, 200, {
                     message: "logout successful",
                 });
             });
 
             test("POST - should not log a user out when request is unauthenticated", async () => {
-                await verifyPostRequestResponse("/auth/logout", undefined, undefined, 401, {
+                await verifyPostRequestResponseWithAuth("/auth/logout", undefined, undefined, 401, {
                     message: "unauthorized",
                 });
             });
         });
 
         describe("/auth/signup", () => {
+            let payload;
+
+            beforeEach(() => {
+                payload = { username: user2Username, password: user2Password };
+            });
+
             test("POST - should sign a user up when username is not already in use", async () => {
-                let response = await request(app)
-                    .post("/auth/signup")
-                    .send({ username: user2Username, password: user2Password });
+                let response = await request(app).post("/auth/signup").send(payload);
                 expect(response.statusCode).toEqual(200);
 
-                response = await request(app)
-                    .post("/auth/login")
-                    .send({ username: user2Username, password: user2Password });
+                response = await request(app).post("/auth/login").send(payload);
                 expect(response.statusCode).toEqual(200);
 
                 user2 = response.body;
             });
 
             test("POST - should not sign a user up when username is already in use", async () => {
-                const response = await request(app)
-                    .post("/auth/login")
-                    .send({ username: user1Username, password: user1Password });
-                expect(response.statusCode).toEqual(200);
-                expect(response.body).toEqual({ user_id: user1.user_id, token: user1.token });
+                payload.username = user1Username;
+                payload.password = user1Password;
+
+                const response = await request(app).post("/auth/signup").send(payload);
+                expect(response.statusCode).toEqual(400);
+                expect(response.body).toEqual({ message: "an account with that username already exists" });
             });
         });
     });
@@ -313,7 +369,7 @@ describe("api tests", () => {
                 delete payload.last_name;
                 delete payload.profile_photo_url;
 
-                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     errors: [
                         {
                             type: "field",
@@ -335,7 +391,7 @@ describe("api tests", () => {
                 payload.first_name = true;
                 payload.year = 4;
 
-                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     errors: [
                         {
                             type: "field",
@@ -358,7 +414,7 @@ describe("api tests", () => {
             test("POST - should not create a student when user does not exist", async () => {
                 payload.student_id = 100;
 
-                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     message: `user with id '${payload.student_id}' does not exist`,
                 });
             });
@@ -366,7 +422,7 @@ describe("api tests", () => {
             test("POST - should not create a student when school does not exist", async () => {
                 payload.school_id = 100;
 
-                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     message: `school with id '${payload.school_id}' does not exist`,
                 });
             });
@@ -374,7 +430,7 @@ describe("api tests", () => {
             test("POST - should not create a student when missing some fields for an interest", async () => {
                 delete payload.interests[0].interest_name;
 
-                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     errors: [
                         {
                             type: "field",
@@ -389,7 +445,7 @@ describe("api tests", () => {
             test("POST - should not create a student when some fields for an interest are the wrong type", async () => {
                 payload.interests[0].interest_name = 123;
 
-                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     errors: [
                         {
                             type: "field",
@@ -405,7 +461,7 @@ describe("api tests", () => {
             test("POST - should not create a student when missing some fields for a social media", async () => {
                 delete payload.social_medias[0].url;
 
-                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     errors: [
                         {
                             type: "field",
@@ -420,7 +476,7 @@ describe("api tests", () => {
             test("POST - should not create a student when some fields for a social media are the wrong type", async () => {
                 payload.social_medias[0].platform = ["Instagram"];
 
-                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     errors: [
                         {
                             type: "field",
@@ -436,13 +492,13 @@ describe("api tests", () => {
             test("POST - should not create a student when a section does not exist", async () => {
                 payload.sections = [section.section_id, 100];
 
-                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     message: `section with id '${payload.sections[1]}' does not exist`,
                 });
             });
 
             test("POST - should not create a student when request is unauthenticated", async () => {
-                await verifyPostRequestResponse("/students", undefined, payload, 401, {
+                await verifyPostRequestResponseWithAuth("/students", undefined, payload, 401, {
                     message: "unauthorized",
                 });
             });

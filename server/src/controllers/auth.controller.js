@@ -50,6 +50,7 @@ passport.deserializeUser((user, cb) => {
  * @param {string} req.body.password - The user's password
  *
  * @returns
+ * - 400 Bad Request if missing or invalid body fields
  * - 401 Unauthorized if login unsuccessful
  * - 500 Internal Server Error if unexpected error
  * - Otherwise, calls the next middleware function in the stack
@@ -93,7 +94,7 @@ const logout = (req, res, next) => {
  *
  * @returns
  * - 200 OK if sign up successful
- * - 400 Bad Request if an account with the username already exists
+ * - 400 Bad Request if missing or invalid body fields or an account with the username already exists
  * - 500 Internal Server Error if unexpected error
  */
 const signup = async (req, res, next) => {
