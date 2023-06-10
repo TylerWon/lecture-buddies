@@ -81,7 +81,7 @@ const logout = (req, res, next) => {
             return next(err);
         }
 
-        return res.json({ message: "Logout successful" });
+        return res.json({ message: "logout successful" });
     });
 };
 
@@ -112,7 +112,7 @@ const signup = async (req, res, next) => {
     try {
         user = await db.one(queries.users.createUser, [username, hashedPassword, salt, token]);
     } catch (err) {
-        return res.status(400).json({ message: "An account with that username already exists" });
+        return res.status(400).json({ message: "an account with that username already exists" });
     }
 
     req.login(user, (err) => {

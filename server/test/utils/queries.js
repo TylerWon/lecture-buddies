@@ -15,6 +15,9 @@ const queries = {
         createSubject: "INSERT INTO subjects (school_id, subject_name) VALUES ($1, $2) RETURNING *",
         deleteSubject: "DELETE FROM subjects WHERE subject_id = $1",
     },
+    students: {
+        deleteStudent: "DELETE FROM students WHERE student_id = $1",
+    },
     users: {
         createUser: "INSERT INTO users (username, password, salt, token) VALUES ($1, $2, $3, $4) RETURNING *",
         deleteUser: "DELETE FROM users WHERE user_id = $1",

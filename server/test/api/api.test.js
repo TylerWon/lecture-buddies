@@ -11,6 +11,7 @@ const queries = require("../utils/queries");
 describe("api tests", () => {
     let user1;
     let user2;
+    let student;
     let school;
     let subject;
     let course;
@@ -40,6 +41,7 @@ describe("api tests", () => {
         await db.none(queries.subjects.deleteSubject, [subject.subject_id]);
         await db.none(queries.courses.deleteCourse, [course.course_id]);
         await db.none(queries.sections.deleteSection, [section.section_id]);
+        await db.none(queries.students.deleteStudent, [student.student_id]);
 
         db.$pool.end();
     });
@@ -119,13 +121,13 @@ describe("api tests", () => {
         describe("/auth/logout", () => {
             test("POST - should log a user out", async () => {
                 await verifyPostRequestResponse("/auth/logout", user1.token, undefined, 200, {
-                    message: "Logout successful",
+                    message: "logout successful",
                 });
             });
 
             test("POST - should not log a user out when request is unauthenticated", async () => {
                 await verifyPostRequestResponse("/auth/logout", undefined, undefined, 401, {
-                    message: "Unauthorized",
+                    message: "unauthorized",
                 });
             });
         });
@@ -157,7 +159,7 @@ describe("api tests", () => {
 
     describe("course routes tests", () => {
         describe("/courses/{course_id}/sections", () => {
-            test("GET - should return the sections for a course when course_id is valid", async () => {
+            test("GET - should return the sections for a course", async () => {
                 await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, user1.token, 200, [
                     {
                         section_id: section.section_id,
@@ -174,7 +176,7 @@ describe("api tests", () => {
 
             test("GET - should return nothing when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, undefined, 401, {
-                    message: "Unauthorized",
+                    message: "unauthorized",
                 });
             });
         });
@@ -194,13 +196,13 @@ describe("api tests", () => {
 
             test("GET - should return nothing when request is unauthenticated", async () => {
                 await verifyGetRequestResponse("/schools", undefined, 401, {
-                    message: "Unauthorized",
+                    message: "unauthorized",
                 });
             });
         });
 
         describe("/schools/{school_id}/subjects", () => {
-            test("GET - should return the subjects for a school when school_id is valid", async () => {
+            test("GET - should return the subjects for a school", async () => {
                 await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, user1.token, 200, [
                     {
                         subject_id: subject.subject_id,
@@ -216,7 +218,7 @@ describe("api tests", () => {
 
             test("GET - should return nothing when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, undefined, 401, {
-                    message: "Unauthorized",
+                    message: "unauthorized",
                 });
             });
         });
@@ -224,7 +226,7 @@ describe("api tests", () => {
 
     describe("subject routes tests", () => {
         describe("/subjects/{subject_id}/courses", () => {
-            test("GET - should return the courses for a subject when subject_id is valid", async () => {
+            test("GET - should return the courses for a subject", async () => {
                 await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, user1.token, 200, [
                     {
                         course_id: course.course_id,
@@ -241,7 +243,207 @@ describe("api tests", () => {
 
             test("GET - should return nothing when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, undefined, 401, {
-                    message: "Unauthorized",
+                    message: "unauthorized",
+                });
+            });
+        });
+    });
+
+    describe("student routes tests", () => {
+        describe("/students", () => {
+            let payload;
+
+            beforeEach(() => {
+                payload = {
+                    student_id: user1.user_id,
+                    first_name: "Tyler",
+                    last_name: "Won",
+                    school: school.school_id,
+                    year: "4",
+                    faculty: "Science",
+                    major: "Computer Science",
+                    bio: "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
+                    profile_photo_url: "www.tylerwon.com/profile_photo.jpg",
+                    interests: [
+                        {
+                            interest_name: "reading",
+                        },
+                    ],
+                    social_medias: [
+                        {
+                            platform: "LinkedIn",
+                            url: "www.linkedin.com/in/tyler-won/",
+                        },
+                    ],
+                    sections: [section.section_id],
+                };
+            });
+
+            test("POST - should create a student", async () => {
+                let response = await request(app).post("/students").auth(user1.token, { type: "bearer" }).send(payload);
+                student = response.body;
+                expect(response.statusCode).toEqual(201);
+                expect(student.student_id).toEqual(payload.user_id);
+                expect(student.first_name).toEqual(payload.first_name);
+                expect(student.last_name).toEqual(payload.last_name);
+                expect(student.school).toEqual(payload.school);
+                expect(student.year).toEqual(payload.year);
+                expect(student.faculty).toEqual(payload.faculty);
+                expect(student.major).toEqual(payload.major);
+                expect(student.bio).toEqual(payload.bio);
+                expect(student.profile_photo_url).toEqual(payload.profile_photo_url);
+
+                response = await request(app)
+                    .get(`/students/${user1.user_id}/interests`)
+                    .auth(user1.token, { type: "bearer" });
+                const interests = response.body;
+                expect(response.statusCode).toEqual(200);
+                expect(interests[0].interest_name).toEqual(payload.interests[0].interest_name);
+
+                response = await request(app)
+                    .get(`/students/${user1.user_id}/social-medias`)
+                    .auth(user1.token, { type: "bearer" });
+                const socialMedias = response.body;
+                expect(response.statusCode).toEqual(200);
+                expect(socialMedias[0].platform).toEqual(payload.social_medias[0].platform);
+                expect(socialMedias[0].url).toEqual(payload.social_medias[0].url);
+            });
+
+            test("POST - should not create a student when missing some student fields", async () => {
+                delete payload.last_name;
+                delete payload.profile_photo_url;
+
+                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                    errors: [
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "last_name",
+                            message: "last_name is a required field",
+                        },
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "profile_photo_url",
+                            message: "profile_photo_url is a required field",
+                        },
+                    ],
+                });
+            });
+
+            test("POST - should not create a student when some student fields are the wrong type", async () => {
+                payload.first_name = true;
+                payload.year = 4;
+
+                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                    errors: [
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "first_name",
+                            value: payload.first_name,
+                            message: "first_name must be a string",
+                        },
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "year",
+                            value: payload.year,
+                            message: "year must be a string",
+                        },
+                    ],
+                });
+            });
+
+            test("POST - should not create a student when user does not exist", async () => {
+                payload.student_id = 100;
+
+                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                    message: `user with id '${payload.student_id}' does not exist`,
+                });
+            });
+
+            test("POST - should not create a student when school does not exist", async () => {
+                payload.school_id = 100;
+
+                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                    message: `school with id '${payload.school_id}' does not exist`,
+                });
+            });
+
+            test("POST - should not create a student when missing some fields for an interest", async () => {
+                delete payload.interests[0].interest_name;
+
+                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                    errors: [
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "interests[0].interest_name",
+                            message: "interest_name is a required field",
+                        },
+                    ],
+                });
+            });
+
+            test("POST - should not create a student when some fields for an interest are the wrong type", async () => {
+                payload.interests[0].interest_name = 123;
+
+                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                    errors: [
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "interests[0].interest_name",
+                            value: payload.interests[0].interest_name,
+                            message: "interest_name must be a string",
+                        },
+                    ],
+                });
+            });
+
+            test("POST - should not create a student when missing some fields for a social media", async () => {
+                delete payload.social_medias[0].url;
+
+                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                    errors: [
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "social_medias[0].url",
+                            message: "url is a required field",
+                        },
+                    ],
+                });
+            });
+
+            test("POST - should not create a student when some fields for a social media are the wrong type", async () => {
+                payload.social_medias[0].platform = ["Instagram"];
+
+                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                    errors: [
+                        {
+                            type: "field",
+                            location: "body",
+                            path: "social_medias[0].platform",
+                            value: payload.social_medias[0].platform,
+                            message: "platform must be a string",
+                        },
+                    ],
+                });
+            });
+
+            test("POST - should not create a student when a section does not exist", async () => {
+                payload.sections = [section.section_id, 100];
+
+                await verifyPostRequestResponse("/students", user1.token, payload, 400, {
+                    message: `section with id '${payload.sections[1]}' does not exist`,
+                });
+            });
+
+            test("POST - should not create a student when request is unauthenticated", async () => {
+                await verifyPostRequestResponse("/students", undefined, payload, 401, {
+                    message: "unauthorized",
                 });
             });
         });
