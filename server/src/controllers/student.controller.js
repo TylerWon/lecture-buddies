@@ -2,7 +2,7 @@ const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
 /**
- * Creates a student
+ * Creates a student. Also creates any interests and social medias provided and associates them with the student
  *
  * @param {number} req.body.student_id - the id of the user associated with the student
  * @param {number} req.body.school_id - the id of the school the student attends
@@ -15,14 +15,16 @@ const queries = require("../utils/queries");
  * @param {string} req.body.bio - the student's bio
  * @param {object[]} req.body.interests - the student's interests
  * @param {object[]} req.body.social_medias - the student's social medias
- * @param {number[]} req.body.sections - the sections the student is enrolled in
+ * @param {number[]} req.body.sections - the id's of sections the student is enrolled in
  *
  * @returns
  * - 201 Created if successful
  * - 400 Bad Request if missing or invalid body fields
  * - 500 Internal Server Error if unexpected error
  */
-const createStudent = async (req, res, next) => {};
+const createStudent = async (req, res, next) => {
+    res.send("Not implemented");
+};
 
 /**
  * Gets a student
@@ -31,7 +33,9 @@ const createStudent = async (req, res, next) => {};
  * - 200 OK if successful
  * - 500 Internal Server Error if unexpected error
  */
-const getStudent = async (req, res, next) => {};
+const getStudent = async (req, res, next) => {
+    res.send("Not implemented");
+};
 
 /**
  * Gets the interests for a student
@@ -40,7 +44,9 @@ const getStudent = async (req, res, next) => {};
  * - 200 OK if successful
  * - 500 Internal Server Error if unexpected error
  */
-const getInterestsForStudent = async (req, res, next) => {};
+const getInterestsForStudent = async (req, res, next) => {
+    res.send("Not implemented");
+};
 
 /**
  * Gets the social medias for a student
@@ -49,25 +55,32 @@ const getInterestsForStudent = async (req, res, next) => {};
  * - 200 OK if successful
  * - 500 Internal Server Error if unexpected error
  */
-const getSocialMediasForStudent = async (req, res, next) => {};
+const getSocialMediasForStudent = async (req, res, next) => {
+    res.send("Not implemented");
+};
 
 /**
- * Gets the course history for a student
+ * Gets the course history for a student. The course history is all the courses a student has taken. Information about
+ * the subject, course, and section is included.
  *
- * @param {string} req.query.group_by - the field to group the response by (options: term)
- * @param {string} req.query.order_by - the field to order the response by (options: -dept, +dept)
+ * @param {string} req.query.group_by the field to group the response by (options: term)
+ * @param {string} req.query.order_by the field to order the response by (options: -dept, +dept)
  *
  * @returns
  * - 200 OK if successful
  * - 400 Bad Request if missing or invalid query paramaters
  * - 500 Internal Server Error if unexpected error
  */
-const getCourseHistoryForStudent = async (req, res, next) => {};
+const getCourseHistoryForStudent = async (req, res, next) => {
+    res.send("Not implemented");
+};
 
 /**
- * Gets the classmates for a student in a section
+ * Gets the classmates for a student in a section. Information about each classmate and their interests, social medias,
+ * and current/previous mutual/non-mutual courses with the student is included.
  *
- * @param {string} req.query.order_by - the field to order the response by (options: -mutual_courses, +mutual_courses, -name, +name, -year, +year, -major, +major)
+ * @param {string} req.query.order_by - the field to order the response by (options: -mutual_courses, +mutual_courses,
+ * -name, +name, -year, +year, -major, +major)
  * @param {string} req.query.offset - the position to start returning results from
  * @param {string} req.query.limit - the number of results to return
  *
@@ -76,10 +89,13 @@ const getCourseHistoryForStudent = async (req, res, next) => {};
  * - 400 Bad Request if missing or invalid query paramaters
  * - 500 Internal Server Error if unexpected error
  */
-const getClassmatesForStudentInSection = async (req, res, next) => {};
+const getClassmatesForStudentInSection = async (req, res, next) => {
+    res.send("Not implemented");
+};
 
 /**
- * Gets the buddies for a student
+ * Gets the buddies for a student. Information about each buddy and their interests, social medias, and
+ * current/previous mutual/non-mutual courses with the student is included.
  *
  * @param {string} req.query.order_by - the field to order the response by (options: -name, +name)
  * @param {string} req.query.offset - the position to start returning results from
@@ -90,10 +106,13 @@ const getClassmatesForStudentInSection = async (req, res, next) => {};
  * - 400 Bad Request if missing or invalid query paramaters
  * - 500 Internal Server Error if unexpected error
  */
-const getBuddiesForStudent = async (req, res, next) => {};
+const getBuddiesForStudent = async (req, res, next) => {
+    res.send("Not implemented");
+};
 
 /**
- * Gets the buddy requests for a student
+ * Gets the buddy requests for a student. Information about each requestor and their interests, social medias, and
+ * current/previous mutual/non-mutual courses with the student is included.
  *
  * @param {string} req.query.order_by - the field to order the response by (options: -name, +name)
  * @param {string} req.query.offset - the position to start returning results from
@@ -104,10 +123,13 @@ const getBuddiesForStudent = async (req, res, next) => {};
  * - 400 Bad Request if missing or invalid query paramaters
  * - 500 Internal Server Error if unexpected error
  */
-const getBuddyRequestsForStudent = async (req, res, next) => {};
+const getBuddyRequestsForStudent = async (req, res, next) => {
+    res.send("Not implemented");
+};
 
 /**
- * Gets the conversation history for a student
+ * Gets the conversation history for a student. The conversation history is all the conversations a student has had.
+ * Information about the conversation and messages is included.
  *
  * @param {string} req.query.order_by - the field to order the response by (options: -date, +date)
  * @param {string} req.query.offset - the position to start returning results from
@@ -118,7 +140,9 @@ const getBuddyRequestsForStudent = async (req, res, next) => {};
  * - 400 Bad Request if missing or invalid query paramaters
  * - 500 Internal Server Error if unexpected error
  */
-const getConversationHistoryForStudent = async (req, res, next) => {};
+const getConversationHistoryForStudent = async (req, res, next) => {
+    res.send("Not implemented");
+};
 
 module.exports = {
     createStudent,
