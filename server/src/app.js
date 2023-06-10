@@ -8,9 +8,10 @@ const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 
 const authRouter = require("./routes/auth.route");
+const courseRouter = require("./routes/course.route");
 const schoolRouter = require("./routes/school.route");
 const subjectRouter = require("./routes/subject.route");
-const courseRouter = require("./routes/course.route");
+const studentRouter = requires("./routes/student.route");
 
 const app = express();
 
@@ -38,9 +39,10 @@ app.use(passport.session());
 
 // Routes
 app.use("/auth", authRouter);
+app.use("/courses", courseRouter);
 app.use("/schools", schoolRouter);
 app.use("/subjects", subjectRouter);
-app.use("/courses", courseRouter);
+app.use("/students", studentRouter);
 app.get("/", (req, res) => res.send("Hello World!"));
 
 module.exports = app;
