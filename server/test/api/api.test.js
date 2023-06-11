@@ -116,7 +116,7 @@ describe("api tests", () => {
                 };
             });
 
-            test("POST - should log a user in when username and password are correct", async () => {
+            test("POST - should log a user in", async () => {
                 verifyPostRequestResponseWithoutAuth("/auth/login", payload, 200, {
                     user_id: user1.user_id,
                     token: user1.token,
@@ -126,32 +126,28 @@ describe("api tests", () => {
             test("POST - should not log a user in when missing some fields", async () => {
                 delete payload.username;
 
-                verifyPostRequestResponseWithoutAuth("/auth/login", payload, 400, {
-                    errors: [
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "username",
-                            message: "username is a required field",
-                        },
-                    ],
-                });
+                await verifyPostRequestResponseWithoutAuth("/auth/login", payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "username",
+                        msg: "username is required",
+                    },
+                ]);
             });
 
             test("POST - should not log a user in when some fields are the wrong type", async () => {
                 payload.password = 12345678;
 
-                verifyPostRequestResponseWithoutAuth("/auth/login", payload, 400, {
-                    errors: [
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "password",
-                            value: payload.password,
-                            message: "password must be a string",
-                        },
-                    ],
-                });
+                await verifyPostRequestResponseWithoutAuth("/auth/login", payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "password",
+                        value: payload.password,
+                        msg: "password must be a string",
+                    },
+                ]);
             });
 
             test("POST - should not log a user in when username is incorrect", async () => {
@@ -192,7 +188,7 @@ describe("api tests", () => {
                 payload = { username: user2Username, password: user2Password };
             });
 
-            test("POST - should sign a user up when username is not already in use", async () => {
+            test("POST - should sign a user up", async () => {
                 let response = await request(app).post("/auth/signup").send(payload);
                 expect(response.statusCode).toEqual(200);
 
@@ -200,6 +196,33 @@ describe("api tests", () => {
                 expect(response.statusCode).toEqual(200);
 
                 user2 = response.body;
+            });
+
+            test("POST - should not sign a user up when missing some fields", async () => {
+                delete payload.username;
+
+                await verifyPostRequestResponseWithoutAuth("/auth/signup", payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "username",
+                        msg: "username is required",
+                    },
+                ]);
+            });
+
+            test("POST - should not sign a user up when some fields are the wrong type", async () => {
+                payload.password = 12345678;
+
+                await verifyPostRequestResponseWithoutAuth("/auth/signup", payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "password",
+                        value: payload.password,
+                        msg: "password must be a string",
+                    },
+                ]);
             });
 
             test("POST - should not sign a user up when username is already in use", async () => {
