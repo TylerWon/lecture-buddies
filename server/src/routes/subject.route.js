@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const subjectController = require("../controllers/subject.controller");
-const authUtils = require("../utils/auth");
+const authMiddleware = require("../middlewares/auth.middleware");
 
-router.get("/:subject_id(\\d+)/courses", authUtils.authenticateRequest, subjectController.getCoursesForSubject);
+router.get("/:subject_id(\\d+)/courses", authMiddleware.authenticateRequest, subjectController.getCoursesForSubject);
 
 module.exports = router;

@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const schoolController = require("../controllers/school.controller");
-const authUtils = require("../utils/auth");
+const authMiddleware = require("../middlewares/auth.middleware");
 
-router.get("/", authUtils.authenticateRequest, schoolController.getSchools);
-router.get("/:school_id(\\d+)/subjects", authUtils.authenticateRequest, schoolController.getSubjectsForSchool);
+router.get("/", authMiddleware.authenticateRequest, schoolController.getSchools);
+router.get("/:school_id(\\d+)/subjects", authMiddleware.authenticateRequest, schoolController.getSubjectsForSchool);
 
 module.exports = router;

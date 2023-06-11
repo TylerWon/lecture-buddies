@@ -3,8 +3,8 @@ const { checkSchema } = require("express-validator");
 const router = express.Router();
 
 const authController = require("../controllers/auth.controller");
-const authUtils = require("../utils/auth");
-const validationUtils = require("../utils/validation");
+const authMiddleware = require("../middlewares/auth.middleware");
+const validationMiddleware = require("../middlewares/validation.middleware");
 
 // express-validator schema for validating request
 const authValidationSchema = () =>
@@ -32,11 +32,11 @@ const authValidationSchema = () =>
 router.post(
     "/login",
     authValidationSchema(),
-    validationUtils.validateRequest,
+    validationMiddleware.validateRequest,
     authController.login,
     authController.afterLogin
 );
-router.post("/logout", authUtils.authenticateRequest, authController.logout);
-router.post("/signup", authValidationSchema(), validationUtils.validateRequest, authController.signup);
+router.post("/logout", authMiddleware.authenticateRequest, authController.logout);
+router.post("/signup", authValidationSchema(), validationMiddleware.validateRequest, authController.signup);
 
 module.exports = router;

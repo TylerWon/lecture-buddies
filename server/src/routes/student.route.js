@@ -2,35 +2,39 @@ const express = require("express");
 const router = express.Router();
 
 const studentController = require("../controllers/student.controller");
-const authUtils = require("../utils/auth");
+const authMiddleware = require("../middlewares/auth.middleware");
 
-router.post("/", authUtils.authenticateRequest, studentController.createStudent);
-router.get("/:student_id(\\d+)", authUtils.authenticateRequest, studentController.getStudent);
-router.get("/:student_id(\\d+)/interests", authUtils.authenticateRequest, studentController.getInterestsForStudent);
+router.post("/", authMiddleware.authenticateRequest, studentController.createStudent);
+router.get("/:student_id(\\d+)", authMiddleware.authenticateRequest, studentController.getStudent);
+router.get(
+    "/:student_id(\\d+)/interests",
+    authMiddleware.authenticateRequest,
+    studentController.getInterestsForStudent
+);
 router.get(
     "/:student_id(\\d+)/social-medias",
-    authUtils.authenticateRequest,
+    authMiddleware.authenticateRequest,
     studentController.getSocialMediasForStudent
 );
 router.get(
     "/:student_id(\\d+)/course-history",
-    authUtils.authenticateRequest,
+    authMiddleware.authenticateRequest,
     studentController.getCourseHistoryForStudent
 );
 router.get(
     "/:student_id(\\d+)/sections/:section_id(\\d+)/classmates",
-    authUtils.authenticateRequest,
+    authMiddleware.authenticateRequest,
     studentController.getClassmatesForStudentInSection
 );
-router.get("/:student_id(\\d+)/buddies", authUtils.authenticateRequest, studentController.getBuddiesForStudent);
+router.get("/:student_id(\\d+)/buddies", authMiddleware.authenticateRequest, studentController.getBuddiesForStudent);
 router.get(
     "/:student_id(\\d+)/buddy-requests",
-    authUtils.authenticateRequest,
+    authMiddleware.authenticateRequest,
     studentController.getBuddyRequestsForStudent
 );
 router.get(
     "/:student_id(\\d+)/conversation-history",
-    authUtils.authenticateRequest,
+    authMiddleware.authenticateRequest,
     studentController.getConversationHistoryForStudent
 );
 
