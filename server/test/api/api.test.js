@@ -335,6 +335,7 @@ describe("api tests", () => {
             beforeEach(() => {
                 payload = {
                     student_id: user1.user_id,
+                    school_id: school.school_id,
                     first_name: "Tyler",
                     last_name: "Won",
                     school: school.school_id,
@@ -392,46 +393,42 @@ describe("api tests", () => {
                 delete payload.last_name;
                 delete payload.profile_photo_url;
 
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
-                    errors: [
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "last_name",
-                            message: "last_name is a required field",
-                        },
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "profile_photo_url",
-                            message: "profile_photo_url is a required field",
-                        },
-                    ],
-                });
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "last_name",
+                        msg: "last_name is required",
+                    },
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "profile_photo_url",
+                        msg: "profile_photo_url is required",
+                    },
+                ]);
             });
 
             test("POST - should not create a student when some student fields are the wrong type", async () => {
                 payload.first_name = true;
                 payload.year = 4;
 
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
-                    errors: [
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "first_name",
-                            value: payload.first_name,
-                            message: "first_name must be a string",
-                        },
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "year",
-                            value: payload.year,
-                            message: "year must be a string",
-                        },
-                    ],
-                });
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "first_name",
+                        value: payload.first_name,
+                        msg: "first_name must be a string",
+                    },
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "year",
+                        value: payload.year,
+                        msg: "year must be a string",
+                    },
+                ]);
             });
 
             test("POST - should not create a student when user does not exist", async () => {
@@ -453,63 +450,55 @@ describe("api tests", () => {
             test("POST - should not create a student when missing some fields for an interest", async () => {
                 delete payload.interests[0].interest_name;
 
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
-                    errors: [
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "interests[0].interest_name",
-                            message: "interest_name is a required field",
-                        },
-                    ],
-                });
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "interests[0].interest_name",
+                        msg: "interest_name is required",
+                    },
+                ]);
             });
 
             test("POST - should not create a student when some fields for an interest are the wrong type", async () => {
                 payload.interests[0].interest_name = 123;
 
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
-                    errors: [
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "interests[0].interest_name",
-                            value: payload.interests[0].interest_name,
-                            message: "interest_name must be a string",
-                        },
-                    ],
-                });
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "interests[0].interest_name",
+                        value: payload.interests[0].interest_name,
+                        msg: "interest_name must be a string",
+                    },
+                ]);
             });
 
             test("POST - should not create a student when missing some fields for a social media", async () => {
                 delete payload.social_medias[0].url;
 
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
-                    errors: [
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "social_medias[0].url",
-                            message: "url is a required field",
-                        },
-                    ],
-                });
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "social_medias[0].url",
+                        msg: "url is required",
+                    },
+                ]);
             });
 
             test("POST - should not create a student when some fields for a social media are the wrong type", async () => {
                 payload.social_medias[0].platform = ["Instagram"];
 
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
-                    errors: [
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "social_medias[0].platform",
-                            value: payload.social_medias[0].platform,
-                            message: "platform must be a string",
-                        },
-                    ],
-                });
+                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "social_medias[0].platform",
+                        value: payload.social_medias[0].platform,
+                        msg: "platform must be a string",
+                    },
+                ]);
             });
 
             test("POST - should not create a student when a section does not exist", async () => {
