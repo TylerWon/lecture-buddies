@@ -11,7 +11,7 @@ const queries = require("../utils/queries");
  * @param {string} req.body.year - the student's year of schooling
  * @param {string} req.body.faculty - the student's faculty
  * @param {string} req.body.major - the student's major
- * @param {string} req.body.profil_photo_url - the url of the student's profile photo
+ * @param {string} req.body.profile_photo_url - the url of the student's profile photo
  * @param {string} req.body.bio - the student's bio
  * @param {object[]} req.body.interests - the student's interests
  * @param {object[]} req.body.social_medias - the student's social medias
