@@ -69,7 +69,14 @@ const createStudent = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const getStudent = async (req, res, next) => {
-    res.send("Not implemented");
+    const studentId = req.params.student_id;
+
+    try {
+        const student = await db.one(queries.students.getStudent, [studentId]);
+        return res.json(student);
+    } catch (err) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
 };
 
 /**
