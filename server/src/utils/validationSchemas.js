@@ -98,59 +98,6 @@ const createStudentValidationSchema = () =>
                     errorMessage: "bio must be a string",
                 },
             },
-            interests: {
-                exists: {
-                    errorMessage: "interests is required",
-                },
-                isArray: {
-                    errorMessage: "interests must be an array",
-                },
-            },
-            "interests.*.interest_name": {
-                exists: {
-                    errorMessage: "interest_name is required",
-                },
-                isString: {
-                    errorMessage: "interest_name must be a string",
-                },
-            },
-            social_medias: {
-                exists: {
-                    errorMessage: "social_medias is required",
-                },
-                isArray: {
-                    errorMessage: "social_medias must be an array",
-                },
-            },
-            "social_medias.*.platform": {
-                exists: {
-                    errorMessage: "platform is required",
-                },
-                isString: {
-                    errorMessage: "platform must be a string",
-                },
-            },
-            "social_medias.*.url": {
-                exists: {
-                    errorMessage: "url is required",
-                },
-                isString: {
-                    errorMessage: "url must be a string",
-                },
-            },
-            sections: {
-                exists: {
-                    errorMessage: "sections is required",
-                },
-                isArray: {
-                    errorMessage: "sections must be an array",
-                },
-            },
-            "sections.*": {
-                isInt: {
-                    errorMessage: "id must be an integer",
-                },
-            },
         },
         ["body"]
     );

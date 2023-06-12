@@ -1,8 +1,10 @@
+const { matchedData } = require("express-validator");
+
 const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
 /**
- * Creates a student. Also creates any interests and social medias provided and associates them with the student
+ * Creates a student
  *
  * @param {number} req.body.student_id - the id of the user associated with the student
  * @param {number} req.body.school_id - the id of the school the student attends
@@ -13,9 +15,6 @@ const queries = require("../utils/queries");
  * @param {string} req.body.major - the student's major
  * @param {string} req.body.profile_photo_url - the url of the student's profile photo
  * @param {string} req.body.bio - the student's bio
- * @param {object[]} req.body.interests - the student's interests
- * @param {object[]} req.body.social_medias - the student's social medias
- * @param {number[]} req.body.sections - the id's of sections the student is enrolled in
  *
  * @returns
  * - 201 Created if successful

@@ -69,11 +69,14 @@ describe("api tests", () => {
      * @param {string} token - the token to send with the GET request
      * @param {number} expectedStatusCode - the expected status code of the response
      * @param {any} expectedBody - the expected body of the response
+     *
+     * @returns {object} the response
      */
     async function verifyGetRequestResponse(endpoint, token, expectedStatusCode, expectedBody) {
         const response = await request(app).get(endpoint).auth(token, { type: "bearer" });
         expect(response.statusCode).toEqual(expectedStatusCode);
         expect(response.body).toEqual(expectedBody);
+        return response;
     }
 
     /**
@@ -84,11 +87,14 @@ describe("api tests", () => {
      * @param {any} payload - the payload to send with the POST request
      * @param {number} expectedStatusCode - the expected status code of the response
      * @param {any} expectedBody - the expected body of the response
+     *
+     * @returns {object} the response
      */
     async function verifyPostRequestResponseWithAuth(endpoint, token, payload, expectedStatusCode, expectedBody) {
         const response = await request(app).post(endpoint).auth(token, { type: "bearer" }).send(payload);
         expect(response.statusCode).toEqual(expectedStatusCode);
         expect(response.body).toEqual(expectedBody);
+        return response;
     }
 
     /**
@@ -98,11 +104,14 @@ describe("api tests", () => {
      * @param {any} payload - the payload to send with the POST request
      * @param {number} expectedStatusCode - the expected status code of the response
      * @param {any} expectedBody - the expected body of the response
+     *
+     * @returns {object} the response
      */
     async function verifyPostRequestResponseWithoutAuth(endpoint, payload, expectedStatusCode, expectedBody) {
         const response = await request(app).post(endpoint).send(payload);
         expect(response.statusCode).toEqual(expectedStatusCode);
         expect(response.body).toEqual(expectedBody);
+        return response;
     }
 
     describe("auth routes tests", () => {
@@ -338,58 +347,26 @@ describe("api tests", () => {
                     school_id: school.school_id,
                     first_name: "Tyler",
                     last_name: "Won",
-                    school: school.school_id,
                     year: "4",
                     faculty: "Science",
                     major: "Computer Science",
-                    bio: "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
                     profile_photo_url: "www.tylerwon.com/profile_photo.jpg",
-                    interests: [
-                        {
-                            interest_name: "reading",
-                        },
-                    ],
-                    social_medias: [
-                        {
-                            platform: "LinkedIn",
-                            url: "www.linkedin.com/in/tyler-won/",
-                        },
-                    ],
-                    sections: [section.section_id],
+                    bio: "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
                 };
             });
 
             test("POST - should create a student", async () => {
-                let response = await request(app).post("/students").auth(user1.token, { type: "bearer" }).send(payload);
+                const response = await verifyPostRequestResponseWithAuth(
+                    "/students",
+                    user1.token,
+                    payload,
+                    201,
+                    payload
+                );
                 student = response.body;
-                expect(response.statusCode).toEqual(201);
-                expect(student.student_id).toEqual(payload.user_id);
-                expect(student.first_name).toEqual(payload.first_name);
-                expect(student.last_name).toEqual(payload.last_name);
-                expect(student.school).toEqual(payload.school);
-                expect(student.year).toEqual(payload.year);
-                expect(student.faculty).toEqual(payload.faculty);
-                expect(student.major).toEqual(payload.major);
-                expect(student.bio).toEqual(payload.bio);
-                expect(student.profile_photo_url).toEqual(payload.profile_photo_url);
-
-                response = await request(app)
-                    .get(`/students/${user1.user_id}/interests`)
-                    .auth(user1.token, { type: "bearer" });
-                const interests = response.body;
-                expect(response.statusCode).toEqual(200);
-                expect(interests[0].interest_name).toEqual(payload.interests[0].interest_name);
-
-                response = await request(app)
-                    .get(`/students/${user1.user_id}/social-medias`)
-                    .auth(user1.token, { type: "bearer" });
-                const socialMedias = response.body;
-                expect(response.statusCode).toEqual(200);
-                expect(socialMedias[0].platform).toEqual(payload.social_medias[0].platform);
-                expect(socialMedias[0].url).toEqual(payload.social_medias[0].url);
             });
 
-            test("POST - should not create a student when missing some student fields", async () => {
+            test("POST - should not create a student when missing some fields", async () => {
                 delete payload.last_name;
                 delete payload.profile_photo_url;
 
@@ -409,7 +386,7 @@ describe("api tests", () => {
                 ]);
             });
 
-            test("POST - should not create a student when some student fields are the wrong type", async () => {
+            test("POST - should not create a student when some fields are the wrong type", async () => {
                 payload.first_name = true;
                 payload.year = 4;
 
@@ -444,68 +421,6 @@ describe("api tests", () => {
 
                 await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     message: `school with id '${payload.school_id}' does not exist`,
-                });
-            });
-
-            test("POST - should not create a student when missing some fields for an interest", async () => {
-                delete payload.interests[0].interest_name;
-
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "interests[0].interest_name",
-                        msg: "interest_name is required",
-                    },
-                ]);
-            });
-
-            test("POST - should not create a student when some fields for an interest are the wrong type", async () => {
-                payload.interests[0].interest_name = 123;
-
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "interests[0].interest_name",
-                        value: payload.interests[0].interest_name,
-                        msg: "interest_name must be a string",
-                    },
-                ]);
-            });
-
-            test("POST - should not create a student when missing some fields for a social media", async () => {
-                delete payload.social_medias[0].url;
-
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "social_medias[0].url",
-                        msg: "url is required",
-                    },
-                ]);
-            });
-
-            test("POST - should not create a student when some fields for a social media are the wrong type", async () => {
-                payload.social_medias[0].platform = ["Instagram"];
-
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, [
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "social_medias[0].platform",
-                        value: payload.social_medias[0].platform,
-                        msg: "platform must be a string",
-                    },
-                ]);
-            });
-
-            test("POST - should not create a student when a section does not exist", async () => {
-                payload.sections = [section.section_id, 100];
-
-                await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
-                    message: `section with id '${payload.sections[1]}' does not exist`,
                 });
             });
 
