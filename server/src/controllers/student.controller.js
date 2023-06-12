@@ -22,7 +22,43 @@ const queries = require("../utils/queries");
  * - 500 Internal Server Error if unexpected error
  */
 const createStudent = async (req, res, next) => {
-    res.send("Not implemented");
+    const payload = matchedData(req);
+
+    // Check if user exists
+    try {
+        await db.one(queries.users.getUser, [payload.student_id]);
+    } catch (err) {
+        return res.status(400).json({
+            message: `user with id '${payload.student_id}' does not exist`,
+        });
+    }
+
+    // Check if school exists
+    try {
+        await db.one(queries.schools.getSchool, [payload.school_id]);
+    } catch (err) {
+        return res.status(400).json({
+            message: `school with id '${payload.school_id}' does not exist`,
+        });
+    }
+
+    // Create student
+    try {
+        const student = await db.one(queries.students.createStudent, [
+            payload.student_id,
+            payload.school_id,
+            payload.first_name,
+            payload.last_name,
+            payload.year,
+            payload.faculty,
+            payload.major,
+            payload.profile_photo_url,
+            payload.bio,
+        ]);
+        return res.status(201).json(student);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 /**
