@@ -11,7 +11,9 @@ const queries = require("../utils/queries");
 describe("api tests", () => {
     let user1;
     let user2;
-    let student;
+    let user3;
+    let student1;
+    let student2;
     let school;
     let subject;
     let course;
@@ -21,9 +23,12 @@ describe("api tests", () => {
     const user1Password = "password1";
     const user2Username = "won.tyler2@gmail.com";
     const user2Password = "password2";
+    const user3Username = "won.tyler3@gmail.com";
+    const user3Password = "password3";
 
     beforeAll(async () => {
         user1 = await createUser(user1Username, user1Password);
+        user2 = await createUser(user2Username, user2Password);
         school = await db.one(queries.schools.createSchool, ["University of British Columbia", "www.ubc.ca/logo.png"]);
         subject = await db.one(queries.subjects.createSubject, [school.school_id, "CPSC"]);
         course = await db.one(queries.courses.createCourse, [
@@ -32,16 +37,29 @@ describe("api tests", () => {
             "Computation, Programs, and Programming",
         ]);
         section = await db.one(queries.sections.createSection, [course.course_id, "001", "2023W1"]);
+        student1 = await db.one(queries.students.createStudent, [
+            user1.user_id,
+            school.school_id,
+            "Tyler",
+            "Won",
+            "4",
+            "Science",
+            "Computer Science",
+            "www.tylerwon.com/profile_photo.jpg",
+            "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
+        ]);
     });
 
     afterAll(async () => {
         await db.none(queries.users.deleteUser, [user1.user_id]);
         await db.none(queries.users.deleteUser, [user2.user_id]);
+        await db.none(queries.users.deleteUser, [user3.user_id]);
         await db.none(queries.schools.deleteSchool, [school.school_id]);
         await db.none(queries.subjects.deleteSubject, [subject.subject_id]);
         await db.none(queries.courses.deleteCourse, [course.course_id]);
         await db.none(queries.sections.deleteSection, [section.section_id]);
-        await db.none(queries.students.deleteStudent, [student.student_id]);
+        await db.none(queries.students.deleteStudent, [student1.student_id]);
+        await db.none(queries.students.deleteStudent, [student2.student_id]);
 
         db.$pool.end();
     });
@@ -194,7 +212,7 @@ describe("api tests", () => {
             let payload;
 
             beforeEach(() => {
-                payload = { username: user2Username, password: user2Password };
+                payload = { username: user3Username, password: user3Password };
             });
 
             test("POST - should sign a user up", async () => {
@@ -204,7 +222,7 @@ describe("api tests", () => {
                 response = await request(app).post("/auth/login").send(payload);
                 expect(response.statusCode).toEqual(200);
 
-                user2 = response.body;
+                user3 = response.body;
             });
 
             test("POST - should not sign a user up when missing some fields", async () => {
@@ -248,17 +266,10 @@ describe("api tests", () => {
     describe("course routes tests", () => {
         describe("/courses/{course_id}/sections", () => {
             test("GET - should return the sections for a course", async () => {
-                await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, user1.token, 200, [
-                    {
-                        section_id: section.section_id,
-                        course_id: course.course_id,
-                        section_number: section.section_number,
-                        section_term: section.section_term,
-                    },
-                ]);
+                await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, user1.token, 200, [section]);
             });
 
-            test("GET - should return nothing when course_id is invalid", async () => {
+            test("GET - should return nothing when course_id does not correspond to a course", async () => {
                 await verifyGetRequestResponse(`/courses/100/sections`, user1.token, 200, []);
             });
 
@@ -273,13 +284,7 @@ describe("api tests", () => {
     describe("school routes tests", () => {
         describe("/schools", () => {
             test("GET - should return all schools", async () => {
-                await verifyGetRequestResponse("/schools", user1.token, 200, [
-                    {
-                        school_id: school.school_id,
-                        school_name: school.school_name,
-                        logo_url: school.logo_url,
-                    },
-                ]);
+                await verifyGetRequestResponse("/schools", user1.token, 200, [school]);
             });
 
             test("GET - should return nothing when request is unauthenticated", async () => {
@@ -291,16 +296,10 @@ describe("api tests", () => {
 
         describe("/schools/{school_id}/subjects", () => {
             test("GET - should return the subjects for a school", async () => {
-                await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, user1.token, 200, [
-                    {
-                        subject_id: subject.subject_id,
-                        school_id: subject.school_id,
-                        subject_name: subject.subject_name,
-                    },
-                ]);
+                await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, user1.token, 200, [subject]);
             });
 
-            test("GET - should return nothing when school_id is invalid", async () => {
+            test("GET - should return nothing when school_id does not correspond to a school", async () => {
                 await verifyGetRequestResponse(`/schools/100/subjects`, user1.token, 200, []);
             });
 
@@ -315,17 +314,10 @@ describe("api tests", () => {
     describe("subject routes tests", () => {
         describe("/subjects/{subject_id}/courses", () => {
             test("GET - should return the courses for a subject", async () => {
-                await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, user1.token, 200, [
-                    {
-                        course_id: course.course_id,
-                        subject_id: course.subject_id,
-                        course_number: course.course_number,
-                        course_name: course.course_name,
-                    },
-                ]);
+                await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, user1.token, 200, [course]);
             });
 
-            test("GET - should return nothing when subject_id is invalid", async () => {
+            test("GET - should return nothing when subject_id does not correspond to a subject", async () => {
                 await verifyGetRequestResponse(`/subjects/100/courses`, user1.token, 200, []);
             });
 
@@ -343,15 +335,15 @@ describe("api tests", () => {
 
             beforeEach(() => {
                 payload = {
-                    student_id: user1.user_id,
+                    student_id: user2.user_id,
                     school_id: school.school_id,
-                    first_name: "Tyler",
+                    first_name: "Connor",
                     last_name: "Won",
-                    year: "4",
+                    year: "3",
                     faculty: "Science",
                     major: "Computer Science",
-                    profile_photo_url: "www.tylerwon.com/profile_photo.jpg",
-                    bio: "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
+                    profile_photo_url: "www.connorwon.com/profile_photo.jpg",
+                    bio: "Hello. I'm Connor. I'm a 3rd year computer science student at UBC.",
                 };
             });
 
@@ -363,7 +355,7 @@ describe("api tests", () => {
                     201,
                     payload
                 );
-                student = response.body;
+                student2 = response.body;
             });
 
             test("POST - should not create a student when missing some fields", async () => {
@@ -426,6 +418,22 @@ describe("api tests", () => {
 
             test("POST - should not create a student when request is unauthenticated", async () => {
                 await verifyPostRequestResponseWithAuth("/students", undefined, payload, 401, {
+                    message: "unauthorized",
+                });
+            });
+        });
+
+        describe("/students/{student_id}", () => {
+            test("GET - should return a student", async () => {
+                await verifyGetRequestResponse(`/students/${student1.student_id}`, user1.token, 200, student1);
+            });
+
+            test("GET - should return nothing when student_id does not correspond to a student", async () => {
+                await verifyGetRequestResponse("/students/100", user1.token, 200, null);
+            });
+
+            test("GET - should return nothing when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(`/students/${student1.student_id}`, undefined, 401, {
                     message: "unauthorized",
                 });
             });

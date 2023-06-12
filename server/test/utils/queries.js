@@ -17,6 +17,8 @@ const queries = {
     },
     students: {
         deleteStudent: "DELETE FROM students WHERE student_id = $1",
+        createStudent:
+            "INSERT INTO students (student_id, school_id, first_name, last_name, year, faculty, major, profile_photo_url, bio) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
     },
     users: {
         createUser: "INSERT INTO users (username, password, salt, token) VALUES ($1, $2, $3, $4) RETURNING *",
