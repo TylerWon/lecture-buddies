@@ -19,6 +19,7 @@ describe("api tests", () => {
     let course;
     let section;
     let interest;
+    let socialMedia;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
@@ -50,6 +51,11 @@ describe("api tests", () => {
             "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
         ]);
         interest = await db.one(queries.interests.createInterest, [student1.student_id, "reading"]);
+        socialMedia = await db.one(queries.socialMedias.createSocialMedia, [
+            student1.student_id,
+            "LinkedIn",
+            "www.linkedin.com/tylerwon",
+        ]);
     });
 
     afterAll(async () => {
@@ -63,6 +69,7 @@ describe("api tests", () => {
         await db.none(queries.students.deleteStudent, [student1.student_id]);
         await db.none(queries.students.deleteStudent, [student2.student_id]);
         await db.none(queries.interests.deleteInterest, [interest.interest_id]);
+        await db.none(queries.socialMedias.deleteSocialMedia, [socialMedia.social_media_id]);
 
         db.$pool.end();
     });
@@ -460,6 +467,29 @@ describe("api tests", () => {
 
             test("GET - should return nothing when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(`/students/${student1.student_id}/interests`, undefined, 401, {
+                    message: "unauthorized",
+                });
+            });
+        });
+
+        describe("/students/{student_id}/social-medias", () => {
+            test("GET - should return the social medias for a student", async () => {
+                await verifyGetRequestResponse(`/students/${student1.student_id}/social-medias`, user1.token, 200, [
+                    socialMedia,
+                ]);
+            });
+
+            test("GET - should return nothing when student_id does not correspond to a student", async () => {
+                await verifyGetRequestResponse(
+                    `/students/${student1.student_id + 100}/social-medias`,
+                    user1.token,
+                    200,
+                    []
+                );
+            });
+
+            test("GET - should return nothing when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(`/students/${student1.student_id}/social-medias`, undefined, 401, {
                     message: "unauthorized",
                 });
             });

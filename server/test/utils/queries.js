@@ -15,6 +15,11 @@ const queries = {
         createSection: "INSERT INTO sections (course_id, section_number, section_term) VALUES ($1, $2, $3) RETURNING *",
         deleteSection: "DELETE FROM sections WHERE section_id = $1",
     },
+    socialMedias: {
+        createSocialMedia:
+            "INSERT INTO social_medias (student_id, social_media_platform, social_media_url) VALUES ($1, $2, $3) RETURNING *",
+        deleteSocialMedia: "DELETE FROM social_medias WHERE social_media_id = $1",
+    },
     subjects: {
         createSubject: "INSERT INTO subjects (school_id, subject_name) VALUES ($1, $2) RETURNING *",
         deleteSubject: "DELETE FROM subjects WHERE subject_id = $1",
