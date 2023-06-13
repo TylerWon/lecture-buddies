@@ -15,6 +15,7 @@ const queries = {
             "INSERT INTO students (student_id, school_id, first_name, last_name, year, faculty, major, profile_photo_url, bio) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
         getStudent: "SELECT * FROM students WHERE student_id = $1",
         getInterestsForStudent: "SELECT * FROM interests WHERE student_id = $1",
+        getSocialMediasForStudent: "SELECT * FROM social_medias WHERE student_id = $1",
     },
     users: {
         getUser: "SELECT * FROM users WHERE user_id = $1",

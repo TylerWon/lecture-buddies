@@ -105,7 +105,14 @@ const getInterestsForStudent = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const getSocialMediasForStudent = async (req, res, next) => {
-    res.send("Not implemented");
+    const studentId = req.params.student_id;
+
+    try {
+        const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [studentId]);
+        return res.json(socialMedias);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 /**
