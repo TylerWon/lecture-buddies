@@ -92,13 +92,13 @@ CREATE TABLE interests (
 		ON UPDATE CASCADE
 );
 
-CREATE TYPE PLATFORM AS ENUM ('Facebook', 'Instagram', 'LinkedIn', 'Twitter');
+CREATE TYPE SOCIAL_MEDIA_PLATFORM AS ENUM ('Facebook', 'Instagram', 'LinkedIn', 'Twitter');
 
 CREATE TABLE social_medias (
 	social_media_id SERIAL PRIMARY KEY,  
 	student_id INTEGER,
-    platform PLATFORM,
-    url VARCHAR(2048),
+    social_media_platform SOCIAL_MEDIA_PLATFORM,
+    social_media_url VARCHAR(2048),
     FOREIGN KEY (student_id) REFERENCES students
 	    ON DELETE CASCADE
 		ON UPDATE CASCADE
