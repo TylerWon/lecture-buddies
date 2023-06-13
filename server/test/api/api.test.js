@@ -18,6 +18,7 @@ describe("api tests", () => {
     let subject;
     let course;
     let section;
+    let interest;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
@@ -48,6 +49,7 @@ describe("api tests", () => {
             "www.tylerwon.com/profile_photo.jpg",
             "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
         ]);
+        interest = await db.one(queries.interests.createInterest, [student1.student_id, "reading"]);
     });
 
     afterAll(async () => {
@@ -60,6 +62,7 @@ describe("api tests", () => {
         await db.none(queries.sections.deleteSection, [section.section_id]);
         await db.none(queries.students.deleteStudent, [student1.student_id]);
         await db.none(queries.students.deleteStudent, [student2.student_id]);
+        await db.none(queries.interests.deleteInterest, [interest.interest_id]);
 
         db.$pool.end();
     });
@@ -270,7 +273,7 @@ describe("api tests", () => {
             });
 
             test("GET - should return nothing when course_id does not correspond to a course", async () => {
-                await verifyGetRequestResponse(`/courses/100/sections`, user1.token, 200, []);
+                await verifyGetRequestResponse(`/courses/${course.course_id + 100}/sections`, user1.token, 200, []);
             });
 
             test("GET - should return nothing when request is unauthenticated", async () => {
@@ -300,7 +303,7 @@ describe("api tests", () => {
             });
 
             test("GET - should return nothing when school_id does not correspond to a school", async () => {
-                await verifyGetRequestResponse(`/schools/100/subjects`, user1.token, 200, []);
+                await verifyGetRequestResponse(`/schools/${school.school_id + 100}/subjects`, user1.token, 200, []);
             });
 
             test("GET - should return nothing when request is unauthenticated", async () => {
@@ -401,7 +404,7 @@ describe("api tests", () => {
             });
 
             test("POST - should not create a student when user does not exist", async () => {
-                payload.student_id = 100;
+                payload.student_id = user2.user_id + 100;
 
                 await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     message: `user with id '${payload.student_id}' does not exist`,
@@ -409,7 +412,7 @@ describe("api tests", () => {
             });
 
             test("POST - should not create a student when school does not exist", async () => {
-                payload.school_id = 100;
+                payload.school_id = school.school_id + 100;
 
                 await verifyPostRequestResponseWithAuth("/students", user1.token, payload, 400, {
                     message: `school with id '${payload.school_id}' does not exist`,
@@ -429,11 +432,34 @@ describe("api tests", () => {
             });
 
             test("GET - should return nothing when student_id does not correspond to a student", async () => {
-                await verifyGetRequestResponse("/students/100", user1.token, 200, null);
+                await verifyGetRequestResponse(`/students/${student1.student_id + 100}`, user1.token, 200, null);
             });
 
             test("GET - should return nothing when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(`/students/${student1.student_id}`, undefined, 401, {
+                    message: "unauthorized",
+                });
+            });
+        });
+
+        describe("/students/{student_id}/interests", () => {
+            test("GET - should return the interests for a student", async () => {
+                await verifyGetRequestResponse(`/students/${student1.student_id}/interests`, user1.token, 200, [
+                    interest,
+                ]);
+            });
+
+            test("GET - should return nothing when student_id does not correspond to a student", async () => {
+                await verifyGetRequestResponse(
+                    `/students/${student1.student_id + 100}/interests`,
+                    user1.token,
+                    200,
+                    []
+                );
+            });
+
+            test("GET - should return nothing when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(`/students/${student1.student_id}/interests`, undefined, 401, {
                     message: "unauthorized",
                 });
             });
