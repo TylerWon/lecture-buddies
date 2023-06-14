@@ -15,9 +15,17 @@ describe("api tests", () => {
     let student1;
     let student2;
     let school;
-    let subject;
-    let course;
-    let section;
+    let subject1;
+    let subject2;
+    let course1;
+    let course2;
+    let course3;
+    let section1;
+    let section2;
+    let section3;
+    let enrolment1;
+    let enrolment2;
+    let enrolment3;
     let interest;
     let socialMedia;
 
@@ -31,15 +39,16 @@ describe("api tests", () => {
     beforeAll(async () => {
         user1 = await createUser(user1Username, user1Password);
         user2 = await createUser(user2Username, user2Password);
-        school = await db.one(queries.schools.createSchool, ["University of British Columbia", "www.ubc.ca/logo.png"]);
-        subject = await db.one(queries.subjects.createSubject, [school.school_id, "CPSC"]);
-        course = await db.one(queries.courses.createCourse, [
-            subject.subject_id,
-            "110",
-            "Computation, Programs, and Programming",
-        ]);
-        section = await db.one(queries.sections.createSection, [course.course_id, "001", "2023W1"]);
-        student1 = await db.one(queries.students.createStudent, [
+        school = await createSchool("University of British Columbia", "www.ubc.ca/logo.png");
+        subject1 = await createSubject(school.school_id, "CPSC");
+        subject2 = await createSubject(school.school_id, "ENGL");
+        course1 = await createCourse(subject1.subject_id, "110", "Computation, Programs, and Programming");
+        course2 = await createCourse(subject1.subject_id, "121", "Models of Computation");
+        course3 = await createCourse(subject2.subject_id, "110", "Approaches to Literature and Culture");
+        section1 = await createSection(course1.course_id, "001", "2023W1");
+        section2 = await createSection(course2.course_id, "001", "2023W1");
+        section3 = await createSection(course3.course_id, "001", "2023W2");
+        student1 = await createStudent(
             user1.user_id,
             school.school_id,
             "Tyler",
@@ -48,14 +57,13 @@ describe("api tests", () => {
             "Science",
             "Computer Science",
             "www.tylerwon.com/profile_photo.jpg",
-            "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
-        ]);
-        interest = await db.one(queries.interests.createInterest, [student1.student_id, "reading"]);
-        socialMedia = await db.one(queries.socialMedias.createSocialMedia, [
-            student1.student_id,
-            "LinkedIn",
-            "www.linkedin.com/tylerwon",
-        ]);
+            "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
+        );
+        interest = await createInterest(student1.student_id, "reading");
+        socialMedia = await createSocialMedia(student1.student_id, "LinkedIn", "www.linkedin.com/tylerwon");
+        enrolment1 = await createEnrolment(student1.student_id, section1.section_id);
+        enrolment2 = await createEnrolment(student1.student_id, section2.section_id);
+        enrolment3 = await createEnrolment(student1.student_id, section3.section_id);
     });
 
     afterAll(async () => {
@@ -63,16 +71,140 @@ describe("api tests", () => {
         await db.none(queries.users.deleteUser, [user2.user_id]);
         await db.none(queries.users.deleteUser, [user3.user_id]);
         await db.none(queries.schools.deleteSchool, [school.school_id]);
-        await db.none(queries.subjects.deleteSubject, [subject.subject_id]);
-        await db.none(queries.courses.deleteCourse, [course.course_id]);
-        await db.none(queries.sections.deleteSection, [section.section_id]);
+        await db.none(queries.subjects.deleteSubject, [subject1.subject_id]);
+        await db.none(queries.subjects.deleteSubject, [subject2.subject_id]);
+        await db.none(queries.courses.deleteCourse, [course1.course_id]);
+        await db.none(queries.courses.deleteCourse, [course2.course_id]);
+        await db.none(queries.courses.deleteCourse, [course3.course_id]);
+        await db.none(queries.sections.deleteSection, [section1.section_id]);
+        await db.none(queries.sections.deleteSection, [section2.section_id]);
+        await db.none(queries.sections.deleteSection, [section3.section_id]);
         await db.none(queries.students.deleteStudent, [student1.student_id]);
         await db.none(queries.students.deleteStudent, [student2.student_id]);
         await db.none(queries.interests.deleteInterest, [interest.interest_id]);
         await db.none(queries.socialMedias.deleteSocialMedia, [socialMedia.social_media_id]);
+        await db.none(queries.enrolments.deleteEnrolment, [enrolment1.student_id, enrolment1.section_id]);
+        await db.none(queries.enrolments.deleteEnrolment, [enrolment2.student_id, enrolment2.section_id]);
+        await db.none(queries.enrolments.deleteEnrolment, [enrolment3.student_id, enrolment3.section_id]);
 
         db.$pool.end();
     });
+
+    /**
+     * Creates a course
+     *
+     * @param {number} subjectId - the id of the subject of the course
+     * @param {string} courseNumber - the course's number
+     * @param {string} courseName - the course's name
+     *
+     * @returns {object} the created course
+     */
+    async function createCourse(subjectId, courseNumber, courseName) {
+        return await db.one(queries.courses.createCourse, [subjectId, courseNumber, courseName]);
+    }
+
+    /**
+     * Creates an enrolment
+     *
+     * @param {number} studentId - the id of the student who is enrolled in the section
+     * @param {number} sectionId - the id of the section the student is enrolled in
+     *
+     * @returns {object} the created enrolment
+     */
+    async function createEnrolment(studentId, sectionId) {
+        return await db.one(queries.enrolments.createEnrolment, [studentId, sectionId]);
+    }
+
+    /**
+     * Creates an interest
+     *
+     * @param {number} studentId - the id of the student who likes the interest
+     * @param {string} interestName - the interest's name
+     *
+     * @returns {object} the created interest
+     */
+    async function createInterest(studentId, interestName) {
+        return await db.one(queries.interests.createInterest, [studentId, interestName]);
+    }
+
+    /**
+     * Creates a school
+     *
+     * @param {string} schoolName - the school's name
+     * @param {string} logoUrl - the school's logo url
+     *
+     * @returns {object} the created school
+     */
+    async function createSchool(schoolName, logoUrl) {
+        return await db.one(queries.schools.createSchool, [schoolName, logoUrl]);
+    }
+
+    /**
+     * Creates a section
+     *
+     * @param {number} courseId - the id of the course of the section
+     * @param {string} sectionNumber - the section's number
+     * @param {string} sectionTerm - the section's term
+     *
+     * @returns {object} the created section
+     */
+    async function createSection(courseId, sectionNumber, sectionTerm) {
+        return await db.one(queries.sections.createSection, [courseId, sectionNumber, sectionTerm]);
+    }
+
+    /**
+     * Creates a social media
+     *
+     * @param {number} studentId - the id of the Student that the social media belongs to
+     * @param {string} socialMediaPlatform - the social media platform
+     * @param {string} socialMediaUrl - the url of the student's profile on the platfor
+     *
+     * @returns {object} the created social media
+     */
+    async function createSocialMedia(studentId, socialMediaName, socialMediaUrl) {
+        return await db.one(queries.socialMedias.createSocialMedia, [studentId, socialMediaName, socialMediaUrl]);
+    }
+
+    /**
+     * Creates a subject
+     *
+     * @param {number} schoolId - the id of the school where the subject is offered
+     * @param {string} subjectName - the subject's name
+     *
+     * @returns {object} the created subject
+     */
+    async function createSubject(schoolId, subjectName) {
+        return await db.one(queries.subjects.createSubject, [schoolId, subjectName]);
+    }
+
+    /**
+     * Creates a student
+     *
+     * @param {number} userId - the id of the user associated with the student
+     * @param {number} schoolId - the id of the school the student attends
+     * @param {string} firstName - the student's first name
+     * @param {string} lastName - the student's last name
+     * @param {string} year - the student's year of schooling
+     * @param {string} faculty - the student's faculty
+     * @param {string} major - the student's major
+     * @param {string} profilePhotoUrl - the url of the student's profile photo
+     * @param {string} bio - the student's bio
+     *
+     * @returns {object} the created student
+     */
+    async function createStudent(userId, schoolId, firstName, lastName, year, faculty, major, profilePhotoUrl, bio) {
+        return await db.one(queries.students.createStudent, [
+            userId,
+            schoolId,
+            firstName,
+            lastName,
+            year,
+            faculty,
+            major,
+            profilePhotoUrl,
+            bio,
+        ]);
+    }
 
     /**
      * Creates a user
@@ -103,6 +235,7 @@ describe("api tests", () => {
     async function verifyGetRequestResponse(endpoint, token, expectedStatusCode, expectedBody) {
         const response = await request(app).get(endpoint).auth(token, { type: "bearer" });
         expect(response.statusCode).toEqual(expectedStatusCode);
+        console.log(response.body);
         expect(response.body).toEqual(expectedBody);
         return response;
     }
@@ -276,15 +409,15 @@ describe("api tests", () => {
     describe("course routes tests", () => {
         describe("/courses/{course_id}/sections", () => {
             test("GET - should return the sections for a course", async () => {
-                await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, user1.token, 200, [section]);
+                await verifyGetRequestResponse(`/courses/${course1.course_id}/sections`, user1.token, 200, [section1]);
             });
 
             test("GET - should return nothing when course_id does not correspond to a course", async () => {
-                await verifyGetRequestResponse(`/courses/${course.course_id + 100}/sections`, user1.token, 200, []);
+                await verifyGetRequestResponse(`/courses/${course1.course_id + 100}/sections`, user1.token, 200, []);
             });
 
-            test("GET - should return nothing when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(`/courses/${course.course_id}/sections`, undefined, 401, {
+            test("GET - should return error message when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(`/courses/${course1.course_id}/sections`, undefined, 401, {
                     message: "unauthorized",
                 });
             });
@@ -297,7 +430,7 @@ describe("api tests", () => {
                 await verifyGetRequestResponse("/schools", user1.token, 200, [school]);
             });
 
-            test("GET - should return nothing when request is unauthenticated", async () => {
+            test("GET - should return error message when request is unauthenticated", async () => {
                 await verifyGetRequestResponse("/schools", undefined, 401, {
                     message: "unauthorized",
                 });
@@ -306,14 +439,17 @@ describe("api tests", () => {
 
         describe("/schools/{school_id}/subjects", () => {
             test("GET - should return the subjects for a school", async () => {
-                await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, user1.token, 200, [subject]);
+                await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, user1.token, 200, [
+                    subject1,
+                    subject2,
+                ]);
             });
 
             test("GET - should return nothing when school_id does not correspond to a school", async () => {
                 await verifyGetRequestResponse(`/schools/${school.school_id + 100}/subjects`, user1.token, 200, []);
             });
 
-            test("GET - should return nothing when request is unauthenticated", async () => {
+            test("GET - should return error message when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(`/schools/${school.school_id}/subjects`, undefined, 401, {
                     message: "unauthorized",
                 });
@@ -324,15 +460,18 @@ describe("api tests", () => {
     describe("subject routes tests", () => {
         describe("/subjects/{subject_id}/courses", () => {
             test("GET - should return the courses for a subject", async () => {
-                await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, user1.token, 200, [course]);
+                await verifyGetRequestResponse(`/subjects/${subject1.subject_id}/courses`, user1.token, 200, [
+                    course1,
+                    course2,
+                ]);
             });
 
             test("GET - should return nothing when subject_id does not correspond to a subject", async () => {
                 await verifyGetRequestResponse(`/subjects/100/courses`, user1.token, 200, []);
             });
 
-            test("GET - should return nothing when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(`/subjects/${subject.subject_id}/courses`, undefined, 401, {
+            test("GET - should return error message when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(`/subjects/${subject1.subject_id}/courses`, undefined, 401, {
                     message: "unauthorized",
                 });
             });
@@ -442,7 +581,7 @@ describe("api tests", () => {
                 await verifyGetRequestResponse(`/students/${student1.student_id + 100}`, user1.token, 200, null);
             });
 
-            test("GET - should return nothing when request is unauthenticated", async () => {
+            test("GET - should return error message when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(`/students/${student1.student_id}`, undefined, 401, {
                     message: "unauthorized",
                 });
@@ -465,7 +604,7 @@ describe("api tests", () => {
                 );
             });
 
-            test("GET - should return nothing when request is unauthenticated", async () => {
+            test("GET - should return error message when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(`/students/${student1.student_id}/interests`, undefined, 401, {
                     message: "unauthorized",
                 });
@@ -488,10 +627,113 @@ describe("api tests", () => {
                 );
             });
 
-            test("GET - should return nothing when request is unauthenticated", async () => {
+            test("GET - should return error message when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(`/students/${student1.student_id}/social-medias`, undefined, 401, {
                     message: "unauthorized",
                 });
+            });
+        });
+
+        describe("/students/{student_id}/course-history", () => {
+            test("GET - should return the course history for a student (order by -name)", async () => {
+                await verifyGetRequestResponse(
+                    `/students/${student1.student_id}/course-history?order_by=-name`,
+                    user1.token,
+                    200,
+                    [
+                        {
+                            student_id: student1.student_id,
+                            school_id: school.school_id,
+                            subject_id: subject1.subject_id,
+                            subject_name: subject1.subject_name,
+                            course_id: course1.course_id,
+                            course_number: course1.course_number,
+                            course_name: course1.course_name,
+                            section_id: section1.section_id,
+                            section_number: section1.section_number,
+                            section_term: section1.section_term,
+                        },
+                        {
+                            student_id: student1.student_id,
+                            school_id: school.school_id,
+                            subject_id: subject1.subject_id,
+                            subject_name: subject1.subject_name,
+                            course_id: course2.course_id,
+                            course_number: course2.course_number,
+                            course_name: course2.course_name,
+                            section_id: section2.section_id,
+                            section_number: section2.section_number,
+                            section_term: section2.section_term,
+                        },
+                        {
+                            student_id: student1.student_id,
+                            school_id: school.school_id,
+                            subject_id: subject2.subject_id,
+                            subject_name: subject2.subject_name,
+                            course_id: course3.course_id,
+                            course_number: course3.course_number,
+                            course_name: course3.course_name,
+                            section_id: section3.section_id,
+                            section_number: section3.section_number,
+                            section_term: section3.section_term,
+                        },
+                    ]
+                );
+            });
+
+            test("GET - should return nothing when student_id does not correspond to a student", async () => {
+                await verifyGetRequestResponse(
+                    `/students/${student1.student_id + 100}/course-history?order_by=-name`,
+                    user1.token,
+                    200,
+                    []
+                );
+            });
+
+            test("GET - should return error message when missing a query parameter", async () => {
+                await verifyGetRequestResponse(
+                    `/students/${student1.student_id + 100}/course-history?order_by=-name`,
+                    user1.token,
+                    200,
+                    [
+                        {
+                            type: "field",
+                            location: "query",
+                            path: "order_by",
+                            msg: "order_by is required",
+                        },
+                    ]
+                );
+            });
+
+            test("GET - should return error message when a query parameter value is not a valid option", async () => {
+                const orderBy = "-term";
+
+                await verifyGetRequestResponse(
+                    `/students/${student1.student_id + 100}/course-history?order_by=${orderBy}`,
+                    user1.token,
+                    200,
+                    [
+                        {
+                            type: "field",
+                            location: "query",
+                            path: "order_by",
+                            value: orderBy,
+                            msg: "order_by must be one of -name, +name",
+                        },
+                    ]
+                );
+            });
+
+            test("GET - should return error message when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(
+                    `/students/${student1.student_id}/course-history?order_by=-name`,
+                    user1.token,
+                    401,
+                    {
+                        message: "unauthorized",
+                    }
+                );
             });
         });
     });

@@ -3,6 +3,10 @@ const queries = {
         createCourse: "INSERT INTO courses (subject_id, course_number, course_name) VALUES ($1, $2, $3) RETURNING *",
         deleteCourse: "DELETE FROM courses WHERE course_id = $1",
     },
+    enrolments: {
+        createEnrolment: "INSERT INTO enrolments (student_id, section_id) VALUES ($1, $2) RETURNING *",
+        deleteEnrolment: "DELETE FROM enrolments WHERE student_id = $1 AND section_id = $2",
+    },
     interests: {
         createInterest: "INSERT INTO interests (student_id, interest_name) VALUES ($1, $2) RETURNING *",
         deleteInterest: "DELETE FROM interests WHERE interest_id = $1",
