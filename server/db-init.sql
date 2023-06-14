@@ -71,7 +71,7 @@ CREATE TABLE students (
 		ON UPDATE CASCADE
 );
 
-CREATE TABLE enrols (
+CREATE TABLE enrolments (
 	student_id INTEGER,
 	section_id INTEGER,
 	PRIMARY KEY (student_id, section_id),
