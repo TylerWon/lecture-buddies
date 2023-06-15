@@ -64,6 +64,8 @@ const createStudent = async (req, res, next) => {
 /**
  * Gets a student
  *
+ * @param {number} req.params.student_id - The student's ID
+ *
  * @returns
  * - 200 OK if successful
  * - 500 Internal Server Error if unexpected error
@@ -82,6 +84,8 @@ const getStudent = async (req, res, next) => {
 /**
  * Gets the interests for a student
  *
+ * @param {number} req.params.student_id - The student's ID
+ *
  * @returns
  * - 200 OK if successful
  * - 500 Internal Server Error if unexpected error
@@ -99,6 +103,8 @@ const getInterestsForStudent = async (req, res, next) => {
 
 /**
  * Gets the social medias for a student
+ *
+ * @param {number} req.params.student_id - The student's ID
  *
  * @returns
  * - 200 OK if successful
@@ -119,8 +125,8 @@ const getSocialMediasForStudent = async (req, res, next) => {
  * Gets the course history for a student. The course history is all the courses a student has taken. Information about
  * the subject, course, and section is included.
  *
- * @param {string} req.query.group_by the field to group the response by (options: term)
- * @param {string} req.query.order_by the field to order the response by (options: -dept, +dept)
+ * @param {number} req.params.student_id - The student's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
  *
  * @returns
  * - 200 OK if successful
@@ -128,15 +134,35 @@ const getSocialMediasForStudent = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const getCourseHistoryForStudent = async (req, res, next) => {
-    res.send("Not implemented");
+    const studentId = req.params.student_id;
+    const orderBy = req.query.order_by;
+
+    try {
+        let courseHistory;
+
+        switch (orderBy) {
+            case "name":
+                courseHistory = await db.any(queries.students.getCourseHistoryForStudentOrderByNameASC, [studentId]);
+                break;
+            case "-name":
+                courseHistory = await db.any(queries.students.getCourseHistoryForStudentOrderByNameDESC, [studentId]);
+                break;
+        }
+
+        return res.json(courseHistory);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 /**
  * Gets the classmates for a student in a section. Information about each classmate and their interests, social medias,
- * and current/previous mutual/non-mutual courses with the student is included.
+ * and current mutual/non-mutual courses with the student is included.
  *
- * @param {string} req.query.order_by - the field to order the response by (options: -mutual_courses, +mutual_courses,
- * -name, +name, -year, +year, -major, +major)
+ * @param {number} req.params.student_id - The student's ID
+ * @param {number} req.params.section_id - The section's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: mutual_courses, -mutual_courses,
+ * name, -name, year, -year, major, -major)
  * @param {string} req.query.offset - the position to start returning results from
  * @param {string} req.query.limit - the number of results to return
  *
@@ -153,7 +179,8 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
  * Gets the buddies for a student. Information about each buddy and their interests, social medias, and
  * current/previous mutual/non-mutual courses with the student is included.
  *
- * @param {string} req.query.order_by - the field to order the response by (options: -name, +name)
+ * @param {number} req.params.student_id - The student's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
  * @param {string} req.query.offset - the position to start returning results from
  * @param {string} req.query.limit - the number of results to return
  *
@@ -168,9 +195,10 @@ const getBuddiesForStudent = async (req, res, next) => {
 
 /**
  * Gets the buddy requests for a student. Information about each requestor and their interests, social medias, and
- * current/previous mutual/non-mutual courses with the student is included.
+ * current mutual/non-mutual courses with the student is included.
  *
- * @param {string} req.query.order_by - the field to order the response by (options: -name, +name)
+ * @param {number} req.params.student_id - The student's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
  * @param {string} req.query.offset - the position to start returning results from
  * @param {string} req.query.limit - the number of results to return
  *
@@ -187,7 +215,8 @@ const getBuddyRequestsForStudent = async (req, res, next) => {
  * Gets the conversation history for a student. The conversation history is all the conversations a student has had.
  * Information about the conversation and messages is included.
  *
- * @param {string} req.query.order_by - the field to order the response by (options: -date, +date)
+ * @param {number} req.params.student_id - The student's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: date, -date)
  * @param {string} req.query.offset - the position to start returning results from
  * @param {string} req.query.limit - the number of results to return
  *

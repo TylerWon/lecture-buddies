@@ -26,6 +26,8 @@ router.get(
 );
 router.get(
     "/:student_id(\\d+)/course-history",
+    validationSchemas.getCourseHistoryForStudentValidationSchema(),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     studentController.getCourseHistoryForStudent
 );

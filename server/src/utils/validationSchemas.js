@@ -1,5 +1,6 @@
 const { checkSchema } = require("express-validator");
 
+// Auth
 const authValidationSchema = () =>
     checkSchema(
         {
@@ -23,6 +24,7 @@ const authValidationSchema = () =>
         ["body"]
     );
 
+// Students
 const createStudentValidationSchema = () =>
     checkSchema(
         {
@@ -102,7 +104,24 @@ const createStudentValidationSchema = () =>
         ["body"]
     );
 
+const getCourseHistoryForStudentValidationSchema = () =>
+    checkSchema(
+        {
+            order_by: {
+                exists: {
+                    errorMessage: "order_by is required",
+                },
+                matches: {
+                    options: [/^(-?)(name)$/],
+                    errorMessage: "order_by must be one of 'name' or '-name'",
+                },
+            },
+        },
+        ["query"]
+    );
+
 module.exports = {
     authValidationSchema,
     createStudentValidationSchema,
+    getCourseHistoryForStudentValidationSchema,
 };
