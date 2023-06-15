@@ -235,7 +235,6 @@ describe("api tests", () => {
     async function verifyGetRequestResponse(endpoint, token, expectedStatusCode, expectedBody) {
         const response = await request(app).get(endpoint).auth(token, { type: "bearer" });
         expect(response.statusCode).toEqual(expectedStatusCode);
-        console.log(response.body);
         expect(response.body).toEqual(expectedBody);
         return response;
     }
@@ -635,49 +634,66 @@ describe("api tests", () => {
         });
 
         describe("/students/{student_id}/course-history", () => {
+            let courseDetails1;
+            let courseDetails2;
+            let courseDetails3;
+
+            beforeAll(() => {
+                courseDetails1 = {
+                    student_id: student1.student_id,
+                    school_id: school.school_id,
+                    subject_id: subject1.subject_id,
+                    subject_name: subject1.subject_name,
+                    course_id: course1.course_id,
+                    course_number: course1.course_number,
+                    course_name: course1.course_name,
+                    section_id: section1.section_id,
+                    section_number: section1.section_number,
+                    section_term: section1.section_term,
+                };
+
+                courseDetails2 = {
+                    student_id: student1.student_id,
+                    school_id: school.school_id,
+                    subject_id: subject1.subject_id,
+                    subject_name: subject1.subject_name,
+                    course_id: course2.course_id,
+                    course_number: course2.course_number,
+                    course_name: course2.course_name,
+                    section_id: section2.section_id,
+                    section_number: section2.section_number,
+                    section_term: section2.section_term,
+                };
+
+                courseDetails3 = {
+                    student_id: student1.student_id,
+                    school_id: school.school_id,
+                    subject_id: subject2.subject_id,
+                    subject_name: subject2.subject_name,
+                    course_id: course3.course_id,
+                    course_number: course3.course_number,
+                    course_name: course3.course_name,
+                    section_id: section3.section_id,
+                    section_number: section3.section_number,
+                    section_term: section3.section_term,
+                };
+            });
+
+            test("GET - should return the course history for a student (order by name)", async () => {
+                await verifyGetRequestResponse(
+                    `/students/${student1.student_id}/course-history?order_by=name`,
+                    user1.token,
+                    200,
+                    [courseDetails1, courseDetails2, courseDetails3]
+                );
+            });
+
             test("GET - should return the course history for a student (order by -name)", async () => {
                 await verifyGetRequestResponse(
                     `/students/${student1.student_id}/course-history?order_by=-name`,
                     user1.token,
                     200,
-                    [
-                        {
-                            student_id: student1.student_id,
-                            school_id: school.school_id,
-                            subject_id: subject1.subject_id,
-                            subject_name: subject1.subject_name,
-                            course_id: course1.course_id,
-                            course_number: course1.course_number,
-                            course_name: course1.course_name,
-                            section_id: section1.section_id,
-                            section_number: section1.section_number,
-                            section_term: section1.section_term,
-                        },
-                        {
-                            student_id: student1.student_id,
-                            school_id: school.school_id,
-                            subject_id: subject1.subject_id,
-                            subject_name: subject1.subject_name,
-                            course_id: course2.course_id,
-                            course_number: course2.course_number,
-                            course_name: course2.course_name,
-                            section_id: section2.section_id,
-                            section_number: section2.section_number,
-                            section_term: section2.section_term,
-                        },
-                        {
-                            student_id: student1.student_id,
-                            school_id: school.school_id,
-                            subject_id: subject2.subject_id,
-                            subject_name: subject2.subject_name,
-                            course_id: course3.course_id,
-                            course_number: course3.course_number,
-                            course_name: course3.course_name,
-                            section_id: section3.section_id,
-                            section_number: section3.section_number,
-                            section_term: section3.section_term,
-                        },
-                    ]
+                    [courseDetails3, courseDetails2, courseDetails1]
                 );
             });
 
@@ -692,9 +708,9 @@ describe("api tests", () => {
 
             test("GET - should return error message when missing a query parameter", async () => {
                 await verifyGetRequestResponse(
-                    `/students/${student1.student_id + 100}/course-history?order_by=-name`,
+                    `/students/${student1.student_id + 100}/course-history`,
                     user1.token,
-                    200,
+                    400,
                     [
                         {
                             type: "field",
@@ -712,14 +728,14 @@ describe("api tests", () => {
                 await verifyGetRequestResponse(
                     `/students/${student1.student_id + 100}/course-history?order_by=${orderBy}`,
                     user1.token,
-                    200,
+                    400,
                     [
                         {
                             type: "field",
                             location: "query",
                             path: "order_by",
                             value: orderBy,
-                            msg: "order_by must be one of -name, +name",
+                            msg: "order_by must be one of 'name' or '-name'",
                         },
                     ]
                 );
@@ -728,7 +744,7 @@ describe("api tests", () => {
             test("GET - should return error message when request is unauthenticated", async () => {
                 await verifyGetRequestResponse(
                     `/students/${student1.student_id}/course-history?order_by=-name`,
-                    user1.token,
+                    undefined,
                     401,
                     {
                         message: "unauthorized",
