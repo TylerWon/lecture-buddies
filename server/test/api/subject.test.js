@@ -2,20 +2,14 @@ const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
     createCourse,
-    createEnrolment,
-    createInterest,
     createSchool,
-    createSection,
-    createSocialMedia,
-    createStudent,
     createSubject,
     createUser,
     cleanUpDatabase,
     verifyGetRequestResponse,
-    verifyPostRequestResponseWithAuth,
 } = require("../utils/helpers");
 
-describe("api tests", () => {
+describe("subject routes tests", () => {
     let user1;
     let school;
     let subject1;
@@ -35,23 +29,20 @@ describe("api tests", () => {
         await cleanUpDatabase(db);
         await db.$pool.end();
     });
+    describe("/subjects/{subject_id}/courses", () => {
+        test("GET - should return the courses for a subject", async () => {
+            await verifyGetRequestResponse(app, `/subjects/${subject1.subject_id}/courses`, user1.token, 200, [
+                course1,
+            ]);
+        });
 
-    describe("subject routes tests", () => {
-        describe("/subjects/{subject_id}/courses", () => {
-            test("GET - should return the courses for a subject", async () => {
-                await verifyGetRequestResponse(app, `/subjects/${subject1.subject_id}/courses`, user1.token, 200, [
-                    course1,
-                ]);
-            });
+        test("GET - should return nothing when subject_id does not correspond to a subject", async () => {
+            await verifyGetRequestResponse(app, `/subjects/100/courses`, user1.token, 200, []);
+        });
 
-            test("GET - should return nothing when subject_id does not correspond to a subject", async () => {
-                await verifyGetRequestResponse(app, `/subjects/100/courses`, user1.token, 200, []);
-            });
-
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, `/subjects/${subject1.subject_id}/courses`, undefined, 401, {
-                    message: "unauthorized",
-                });
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(app, `/subjects/${subject1.subject_id}/courses`, undefined, 401, {
+                message: "unauthorized",
             });
         });
     });

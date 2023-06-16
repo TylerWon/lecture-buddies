@@ -10,7 +10,7 @@ const {
     verifyGetRequestResponse,
 } = require("../utils/helpers");
 
-describe("api tests", () => {
+describe("course routes tests", () => {
     let user1;
     let school1;
     let course1;
@@ -31,29 +31,18 @@ describe("api tests", () => {
         await cleanUpDatabase(db);
         await db.$pool.end();
     });
+    describe("/courses/{course_id}/sections", () => {
+        test("GET - should return the sections for a course", async () => {
+            await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, user1.token, 200, [section1]);
+        });
 
-    describe("course routes tests", () => {
-        describe("/courses/{course_id}/sections", () => {
-            test("GET - should return the sections for a course", async () => {
-                await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, user1.token, 200, [
-                    section1,
-                ]);
-            });
+        test("GET - should return nothing when course_id does not correspond to a course", async () => {
+            await verifyGetRequestResponse(app, `/courses/${course1.course_id + 100}/sections`, user1.token, 200, []);
+        });
 
-            test("GET - should return nothing when course_id does not correspond to a course", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/courses/${course1.course_id + 100}/sections`,
-                    user1.token,
-                    200,
-                    []
-                );
-            });
-
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, undefined, 401, {
-                    message: "unauthorized",
-                });
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, undefined, 401, {
+                message: "unauthorized",
             });
         });
     });
