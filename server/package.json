@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "jest --verbose",
+        "test": "jest --verbose --runInBand --watchAll",
         "start": "node ./src/server.js",
         "dev": "nodemon ./src/server.js"
     },
