@@ -15,7 +15,7 @@ const {
     verifyPostRequestResponseWithAuth,
 } = require("../utils/helpers");
 
-describe("student tests", () => {
+describe("student routes tests", () => {
     let user1;
     let user2;
     let student1;
@@ -75,285 +75,279 @@ describe("student tests", () => {
         await db.$pool.end();
     });
 
-    describe("student routes tests", () => {
-        describe("/students", () => {
-            let payload;
+    describe("/students", () => {
+        let payload;
 
-            beforeEach(() => {
-                payload = {
-                    student_id: user2.user_id,
-                    school_id: school1.school_id,
-                    first_name: "Connor",
-                    last_name: "Won",
-                    year: "3",
-                    faculty: "Science",
-                    major: "Computer Science",
-                    profile_photo_url: "www.connorwon.com/profile_photo.jpg",
-                    bio: "Hello. I'm Connor. I'm a 3rd year computer science student at UBC.",
-                };
-            });
+        beforeEach(() => {
+            payload = {
+                student_id: user2.user_id,
+                school_id: school1.school_id,
+                first_name: "Connor",
+                last_name: "Won",
+                year: "3",
+                faculty: "Science",
+                major: "Computer Science",
+                profile_photo_url: "www.connorwon.com/profile_photo.jpg",
+                bio: "Hello. I'm Connor. I'm a 3rd year computer science student at UBC.",
+            };
+        });
 
-            test("POST - should create a student", async () => {
-                await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 201, payload);
-            });
+        test("POST - should create a student", async () => {
+            await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 201, payload);
+        });
 
-            test("POST - should not create a student when missing some fields", async () => {
-                delete payload.last_name;
-                delete payload.profile_photo_url;
+        test("POST - should not create a student when missing some fields", async () => {
+            delete payload.last_name;
+            delete payload.profile_photo_url;
 
-                await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, [
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "last_name",
-                        msg: "last_name is required",
-                    },
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "profile_photo_url",
-                        msg: "profile_photo_url is required",
-                    },
-                ]);
-            });
+            await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, [
+                {
+                    type: "field",
+                    location: "body",
+                    path: "last_name",
+                    msg: "last_name is required",
+                },
+                {
+                    type: "field",
+                    location: "body",
+                    path: "profile_photo_url",
+                    msg: "profile_photo_url is required",
+                },
+            ]);
+        });
 
-            test("POST - should not create a student when some fields are the wrong type", async () => {
-                payload.first_name = true;
-                payload.year = 4;
+        test("POST - should not create a student when some fields are the wrong type", async () => {
+            payload.first_name = true;
+            payload.year = 4;
 
-                await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, [
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "first_name",
-                        value: payload.first_name,
-                        msg: "first_name must be a string",
-                    },
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "year",
-                        value: payload.year,
-                        msg: "year must be a string",
-                    },
-                ]);
-            });
+            await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, [
+                {
+                    type: "field",
+                    location: "body",
+                    path: "first_name",
+                    value: payload.first_name,
+                    msg: "first_name must be a string",
+                },
+                {
+                    type: "field",
+                    location: "body",
+                    path: "year",
+                    value: payload.year,
+                    msg: "year must be a string",
+                },
+            ]);
+        });
 
-            test("POST - should not create a student when user does not exist", async () => {
-                payload.student_id = user2.user_id + 100;
+        test("POST - should not create a student when user does not exist", async () => {
+            payload.student_id = user2.user_id + 100;
 
-                await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, {
-                    message: `user with id '${payload.student_id}' does not exist`,
-                });
-            });
-
-            test("POST - should not create a student when school does not exist", async () => {
-                payload.school_id = school1.school_id + 100;
-
-                await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, {
-                    message: `school with id '${payload.school_id}' does not exist`,
-                });
-            });
-
-            test("POST - should not create a student when request is unauthenticated", async () => {
-                await verifyPostRequestResponseWithAuth(app, "/students", undefined, payload, 401, {
-                    message: "unauthorized",
-                });
+            await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, {
+                message: `user with id '${payload.student_id}' does not exist`,
             });
         });
 
-        describe("/students/{student_id}", () => {
-            test("GET - should return a student", async () => {
-                await verifyGetRequestResponse(app, `/students/${student1.student_id}`, user1.token, 200, student1);
-            });
+        test("POST - should not create a student when school does not exist", async () => {
+            payload.school_id = school1.school_id + 100;
 
-            test("GET - should return nothing when student_id does not correspond to a student", async () => {
-                await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}`, user1.token, 200, null);
-            });
-
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, `/students/${student1.student_id}`, undefined, 401, {
-                    message: "unauthorized",
-                });
+            await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, {
+                message: `school with id '${payload.school_id}' does not exist`,
             });
         });
 
-        describe("/students/{student_id}/interests", () => {
-            test("GET - should return the interests for a student", async () => {
-                await verifyGetRequestResponse(app, `/students/${student1.student_id}/interests`, user1.token, 200, [
-                    interest1,
-                ]);
-            });
-
-            test("GET - should return nothing when student_id does not correspond to a student", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/students/${student1.student_id + 100}/interests`,
-                    user1.token,
-                    200,
-                    []
-                );
-            });
-
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, `/students/${student1.student_id}/interests`, undefined, 401, {
-                    message: "unauthorized",
-                });
+        test("POST - should not create a student when request is unauthenticated", async () => {
+            await verifyPostRequestResponseWithAuth(app, "/students", undefined, payload, 401, {
+                message: "unauthorized",
             });
         });
+    });
 
-        describe("/students/{student_id}/social-medias", () => {
-            test("GET - should return the social medias for a student", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/students/${student1.student_id}/social-medias`,
-                    user1.token,
-                    200,
-                    [socialMedia1]
-                );
-            });
-
-            test("GET - should return nothing when student_id does not correspond to a student", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/students/${student1.student_id + 100}/social-medias`,
-                    user1.token,
-                    200,
-                    []
-                );
-            });
-
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, `/students/${student1.student_id}/social-medias`, undefined, 401, {
-                    message: "unauthorized",
-                });
-            });
+    describe("/students/{student_id}", () => {
+        test("GET - should return a student", async () => {
+            await verifyGetRequestResponse(app, `/students/${student1.student_id}`, user1.token, 200, student1);
         });
 
-        describe("/students/{student_id}/course-history", () => {
-            let courseDetails1;
-            let courseDetails2;
-            let courseDetails3;
+        test("GET - should return nothing when student_id does not correspond to a student", async () => {
+            await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}`, user1.token, 200, null);
+        });
 
-            beforeAll(() => {
-                courseDetails1 = {
-                    student_id: student1.student_id,
-                    school_id: school1.school_id,
-                    subject_id: subject1.subject_id,
-                    subject_name: subject1.subject_name,
-                    course_id: course1.course_id,
-                    course_number: course1.course_number,
-                    course_name: course1.course_name,
-                    section_id: section1.section_id,
-                    section_number: section1.section_number,
-                    section_term: section1.section_term,
-                };
-
-                courseDetails2 = {
-                    student_id: student1.student_id,
-                    school_id: school1.school_id,
-                    subject_id: subject1.subject_id,
-                    subject_name: subject1.subject_name,
-                    course_id: course2.course_id,
-                    course_number: course2.course_number,
-                    course_name: course2.course_name,
-                    section_id: section2.section_id,
-                    section_number: section2.section_number,
-                    section_term: section2.section_term,
-                };
-
-                courseDetails3 = {
-                    student_id: student1.student_id,
-                    school_id: school1.school_id,
-                    subject_id: subject2.subject_id,
-                    subject_name: subject2.subject_name,
-                    course_id: course3.course_id,
-                    course_number: course3.course_number,
-                    course_name: course3.course_name,
-                    section_id: section3.section_id,
-                    section_number: section3.section_number,
-                    section_term: section3.section_term,
-                };
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(app, `/students/${student1.student_id}`, undefined, 401, {
+                message: "unauthorized",
             });
+        });
+    });
 
-            test("GET - should return the course history for a student (order by name)", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/students/${student1.student_id}/course-history?order_by=name`,
-                    user1.token,
-                    200,
-                    [courseDetails1, courseDetails2, courseDetails3]
-                );
+    describe("/students/{student_id}/interests", () => {
+        test("GET - should return the interests for a student", async () => {
+            await verifyGetRequestResponse(app, `/students/${student1.student_id}/interests`, user1.token, 200, [
+                interest1,
+            ]);
+        });
+
+        test("GET - should return nothing when student_id does not correspond to a student", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id + 100}/interests`,
+                user1.token,
+                200,
+                []
+            );
+        });
+
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(app, `/students/${student1.student_id}/interests`, undefined, 401, {
+                message: "unauthorized",
             });
+        });
+    });
 
-            test("GET - should return the course history for a student (order by -name)", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/students/${student1.student_id}/course-history?order_by=-name`,
-                    user1.token,
-                    200,
-                    [courseDetails3, courseDetails2, courseDetails1]
-                );
+    describe("/students/{student_id}/social-medias", () => {
+        test("GET - should return the social medias for a student", async () => {
+            await verifyGetRequestResponse(app, `/students/${student1.student_id}/social-medias`, user1.token, 200, [
+                socialMedia1,
+            ]);
+        });
+
+        test("GET - should return nothing when student_id does not correspond to a student", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id + 100}/social-medias`,
+                user1.token,
+                200,
+                []
+            );
+        });
+
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(app, `/students/${student1.student_id}/social-medias`, undefined, 401, {
+                message: "unauthorized",
             });
+        });
+    });
 
-            test("GET - should return nothing when student_id does not correspond to a student", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/students/${student1.student_id + 100}/course-history?order_by=-name`,
-                    user1.token,
-                    200,
-                    []
-                );
-            });
+    describe("/students/{student_id}/course-history", () => {
+        let courseDetails1;
+        let courseDetails2;
+        let courseDetails3;
 
-            test("GET - should return error message when missing a query parameter", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/students/${student1.student_id + 100}/course-history`,
-                    user1.token,
-                    400,
-                    [
-                        {
-                            type: "field",
-                            location: "query",
-                            path: "order_by",
-                            msg: "order_by is required",
-                        },
-                    ]
-                );
-            });
+        beforeAll(() => {
+            courseDetails1 = {
+                student_id: student1.student_id,
+                school_id: school1.school_id,
+                subject_id: subject1.subject_id,
+                subject_name: subject1.subject_name,
+                course_id: course1.course_id,
+                course_number: course1.course_number,
+                course_name: course1.course_name,
+                section_id: section1.section_id,
+                section_number: section1.section_number,
+                section_term: section1.section_term,
+            };
 
-            test("GET - should return error message when a query parameter value is not a valid option", async () => {
-                const orderBy = "-term";
+            courseDetails2 = {
+                student_id: student1.student_id,
+                school_id: school1.school_id,
+                subject_id: subject1.subject_id,
+                subject_name: subject1.subject_name,
+                course_id: course2.course_id,
+                course_number: course2.course_number,
+                course_name: course2.course_name,
+                section_id: section2.section_id,
+                section_number: section2.section_number,
+                section_term: section2.section_term,
+            };
 
-                await verifyGetRequestResponse(
-                    app,
-                    `/students/${student1.student_id + 100}/course-history?order_by=${orderBy}`,
-                    user1.token,
-                    400,
-                    [
-                        {
-                            type: "field",
-                            location: "query",
-                            path: "order_by",
-                            value: orderBy,
-                            msg: "order_by must be one of 'name' or '-name'",
-                        },
-                    ]
-                );
-            });
+            courseDetails3 = {
+                student_id: student1.student_id,
+                school_id: school1.school_id,
+                subject_id: subject2.subject_id,
+                subject_name: subject2.subject_name,
+                course_id: course3.course_id,
+                course_number: course3.course_number,
+                course_name: course3.course_name,
+                section_id: section3.section_id,
+                section_number: section3.section_number,
+                section_term: section3.section_term,
+            };
+        });
 
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/students/${student1.student_id}/course-history?order_by=-name`,
-                    undefined,
-                    401,
+        test("GET - should return the course history for a student (order by name)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/course-history?order_by=name`,
+                user1.token,
+                200,
+                [courseDetails1, courseDetails2, courseDetails3]
+            );
+        });
+
+        test("GET - should return the course history for a student (order by -name)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/course-history?order_by=-name`,
+                user1.token,
+                200,
+                [courseDetails3, courseDetails2, courseDetails1]
+            );
+        });
+
+        test("GET - should return nothing when student_id does not correspond to a student", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id + 100}/course-history?order_by=-name`,
+                user1.token,
+                200,
+                []
+            );
+        });
+
+        test("GET - should return error message when missing a query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id + 100}/course-history`,
+                user1.token,
+                400,
+                [
                     {
-                        message: "unauthorized",
-                    }
-                );
-            });
+                        type: "field",
+                        location: "query",
+                        path: "order_by",
+                        msg: "order_by is required",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when a query parameter value is not a valid option", async () => {
+            const orderBy = "-term";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id + 100}/course-history?order_by=${orderBy}`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "order_by",
+                        value: orderBy,
+                        msg: "order_by must be one of 'name' or '-name'",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/course-history?order_by=-name`,
+                undefined,
+                401,
+                {
+                    message: "unauthorized",
+                }
+            );
         });
     });
 });
