@@ -15,11 +15,11 @@ const {
     verifyPostRequestResponseWithAuth,
 } = require("../utils/helpers");
 
-describe("api tests", () => {
+describe("student tests", () => {
     let user1;
     let user2;
     let student1;
-    let school;
+    let school1;
     let subject1;
     let subject2;
     let course1;
@@ -31,8 +31,8 @@ describe("api tests", () => {
     let enrolment1;
     let enrolment2;
     let enrolment3;
-    let interest;
-    let socialMedia;
+    let interest1;
+    let socialMedia1;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
@@ -42,9 +42,9 @@ describe("api tests", () => {
     beforeAll(async () => {
         user1 = await createUser(db, user1Username, user1Password);
         user2 = await createUser(db, user2Username, user2Password);
-        school = await createSchool(db, "University of British Columbia", "www.ubc.ca/logo.png");
-        subject1 = await createSubject(db, school.school_id, "CPSC");
-        subject2 = await createSubject(db, school.school_id, "ENGL");
+        school1 = await createSchool(db, "University of British Columbia", "www.ubc.ca/logo.png");
+        subject1 = await createSubject(db, school1.school_id, "CPSC");
+        subject2 = await createSubject(db, school1.school_id, "ENGL");
         course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");
         course2 = await createCourse(db, subject1.subject_id, "121", "Models of Computation");
         course3 = await createCourse(db, subject2.subject_id, "110", "Approaches to Literature and Culture");
@@ -54,7 +54,7 @@ describe("api tests", () => {
         student1 = await createStudent(
             db,
             user1.user_id,
-            school.school_id,
+            school1.school_id,
             "Tyler",
             "Won",
             "4",
@@ -63,8 +63,8 @@ describe("api tests", () => {
             "www.tylerwon.com/profile_photo.jpg",
             "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
         );
-        interest = await createInterest(db, student1.student_id, "reading");
-        socialMedia = await createSocialMedia(db, student1.student_id, "LinkedIn", "www.linkedin.com/tylerwon");
+        interest1 = await createInterest(db, student1.student_id, "reading");
+        socialMedia1 = await createSocialMedia(db, student1.student_id, "LinkedIn", "www.linkedin.com/tylerwon");
         enrolment1 = await createEnrolment(db, student1.student_id, section1.section_id);
         enrolment2 = await createEnrolment(db, student1.student_id, section2.section_id);
         enrolment3 = await createEnrolment(db, student1.student_id, section3.section_id);
@@ -82,7 +82,7 @@ describe("api tests", () => {
             beforeEach(() => {
                 payload = {
                     student_id: user2.user_id,
-                    school_id: school.school_id,
+                    school_id: school1.school_id,
                     first_name: "Connor",
                     last_name: "Won",
                     year: "3",
@@ -148,7 +148,7 @@ describe("api tests", () => {
             });
 
             test("POST - should not create a student when school does not exist", async () => {
-                payload.school_id = school.school_id + 100;
+                payload.school_id = school1.school_id + 100;
 
                 await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, {
                     message: `school with id '${payload.school_id}' does not exist`,
@@ -181,7 +181,7 @@ describe("api tests", () => {
         describe("/students/{student_id}/interests", () => {
             test("GET - should return the interests for a student", async () => {
                 await verifyGetRequestResponse(app, `/students/${student1.student_id}/interests`, user1.token, 200, [
-                    interest,
+                    interest1,
                 ]);
             });
 
@@ -209,7 +209,7 @@ describe("api tests", () => {
                     `/students/${student1.student_id}/social-medias`,
                     user1.token,
                     200,
-                    [socialMedia]
+                    [socialMedia1]
                 );
             });
 
@@ -238,7 +238,7 @@ describe("api tests", () => {
             beforeAll(() => {
                 courseDetails1 = {
                     student_id: student1.student_id,
-                    school_id: school.school_id,
+                    school_id: school1.school_id,
                     subject_id: subject1.subject_id,
                     subject_name: subject1.subject_name,
                     course_id: course1.course_id,
@@ -251,7 +251,7 @@ describe("api tests", () => {
 
                 courseDetails2 = {
                     student_id: student1.student_id,
-                    school_id: school.school_id,
+                    school_id: school1.school_id,
                     subject_id: subject1.subject_id,
                     subject_name: subject1.subject_name,
                     course_id: course2.course_id,
@@ -264,7 +264,7 @@ describe("api tests", () => {
 
                 courseDetails3 = {
                     student_id: student1.student_id,
-                    school_id: school.school_id,
+                    school_id: school1.school_id,
                     subject_id: subject2.subject_id,
                     subject_name: subject2.subject_name,
                     course_id: course3.course_id,
