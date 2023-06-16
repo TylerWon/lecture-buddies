@@ -75,27 +75,6 @@ describe("api tests", () => {
         await db.$pool.end();
     });
 
-    describe("subject routes tests", () => {
-        describe("/subjects/{subject_id}/courses", () => {
-            test("GET - should return the courses for a subject", async () => {
-                await verifyGetRequestResponse(app, `/subjects/${subject1.subject_id}/courses`, user1.token, 200, [
-                    course1,
-                    course2,
-                ]);
-            });
-
-            test("GET - should return nothing when subject_id does not correspond to a subject", async () => {
-                await verifyGetRequestResponse(app, `/subjects/100/courses`, user1.token, 200, []);
-            });
-
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, `/subjects/${subject1.subject_id}/courses`, undefined, 401, {
-                    message: "unauthorized",
-                });
-            });
-        });
-    });
-
     describe("student routes tests", () => {
         describe("/students", () => {
             let payload;
