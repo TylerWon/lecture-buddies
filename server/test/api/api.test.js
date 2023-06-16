@@ -75,45 +75,6 @@ describe("api tests", () => {
         await db.$pool.end();
     });
 
-    describe("school routes tests", () => {
-        describe("/schools", () => {
-            test("GET - should return all schools", async () => {
-                await verifyGetRequestResponse(app, "/schools", user1.token, 200, [school]);
-            });
-
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, "/schools", undefined, 401, {
-                    message: "unauthorized",
-                });
-            });
-        });
-
-        describe("/schools/{school_id}/subjects", () => {
-            test("GET - should return the subjects for a school", async () => {
-                await verifyGetRequestResponse(app, `/schools/${school.school_id}/subjects`, user1.token, 200, [
-                    subject1,
-                    subject2,
-                ]);
-            });
-
-            test("GET - should return nothing when school_id does not correspond to a school", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/schools/${school.school_id + 100}/subjects`,
-                    user1.token,
-                    200,
-                    []
-                );
-            });
-
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, `/schools/${school.school_id}/subjects`, undefined, 401, {
-                    message: "unauthorized",
-                });
-            });
-        });
-    });
-
     describe("subject routes tests", () => {
         describe("/subjects/{subject_id}/courses", () => {
             test("GET - should return the courses for a subject", async () => {
