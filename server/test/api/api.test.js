@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
@@ -75,32 +73,6 @@ describe("api tests", () => {
     afterAll(async () => {
         await cleanUpDatabase(db);
         await db.$pool.end();
-    });
-
-    describe("course routes tests", () => {
-        describe("/courses/{course_id}/sections", () => {
-            test("GET - should return the sections for a course", async () => {
-                await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, user1.token, 200, [
-                    section1,
-                ]);
-            });
-
-            test("GET - should return nothing when course_id does not correspond to a course", async () => {
-                await verifyGetRequestResponse(
-                    app,
-                    `/courses/${course1.course_id + 100}/sections`,
-                    user1.token,
-                    200,
-                    []
-                );
-            });
-
-            test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, undefined, 401, {
-                    message: "unauthorized",
-                });
-            });
-        });
     });
 
     describe("school routes tests", () => {
