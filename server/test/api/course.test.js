@@ -36,7 +36,7 @@ describe("course routes tests", () => {
             await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, user1.token, 200, [section1]);
         });
 
-        test("GET - should return nothing when course_id does not correspond to a course", async () => {
+        test("GET - should return nothing when the course_id path parameter does not correspond to a course", async () => {
             await verifyGetRequestResponse(app, `/courses/${course1.course_id + 100}/sections`, user1.token, 200, []);
         });
 

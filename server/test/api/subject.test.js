@@ -36,7 +36,7 @@ describe("subject routes tests", () => {
             ]);
         });
 
-        test("GET - should return nothing when subject_id does not correspond to a subject", async () => {
+        test("GET - should return nothing when the subject_id path parameter does not correspond to a subject", async () => {
             await verifyGetRequestResponse(app, `/subjects/100/courses`, user1.token, 200, []);
         });
 
