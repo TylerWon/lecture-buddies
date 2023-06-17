@@ -18,7 +18,11 @@ const {
 describe("student routes tests", () => {
     let user1;
     let user2;
+    let user3;
+    let user4;
     let student1;
+    let student2;
+    let student3;
     let school1;
     let subject1;
     let subject2;
@@ -31,17 +35,30 @@ describe("student routes tests", () => {
     let enrolment1;
     let enrolment2;
     let enrolment3;
+    let enrolment4;
+    let enrolment5;
+    let enrolment6;
     let interest1;
+    let interest2;
+    let interest3;
     let socialMedia1;
+    let socialMedia2;
+    let socialMedia3;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
     const user2Username = "won.tyler2@gmail.com";
     const user2Password = "password2";
+    const user3Username = "won.tyler3@gmail.com";
+    const user3Password = "password3";
+    const user4Username = "won.tyler4@gmail.com";
+    const user4Password = "password4";
 
     beforeAll(async () => {
         user1 = await createUser(db, user1Username, user1Password);
         user2 = await createUser(db, user2Username, user2Password);
+        user3 = await createUser(db, user3Username, user3Password);
+        user4 = await createUser(db, user4Username, user4Password);
         school1 = await createSchool(db, "University of British Columbia", "www.ubc.ca/logo.png");
         subject1 = await createSubject(db, school1.school_id, "CPSC");
         subject2 = await createSubject(db, school1.school_id, "ENGL");
@@ -63,11 +80,42 @@ describe("student routes tests", () => {
             "www.tylerwon.com/profile_photo.jpg",
             "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
         );
+        student2 = await createStudent(
+            db,
+            user2.user_id,
+            school1.school_id,
+            "Connor",
+            "Won",
+            "3",
+            "Science",
+            "Computer Science",
+            "www.connorwon.com/profile_photo.jpg",
+            "Hello. I'm Connor. I'm a 3rd year computer science student at UBC."
+        );
+        student3 = await createStudent(
+            db,
+            user3.user_id,
+            school1.school_id,
+            "Brian",
+            "Wu",
+            "4",
+            "Science",
+            "Cellular, Anatomical, and Physiological Sciences",
+            "www.brianwu.com/profile_photo.jpg",
+            "Hello. I'm Brian. I'm a 4th year cellular, anatomical, and physiological sciences student at UBC."
+        );
         interest1 = await createInterest(db, student1.student_id, "reading");
+        interest2 = await createInterest(db, student2.student_id, "video games");
+        interest3 = await createInterest(db, student3.student_id, "yoshi");
         socialMedia1 = await createSocialMedia(db, student1.student_id, "LinkedIn", "www.linkedin.com/tylerwon");
+        socialMedia2 = await createSocialMedia(db, student2.student_id, "Instagram", "www.instagram.com/connorwon");
+        socialMedia3 = await createSocialMedia(db, student3.student_id, "Facebook", "www.facebook.com/brianwu");
         enrolment1 = await createEnrolment(db, student1.student_id, section1.section_id);
         enrolment2 = await createEnrolment(db, student1.student_id, section2.section_id);
         enrolment3 = await createEnrolment(db, student1.student_id, section3.section_id);
+        enrolment4 = await createEnrolment(db, student2.student_id, section1.section_id);
+        enrolment5 = await createEnrolment(db, student2.student_id, section2.section_id);
+        enrolment6 = await createEnrolment(db, student3.student_id, section1.section_id);
     });
 
     afterAll(async () => {
@@ -80,15 +128,15 @@ describe("student routes tests", () => {
 
         beforeEach(() => {
             payload = {
-                student_id: user2.user_id,
+                student_id: user4.user_id,
                 school_id: school1.school_id,
-                first_name: "Connor",
+                first_name: "Tyler",
                 last_name: "Won",
-                year: "3",
+                year: "4",
                 faculty: "Science",
                 major: "Computer Science",
-                profile_photo_url: "www.connorwon.com/profile_photo.jpg",
-                bio: "Hello. I'm Connor. I'm a 3rd year computer science student at UBC.",
+                profile_photo_url: "www.tylerwon.com/profile_photo.jpg",
+                bio: "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
             };
         });
 
@@ -139,7 +187,7 @@ describe("student routes tests", () => {
         });
 
         test("POST - should not create a student when user does not exist", async () => {
-            payload.student_id = user2.user_id + 100;
+            payload.student_id = user4.user_id + 100;
 
             await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, {
                 message: `user with id '${payload.student_id}' does not exist`,
@@ -166,7 +214,7 @@ describe("student routes tests", () => {
             await verifyGetRequestResponse(app, `/students/${student1.student_id}`, user1.token, 200, student1);
         });
 
-        test("GET - should return nothing when student_id does not correspond to a student", async () => {
+        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}`, user1.token, 200, null);
         });
 
@@ -184,7 +232,7 @@ describe("student routes tests", () => {
             ]);
         });
 
-        test("GET - should return nothing when student_id does not correspond to a student", async () => {
+        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id + 100}/interests`,
@@ -208,7 +256,7 @@ describe("student routes tests", () => {
             ]);
         });
 
-        test("GET - should return nothing when student_id does not correspond to a student", async () => {
+        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id + 100}/social-medias`,
@@ -232,7 +280,6 @@ describe("student routes tests", () => {
 
         beforeAll(() => {
             courseDetails1 = {
-                student_id: student1.student_id,
                 school_id: school1.school_id,
                 subject_id: subject1.subject_id,
                 subject_name: subject1.subject_name,
@@ -245,7 +292,6 @@ describe("student routes tests", () => {
             };
 
             courseDetails2 = {
-                student_id: student1.student_id,
                 school_id: school1.school_id,
                 subject_id: subject1.subject_id,
                 subject_name: subject1.subject_name,
@@ -258,7 +304,6 @@ describe("student routes tests", () => {
             };
 
             courseDetails3 = {
-                student_id: student1.student_id,
                 school_id: school1.school_id,
                 subject_id: subject2.subject_id,
                 subject_name: subject2.subject_name,
@@ -291,7 +336,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return nothing when student_id does not correspond to a student", async () => {
+        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id + 100}/course-history?order_by=-name`,
@@ -301,7 +346,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return error message when missing a query parameter", async () => {
+        test("GET - should return error message when missing the order_by query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id + 100}/course-history`,
@@ -318,7 +363,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return error message when a query parameter value is not a valid option", async () => {
+        test("GET - should return error message when the order_by query parameter value is not a valid option", async () => {
             const orderBy = "-term";
 
             await verifyGetRequestResponse(
@@ -342,6 +387,259 @@ describe("student routes tests", () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/course-history?order_by=-name`,
+                undefined,
+                401,
+                {
+                    message: "unauthorized",
+                }
+            );
+        });
+    });
+
+    describe("/students/{student_id}/sections/{section_id}/classmates", () => {
+        let classmateDetails1;
+        let classmateDetails2;
+        let courseDetails1;
+        let courseDetails2;
+
+        beforeAll(() => {
+            courseDetails1 = {
+                school_id: school1.school_id,
+                subject_id: subject1.subject_id,
+                subject_name: subject1.subject_name,
+                course_id: course1.course_id,
+                course_number: course1.course_number,
+                course_name: course1.course_name,
+                section_id: section1.section_id,
+                section_number: section1.section_number,
+                section_term: section1.section_term,
+            };
+
+            courseDetails2 = {
+                school_id: school1.school_id,
+                subject_id: subject1.subject_id,
+                subject_name: subject1.subject_name,
+                course_id: course2.course_id,
+                course_number: course2.course_number,
+                course_name: course2.course_name,
+                section_id: section2.section_id,
+                section_number: section2.section_number,
+                section_term: section2.section_term,
+            };
+
+            classmateDetails1 = {
+                ...student2,
+                interests: [interest2],
+                social_medias: [socialMedia2],
+                current_mutual_courses: [courseDetails1, courseDetails2],
+            };
+
+            classmateDetails2 = {
+                ...student3,
+                interests: [interest3],
+                social_medias: [socialMedia3],
+                current_mutual_courses: [courseDetails1],
+            };
+        });
+
+        test("GET - should return the classmates for a student (order by num_mutual_courses)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails1, classmateDetails2]
+            );
+        });
+
+        test("GET - should return the classmates for a student (order by -num_mutual_courses)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=-num_mutual_courses&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails2, classmateDetails1]
+            );
+        });
+
+        test("GET - should return the classmates for a student (order by name)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=name&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails2, classmateDetails1]
+            );
+        });
+
+        test("GET - should return the classmates for a student (order by -name)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=-name&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails1, classmateDetails2]
+            );
+        });
+
+        test("GET - should return the classmates for a student (order by year)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=year&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails1, classmateDetails2]
+            );
+        });
+
+        test("GET - should return the classmates for a student (order by -year)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=-year&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails2, classmateDetails1]
+            );
+        });
+
+        test("GET - should return the classmates for a student (order by major)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=major&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails2, classmateDetails1]
+            );
+        });
+
+        test("GET - should return the classmates for a student (order by -major)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=-major&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails1, classmateDetails2]
+            );
+        });
+
+        test("GET - should return the classmates for a student (0 < offset <= total number of results)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=1&limit=1`,
+                user1.token,
+                200,
+                [classmateDetails2]
+            );
+        });
+
+        test("GET - should return the classmates for a student (limit > total number of results)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=10`,
+                user1.token,
+                200,
+                [classmateDetails1, classmateDetails2]
+            );
+        });
+
+        test("GET - should return nothing when offset > total number of results", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=2&limit=2`,
+                user1.token,
+                200,
+                []
+            );
+        });
+
+        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id + 100}/sections/${
+                    section1.section_id
+                }/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
+                user1.token,
+                200,
+                []
+            );
+        });
+
+        test("GET - should return nothing when the section_id path parameter does not correspond to a section", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${
+                    section1.section_id + 100
+                }/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
+                user1.token,
+                200,
+                []
+            );
+        });
+
+        test("GET - should return error message when the order_by query parameter value is not a valid option", async () => {
+            const orderBy = "faculty";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=${orderBy}&offset=0&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "order_by",
+                        value: orderBy,
+                        msg: "order_by must be one of 'num_mutual_courses', '-num_mutual_courses', 'name', '-name', 'year', '-year', 'major', '-major''",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when the offset query parameter value is negative", async () => {
+            const offset = "-1";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=${offset}&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "offset",
+                        value: offset,
+                        msg: "offset must be a positive integer",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when the limit query parameter value is negative", async () => {
+            const limit = "-1";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=${limit}`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "limit",
+                        value: limit,
+                        msg: "limit must be a positive integer",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
                 undefined,
                 401,
                 {
