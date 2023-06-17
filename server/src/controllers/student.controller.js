@@ -147,6 +147,8 @@ const getCourseHistoryForStudent = async (req, res, next) => {
             case "-name":
                 courseHistory = await db.any(queries.students.getCourseHistoryForStudentOrderByNameDESC, [studentId]);
                 break;
+            default:
+                return res.status(400).json({ message: "invalid query parameters" });
         }
 
         return res.json(courseHistory);
@@ -157,12 +159,12 @@ const getCourseHistoryForStudent = async (req, res, next) => {
 
 /**
  * Gets the classmates for a student in a section. Information about each classmate and their interests, social medias,
- * and current mutual/non-mutual courses with the student is included.
+ * and current mutual courses with the student is included.
  *
  * @param {number} req.params.student_id - The student's ID
  * @param {number} req.params.section_id - The section's ID
- * @param {string} req.query.order_by - the field to order the response by (options: mutual_courses, -mutual_courses,
- * name, -name, year, -year, major, -major)
+ * @param {string} req.query.order_by - the field to order the response by (options: num_mutual_courses,
+ * -num_mutual_courses, name, -name, year, -year, major, -major)
  * @param {string} req.query.offset - the position to start returning results from
  * @param {string} req.query.limit - the number of results to return
  *
@@ -177,7 +179,7 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
 
 /**
  * Gets the buddies for a student. Information about each buddy and their interests, social medias, and
- * current/previous mutual/non-mutual courses with the student is included.
+ * current/previous mutual courses with the student is included.
  *
  * @param {number} req.params.student_id - The student's ID
  * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
@@ -195,7 +197,7 @@ const getBuddiesForStudent = async (req, res, next) => {
 
 /**
  * Gets the buddy requests for a student. Information about each requestor and their interests, social medias, and
- * current mutual/non-mutual courses with the student is included.
+ * current mutual courses with the student is included.
  *
  * @param {number} req.params.student_id - The student's ID
  * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
