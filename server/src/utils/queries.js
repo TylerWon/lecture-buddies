@@ -51,8 +51,8 @@ const queries = {
             WHERE student_id = $1
         `,
         getCourseHistoryForStudentOrderByNameASC: `
-            SELECT * 
-            FROM enrolments 
+            SELECT subjects.school_id, subjects.subject_id, subjects.subject_name, courses.course_id, courses.course_number, courses.course_name, sections.section_id, sections.section_number, sections.section_term
+            FROM enrolments
             JOIN sections ON enrolments.section_id = sections.section_id 
             JOIN courses ON sections.course_id = courses.course_id 
             JOIN subjects ON courses.subject_id = subjects.subject_id 
@@ -60,8 +60,8 @@ const queries = {
             ORDER BY subjects.subject_name ASC, courses.course_number ASC, courses.course_name ASC, sections.section_number ASC
         `,
         getCourseHistoryForStudentOrderByNameDESC: `
-            SELECT * 
-            FROM enrolments 
+            SELECT subjects.school_id, subjects.subject_id, subjects.subject_name, courses.course_id, courses.course_number, courses.course_name, sections.section_id, sections.section_number, sections.section_term
+            FROM enrolments
             JOIN sections ON enrolments.section_id = sections.section_id 
             JOIN courses ON sections.course_id = courses.course_id 
             JOIN subjects ON courses.subject_id = subjects.subject_id 
