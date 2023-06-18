@@ -11,7 +11,7 @@ const {
 
 describe("subject routes tests", () => {
     let user1;
-    let school;
+    let school1;
     let subject1;
     let course1;
 
@@ -20,8 +20,8 @@ describe("subject routes tests", () => {
 
     beforeAll(async () => {
         user1 = await createUser(db, user1Username, user1Password);
-        school = await createSchool(db, "University of British Columbia", "www.ubc.ca/logo.png");
-        subject1 = await createSubject(db, school.school_id, "CPSC");
+        school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
+        subject1 = await createSubject(db, school1.school_id, "CPSC");
         course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");
     });
 
@@ -29,6 +29,7 @@ describe("subject routes tests", () => {
         await cleanUpDatabase(db);
         await db.$pool.end();
     });
+
     describe("/subjects/{subject_id}/courses", () => {
         test("GET - should return the courses for a subject", async () => {
             await verifyGetRequestResponse(app, `/subjects/${subject1.subject_id}/courses`, user1.token, 200, [

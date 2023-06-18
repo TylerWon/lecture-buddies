@@ -13,6 +13,7 @@ CREATE DATABASE lecture_buddies;
 CREATE TABLE schools (
 	school_id SERIAL PRIMARY KEY,
 	school_name VARCHAR(150) UNIQUE,
+	current_term VARCHAR(10),
 	logo_url VARCHAR(2048)
 );
 

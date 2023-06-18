@@ -51,12 +51,13 @@ async function createInterest(db, studentId, interestName) {
  *
  * @param {object} db - the database connection
  * @param {string} schoolName - the school's name
+ * @param {string} currentTerm - the school's current term
  * @param {string} logoUrl - the school's logo url
  *
  * @returns {object} the created school
  */
-async function createSchool(db, schoolName, logoUrl) {
-    return await db.one(queries.schools.createSchool, [schoolName, logoUrl]);
+async function createSchool(db, schoolName, currentTerm, logoUrl) {
+    return await db.one(queries.schools.createSchool, [schoolName, currentTerm, logoUrl]);
 }
 
 /**

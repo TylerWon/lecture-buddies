@@ -21,7 +21,7 @@ describe("course routes tests", () => {
 
     beforeAll(async () => {
         user1 = await createUser(db, user1Username, user1Password);
-        school1 = await createSchool(db, "University of British Columbia", "www.ubc.ca/logo.png");
+        school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
         subject1 = await createSubject(db, school1.school_id, "CPSC");
         course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");
         section1 = await createSection(db, course1.course_id, "001", "2023W1");
@@ -31,6 +31,7 @@ describe("course routes tests", () => {
         await cleanUpDatabase(db);
         await db.$pool.end();
     });
+
     describe("/courses/{course_id}/sections", () => {
         test("GET - should return the sections for a course", async () => {
             await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, user1.token, 200, [section1]);

@@ -12,7 +12,7 @@ const queries = {
         deleteInterest: "DELETE FROM interests WHERE interest_id = $1",
     },
     schools: {
-        createSchool: "INSERT INTO schools (school_name, logo_url) VALUES ($1, $2) RETURNING *",
+        createSchool: "INSERT INTO schools (school_name, current_term, logo_url) VALUES ($1, $2, $3) RETURNING *",
         deleteSchool: "DELETE FROM schools WHERE school_id = $1",
     },
     sections: {

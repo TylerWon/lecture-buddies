@@ -18,7 +18,7 @@ describe("school routes tests", () => {
 
     beforeAll(async () => {
         user1 = await createUser(db, user1Username, user1Password);
-        school1 = await createSchool(db, "University of British Columbia", "www.ubc.ca/logo.png");
+        school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
         subject1 = await createSubject(db, school1.school_id, "CPSC");
     });
 
@@ -26,6 +26,7 @@ describe("school routes tests", () => {
         await cleanUpDatabase(db);
         await db.$pool.end();
     });
+
     describe("/schools", () => {
         test("GET - should return all schools", async () => {
             await verifyGetRequestResponse(app, "/schools", user1.token, 200, [school1]);
