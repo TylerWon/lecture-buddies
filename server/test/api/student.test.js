@@ -112,8 +112,8 @@ describe("student routes tests", () => {
         await createEnrolment(db, student2.student_id, section2.section_id);
         await createEnrolment(db, student2.student_id, section3.section_id);
         await createEnrolment(db, student3.student_id, section1.section_id);
-        await createBuddy(db, student1.student_id, student2.student_id);
-        await createBuddy(db, student1.student_id, student3.student_id);
+        await createBuddy(db, student1.student_id, student2.student_id, "accepted");
+        await createBuddy(db, student1.student_id, student3.student_id, "accepted");
     });
 
     afterAll(async () => {

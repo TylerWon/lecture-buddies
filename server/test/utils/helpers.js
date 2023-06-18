@@ -12,11 +12,12 @@ const queries = require("../utils/queries");
  * @param {object} db - the database connection
  * @param {number} requestorId - the id of the student who sent the buddy request
  * @param {number} requesteeId - the id of the student who received the buddy request
+ * @param {string} status - the status of the buddy request
  *
  * @returns {object} the created buddy
  */
-async function createBuddy(db, requestorId, requesteeId) {
-    return await db.one(queries.buddies.createBuddy, [requestorId, requesteeId]);
+async function createBuddy(db, requestorId, requesteeId, status) {
+    return await db.one(queries.buddies.createBuddy, [requestorId, requesteeId, status]);
 }
 
 /**

@@ -1,6 +1,6 @@
 const queries = {
     buddies: {
-        createBuddy: "INSERT INTO buddies (requestor_id, requestee_id) VALUES ($1, $2) RETURNING *",
+        createBuddy: "INSERT INTO buddies (requestor_id, requestee_id, status) VALUES ($1, $2, $3) RETURNING *",
     },
     courses: {
         createCourse: "INSERT INTO courses (subject_id, course_number, course_name) VALUES ($1, $2, $3) RETURNING *",
