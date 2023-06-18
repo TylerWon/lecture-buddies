@@ -1,6 +1,7 @@
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
+    createBuddy,
     createCourse,
     createEnrolment,
     createInterest,
@@ -111,6 +112,8 @@ describe("student routes tests", () => {
         await createEnrolment(db, student2.student_id, section2.section_id);
         await createEnrolment(db, student2.student_id, section3.section_id);
         await createEnrolment(db, student3.student_id, section1.section_id);
+        await createBuddy(db, student1.student_id, student2.student_id);
+        await createBuddy(db, student1.student_id, student3.student_id);
     });
 
     afterAll(async () => {
@@ -342,20 +345,14 @@ describe("student routes tests", () => {
         });
 
         test("GET - should return error message when missing the order_by query parameter", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id + 100}/course-history`,
-                user1.token,
-                400,
-                [
-                    {
-                        type: "field",
-                        location: "query",
-                        path: "order_by",
-                        msg: "order_by is required",
-                    },
-                ]
-            );
+            await verifyGetRequestResponse(app, `/students/${student1.student_id}/course-history`, user1.token, 400, [
+                {
+                    type: "field",
+                    location: "query",
+                    path: "order_by",
+                    msg: "order_by is required",
+                },
+            ]);
         });
 
         test("GET - should return error message when the order_by query parameter value is not a valid option", async () => {
@@ -363,7 +360,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id + 100}/course-history?order_by=${orderBy}`,
+                `/students/${student1.student_id}/course-history?order_by=${orderBy}`,
                 user1.token,
                 400,
                 [
@@ -571,6 +568,57 @@ describe("student routes tests", () => {
             );
         });
 
+        test("GET - should return error message when missing the order_by query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?&offset=0&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "order_by",
+                        msg: "order_by is required",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when missing the offset query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "offset",
+                        msg: "offset is required",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when missing the limit query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "limit",
+                        msg: "limit is required",
+                    },
+                ]
+            );
+        });
+
         test("GET - should return error message when the order_by query parameter value is not a valid option", async () => {
             const orderBy = "faculty";
 
@@ -635,6 +683,251 @@ describe("student routes tests", () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
+                undefined,
+                401,
+                {
+                    message: "unauthorized",
+                }
+            );
+        });
+    });
+
+    describe("/students/{student_id}/buddies", () => {
+        let classmateDetails1;
+        let classmateDetails2;
+        let courseDetails1;
+        let courseDetails2;
+        let courseDetails3;
+
+        beforeAll(() => {
+            courseDetails1 = {
+                school_id: school1.school_id,
+                subject_id: subject1.subject_id,
+                subject_name: subject1.subject_name,
+                course_id: course1.course_id,
+                course_number: course1.course_number,
+                course_name: course1.course_name,
+                section_id: section1.section_id,
+                section_number: section1.section_number,
+                section_term: section1.section_term,
+            };
+
+            courseDetails2 = {
+                school_id: school1.school_id,
+                subject_id: subject1.subject_id,
+                subject_name: subject1.subject_name,
+                course_id: course2.course_id,
+                course_number: course2.course_number,
+                course_name: course2.course_name,
+                section_id: section2.section_id,
+                section_number: section2.section_number,
+                section_term: section2.section_term,
+            };
+
+            courseDetails3 = {
+                school_id: school1.school_id,
+                subject_id: subject2.subject_id,
+                subject_name: subject2.subject_name,
+                course_id: course3.course_id,
+                course_number: course3.course_number,
+                course_name: course3.course_name,
+                section_id: section3.section_id,
+                section_number: section3.section_number,
+                section_term: section3.section_term,
+            };
+
+            classmateDetails1 = {
+                ...student2,
+                interests: [interest2],
+                social_medias: [socialMedia2],
+                current_mutual_courses: [courseDetails3],
+                previous_mutual_courses: [courseDetails1, courseDetails2],
+            };
+
+            classmateDetails2 = {
+                ...student3,
+                interests: [interest3],
+                social_medias: [socialMedia3],
+                current_mutual_courses: [],
+                previous_mutual_courses: [courseDetails1],
+            };
+        });
+
+        test("GET - should return the buddies for a student (order by name)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails2, classmateDetails1]
+            );
+        });
+
+        test("GET - should return the buddies for a student (order by -name)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=2`,
+                user1.token,
+                200,
+                [classmateDetails1, classmateDetails2]
+            );
+        });
+
+        test("GET - should return the buddies for a student (0 < offset <= total number of results)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=1&limit=1`,
+                user1.token,
+                200,
+                [classmateDetails1]
+            );
+        });
+
+        test("GET - should return the buddies for a student (limit > total number of results)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=10`,
+                user1.token,
+                200,
+                [classmateDetails2, classmateDetails1]
+            );
+        });
+
+        test("GET - should return nothing when offset > total number of results", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=2&limit=2`,
+                user1.token,
+                200,
+                []
+            );
+        });
+
+        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id + 100}/buddies?order_by=name&offset=0&limit=2`,
+                user1.token,
+                200,
+                []
+            );
+        });
+
+        test("GET - should return error message when missing the order_by query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?offset=0&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "order_by",
+                        msg: "order_by is required",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when missing the offset query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "offset",
+                        msg: "offset is required",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when missing the limit query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=0`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "limit",
+                        msg: "limit is required",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when the order_by query parameter value is not a valid option", async () => {
+            const orderBy = "num_mutual_courses";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=${orderBy}&offset=0&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "order_by",
+                        value: orderBy,
+                        msg: "order_by must be one of 'name' or '-name'",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when the offset query parameter value is negative", async () => {
+            const offset = "-1";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=${offset}&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "offset",
+                        value: offset,
+                        msg: "offset must be a positive integer",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when the limit query parameter value is negative", async () => {
+            const limit = "-1";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=${limit}`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "limit",
+                        value: limit,
+                        msg: "limit must be a positive integer",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=2`,
                 undefined,
                 401,
                 {
