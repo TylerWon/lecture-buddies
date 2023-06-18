@@ -6,6 +6,13 @@ const queries = {
             WHERE course_id = $1
         `,
     },
+    enrolments: {
+        getEnrolment: `
+            SELECT *
+            FROM enrolments
+            WHERE student_id = $1 AND section_id = $2
+        `,
+    },
     schools: {
         getSchools: `
             SELECT * 
@@ -67,6 +74,24 @@ const queries = {
             JOIN subjects ON courses.subject_id = subjects.subject_id 
             WHERE enrolments.student_id = $1 
             ORDER BY subjects.subject_name DESC, courses.course_number DESC, courses.course_name DESC, sections.section_number DESC
+        `,
+        getClassmatesForStudentInSection: `
+            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
+            FROM enrolments
+            JOIN students ON enrolments.student_id = students.student_id
+            WHERE enrolments.student_id != $1 AND enrolments.section_id = $2
+        `,
+        getCurrentMutualCoursesForTwoStudents: `
+            SELECT subjects.school_id, subjects.subject_id, subjects.subject_name, courses.course_id, courses.course_number, courses.course_name, sections.section_id, sections.section_number, sections.section_term
+            FROM enrolments
+            JOIN sections ON enrolments.section_id = sections.section_id 
+            JOIN courses ON sections.course_id = courses.course_id 
+            JOIN subjects ON courses.subject_id = subjects.subject_id 
+            WHERE enrolments.student_id = $1 AND enrolments.section_id IN (
+                SELECT enrolments.section_id
+                FROM enrolments
+                WHERE enrolments.student_id = $2
+            )
         `,
     },
     users: {

@@ -448,7 +448,7 @@ describe("student routes tests", () => {
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
                 user1.token,
                 200,
-                [classmateDetails1, classmateDetails2]
+                [classmateDetails2, classmateDetails1]
             );
         });
 
@@ -458,7 +458,7 @@ describe("student routes tests", () => {
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=-num_mutual_courses&offset=0&limit=2`,
                 user1.token,
                 200,
-                [classmateDetails2, classmateDetails1]
+                [classmateDetails1, classmateDetails2]
             );
         });
 
@@ -528,7 +528,7 @@ describe("student routes tests", () => {
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=1&limit=1`,
                 user1.token,
                 200,
-                [classmateDetails2]
+                [classmateDetails1]
             );
         });
 
@@ -538,7 +538,7 @@ describe("student routes tests", () => {
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=10`,
                 user1.token,
                 200,
-                [classmateDetails1, classmateDetails2]
+                [classmateDetails2, classmateDetails1]
             );
         });
 

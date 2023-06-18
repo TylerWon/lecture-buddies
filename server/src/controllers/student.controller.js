@@ -1,5 +1,3 @@
-const { matchedData } = require("express-validator");
-
 const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
@@ -22,7 +20,7 @@ const queries = require("../utils/queries");
  * - 500 Internal Server Error if unexpected error
  */
 const createStudent = async (req, res, next) => {
-    const payload = matchedData(req);
+    const payload = req.body;
 
     // Check if user exists
     try {
@@ -174,7 +172,89 @@ const getCourseHistoryForStudent = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const getClassmatesForStudentInSection = async (req, res, next) => {
-    res.send("Not implemented");
+    const studentId = req.params.student_id;
+    const sectionId = req.params.section_id;
+    const orderBy = req.query.order_by;
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    // Check if student is enrolled in section
+    try {
+        await db.one(queries.enrolments.getEnrolment, [studentId, sectionId]);
+    } catch (err) {
+        return res.json([]);
+    }
+
+    try {
+        // Get classmates
+        let classmates = await db.any(queries.students.getClassmatesForStudentInSection, [studentId, sectionId]);
+
+        // Get current mutual courses for each classmate
+        for (const classmate of classmates) {
+            const currentMutualCourses = await db.any(queries.students.getCurrentMutualCoursesForTwoStudents, [
+                studentId,
+                classmate.student_id,
+            ]);
+            classmate.current_mutual_courses = currentMutualCourses;
+        }
+
+        // Sort classmates
+        switch (orderBy) {
+            case "num_mutual_courses":
+                classmates.sort((a, b) => a.current_mutual_courses.length - b.current_mutual_courses.length);
+                break;
+            case "-num_mutual_courses":
+                classmates.sort((a, b) => b.current_mutual_courses.length - a.current_mutual_courses.length);
+                break;
+            case "name":
+                classmates.sort((a, b) => {
+                    const aName = `${a.first_name} ${a.last_name}`;
+                    const bName = `${b.first_name} ${b.last_name}`;
+                    return aName.localeCompare(bName);
+                });
+                break;
+            case "-name":
+                classmates.sort((a, b) => {
+                    const aName = `${a.first_name} ${a.last_name}`;
+                    const bName = `${b.first_name} ${b.last_name}`;
+                    return bName.localeCompare(aName);
+                });
+                break;
+            case "year":
+                classmates.sort((a, b) => a.year - b.year);
+                break;
+            case "-year":
+                classmates.sort((a, b) => b.year - a.year);
+                break;
+            case "major":
+                classmates.sort((a, b) => a.major.localeCompare(b.major));
+                break;
+            case "-major":
+                classmates.sort((a, b) => b.major.localeCompare(a.major));
+                break;
+            default:
+                return res.status(400).json({ message: "invalid query parameters" });
+        }
+
+        // Paginate classmates
+        classmates = classmates.slice(offset, offset + limit);
+
+        // Get interests for each classmate
+        for (const classmate of classmates) {
+            const interests = await db.any(queries.students.getInterestsForStudent, [classmate.student_id]);
+            classmate.interests = interests;
+        }
+
+        // Get social medias for each classmate
+        for (const classmate of classmates) {
+            const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [classmate.student_id]);
+            classmate.social_medias = socialMedias;
+        }
+
+        return res.json(classmates);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 /**

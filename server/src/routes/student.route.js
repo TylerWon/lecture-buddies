@@ -33,6 +33,8 @@ router.get(
 );
 router.get(
     "/:student_id(\\d+)/sections/:section_id(\\d+)/classmates",
+    validationSchemas.getClassmatesForStudentInSectionValidationSchema(),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     studentController.getClassmatesForStudentInSection
 );

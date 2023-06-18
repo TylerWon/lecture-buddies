@@ -120,8 +120,44 @@ const getCourseHistoryForStudentValidationSchema = () =>
         ["query"]
     );
 
+const getClassmatesForStudentInSectionValidationSchema = () =>
+    checkSchema(
+        {
+            order_by: {
+                exists: {
+                    errorMessage: "order_by is required",
+                },
+                matches: {
+                    options: [/^(-?)(num_mutual_courses|name|year|major)$/],
+                    errorMessage:
+                        "order_by must be one of 'num_mutual_courses', '-num_mutual_courses', 'name', '-name', 'year', '-year', 'major', '-major''",
+                },
+            },
+            offset: {
+                exists: {
+                    errorMessage: "offset is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "offset must be a positive integer",
+                },
+            },
+            limit: {
+                exists: {
+                    errorMessage: "limit is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "limit must be a positive integer",
+                },
+            },
+        },
+        ["query"]
+    );
+
 module.exports = {
     authValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
+    getClassmatesForStudentInSectionValidationSchema,
 };
