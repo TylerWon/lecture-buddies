@@ -206,14 +206,23 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
         // Get classmates
         let classmates = await db.any(queries.students.getClassmatesForStudentInSection, [studentId, sectionId]);
 
-        // Get mutual courses with the student for the term the section is in for each classmate
+        // Get mutual courses with the student for each classmate (sort the courses by name ascending)
         for (const classmate of classmates) {
             const mutualCoursesForTerm = await db.any(queries.students.getMutualCoursesForTwoStudentsForTerm, [
                 studentId,
                 classmate.student_id,
                 section.section_term,
             ]);
+
             classmate.mutual_courses_for_term = mutualCoursesForTerm;
+
+            classmate.mutual_courses_for_term.sort(
+                (a, b) =>
+                    a.subject_name.localeCompare(b.subject_name) ||
+                    a.course_number.localeCompare(b.course_number) ||
+                    a.course_name.localeCompare(b.course_name) ||
+                    a.section_number.localeCompare(b.section_number)
+            );
         }
 
         // Sort classmates
