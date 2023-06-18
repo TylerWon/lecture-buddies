@@ -171,7 +171,7 @@ const getCourseHistoryForStudent = async (req, res, next) => {
 
 /**
  * Gets the classmates for a student in a section. Information about each classmate and their interests, social medias,
- * and current mutual courses with the student is included.
+ * and mutual courses with the student for the term the section is in is included.
  *
  * @param {number} req.params.student_id - The student's ID
  * @param {number} req.params.section_id - The section's ID
@@ -206,23 +206,23 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
         // Get classmates
         let classmates = await db.any(queries.students.getClassmatesForStudentInSection, [studentId, sectionId]);
 
-        // Get current mutual courses for each classmate
+        // Get mutual courses with the student for the term the section is in for each classmate
         for (const classmate of classmates) {
-            const currentMutualCourses = await db.any(queries.students.getCurrentMutualCoursesForTwoStudents, [
+            const mutualCoursesForTerm = await db.any(queries.students.getMutualCoursesForTwoStudentsForTerm, [
                 studentId,
                 classmate.student_id,
                 section.section_term,
             ]);
-            classmate.current_mutual_courses = currentMutualCourses;
+            classmate.mutual_courses_for_term = mutualCoursesForTerm;
         }
 
         // Sort classmates
         switch (orderBy) {
             case "num_mutual_courses":
-                classmates.sort((a, b) => a.current_mutual_courses.length - b.current_mutual_courses.length);
+                classmates.sort((a, b) => a.mutual_courses_for_term.length - b.mutual_courses_for_term.length);
                 break;
             case "-num_mutual_courses":
-                classmates.sort((a, b) => b.current_mutual_courses.length - a.current_mutual_courses.length);
+                classmates.sort((a, b) => b.mutual_courses_for_term.length - a.mutual_courses_for_term.length);
                 break;
             case "name":
                 classmates.sort((a, b) => {

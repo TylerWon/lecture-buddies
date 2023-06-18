@@ -78,7 +78,7 @@ const queries = {
             JOIN students ON enrolments.student_id = students.student_id
             WHERE enrolments.student_id != $1 AND enrolments.section_id = $2
         `,
-        getCurrentMutualCoursesForTwoStudents: `
+        getMutualCoursesForTwoStudentsForTerm: `
             SELECT subjects.school_id, subjects.subject_id, subjects.subject_name, courses.course_id, courses.course_number, courses.course_name, sections.section_id, sections.section_number, sections.section_term
             FROM enrolments
             JOIN sections ON enrolments.section_id = sections.section_id 

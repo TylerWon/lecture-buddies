@@ -32,12 +32,6 @@ describe("student routes tests", () => {
     let section1;
     let section2;
     let section3;
-    let enrolment1;
-    let enrolment2;
-    let enrolment3;
-    let enrolment4;
-    let enrolment5;
-    let enrolment6;
     let interest1;
     let interest2;
     let interest3;
@@ -110,12 +104,13 @@ describe("student routes tests", () => {
         socialMedia1 = await createSocialMedia(db, student1.student_id, "LinkedIn", "www.linkedin.com/tylerwon");
         socialMedia2 = await createSocialMedia(db, student2.student_id, "Instagram", "www.instagram.com/connorwon");
         socialMedia3 = await createSocialMedia(db, student3.student_id, "Facebook", "www.facebook.com/brianwu");
-        enrolment1 = await createEnrolment(db, student1.student_id, section1.section_id);
-        enrolment2 = await createEnrolment(db, student1.student_id, section2.section_id);
-        enrolment3 = await createEnrolment(db, student1.student_id, section3.section_id);
-        enrolment4 = await createEnrolment(db, student2.student_id, section1.section_id);
-        enrolment5 = await createEnrolment(db, student2.student_id, section2.section_id);
-        enrolment6 = await createEnrolment(db, student3.student_id, section1.section_id);
+        await createEnrolment(db, student1.student_id, section1.section_id);
+        await createEnrolment(db, student1.student_id, section2.section_id);
+        await createEnrolment(db, student1.student_id, section3.section_id);
+        await createEnrolment(db, student2.student_id, section1.section_id);
+        await createEnrolment(db, student2.student_id, section2.section_id);
+        await createEnrolment(db, student2.student_id, section3.section_id);
+        await createEnrolment(db, student3.student_id, section1.section_id);
     });
 
     afterAll(async () => {
@@ -431,14 +426,14 @@ describe("student routes tests", () => {
                 ...student2,
                 interests: [interest2],
                 social_medias: [socialMedia2],
-                current_mutual_courses: [courseDetails1, courseDetails2],
+                mutual_courses_for_term: [courseDetails1, courseDetails2],
             };
 
             classmateDetails2 = {
                 ...student3,
                 interests: [interest3],
                 social_medias: [socialMedia3],
-                current_mutual_courses: [courseDetails1],
+                mutual_courses_for_term: [courseDetails1],
             };
         });
 
