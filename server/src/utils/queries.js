@@ -29,6 +29,13 @@ const queries = {
             WHERE school_id = $1
         `,
     },
+    sections: {
+        getSection: `
+            SELECT *
+            FROM sections
+            WHERE section_id = $1
+        `,
+    },
     subjects: {
         getCoursesForSubject: `
             SELECT * 
@@ -77,7 +84,7 @@ const queries = {
             JOIN sections ON enrolments.section_id = sections.section_id 
             JOIN courses ON sections.course_id = courses.course_id 
             JOIN subjects ON courses.subject_id = subjects.subject_id 
-            WHERE enrolments.student_id = $1 AND enrolments.section_id IN (
+            WHERE enrolments.student_id = $1 AND sections.section_term = $3 AND enrolments.section_id IN (
                 SELECT enrolments.section_id
                 FROM enrolments
                 WHERE enrolments.student_id = $2

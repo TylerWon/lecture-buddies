@@ -136,8 +136,10 @@ const getCourseHistoryForStudent = async (req, res, next) => {
     const orderBy = req.query.order_by;
 
     try {
+        // Get course history
         let courseHistory = await db.any(queries.students.getCourseHistoryForStudent, [studentId]);
 
+        // Sort course history
         switch (orderBy) {
             case "name":
                 courseHistory.sort(
@@ -198,6 +200,9 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
     }
 
     try {
+        // Get section
+        const section = await db.one(queries.sections.getSection, [sectionId]);
+
         // Get classmates
         let classmates = await db.any(queries.students.getClassmatesForStudentInSection, [studentId, sectionId]);
 
@@ -206,6 +211,7 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
             const currentMutualCourses = await db.any(queries.students.getCurrentMutualCoursesForTwoStudents, [
                 studentId,
                 classmate.student_id,
+                section.section_term,
             ]);
             classmate.current_mutual_courses = currentMutualCourses;
         }
