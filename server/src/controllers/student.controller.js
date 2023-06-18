@@ -136,17 +136,29 @@ const getCourseHistoryForStudent = async (req, res, next) => {
     const orderBy = req.query.order_by;
 
     try {
-        let courseHistory;
+        let courseHistory = await db.any(queries.students.getCourseHistoryForStudent, [studentId]);
 
         switch (orderBy) {
             case "name":
-                courseHistory = await db.any(queries.students.getCourseHistoryForStudentOrderByNameASC, [studentId]);
+                courseHistory.sort(
+                    (a, b) =>
+                        a.subject_name.localeCompare(b.subject_name) ||
+                        a.course_number.localeCompare(b.course_number) ||
+                        a.course_name.localeCompare(b.course_name) ||
+                        a.section_number.localeCompare(b.section_number)
+                );
                 break;
             case "-name":
-                courseHistory = await db.any(queries.students.getCourseHistoryForStudentOrderByNameDESC, [studentId]);
+                courseHistory.sort(
+                    (a, b) =>
+                        b.subject_name.localeCompare(a.subject_name) ||
+                        b.course_number.localeCompare(a.course_number) ||
+                        b.course_name.localeCompare(a.course_name) ||
+                        b.section_number.localeCompare(a.section_number)
+                );
                 break;
             default:
-                return res.status(400).json({ message: "invalid query parameters" });
+                return res.status(400).json({ message: "invalid order_by query parameter" });
         }
 
         return res.json(courseHistory);
@@ -221,10 +233,10 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
                 });
                 break;
             case "year":
-                classmates.sort((a, b) => a.year - b.year);
+                classmates.sort((a, b) => a.year.localeCompare(b.year));
                 break;
             case "-year":
-                classmates.sort((a, b) => b.year - a.year);
+                classmates.sort((a, b) => b.year.localeCompare(a.year));
                 break;
             case "major":
                 classmates.sort((a, b) => a.major.localeCompare(b.major));
@@ -233,7 +245,7 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
                 classmates.sort((a, b) => b.major.localeCompare(a.major));
                 break;
             default:
-                return res.status(400).json({ message: "invalid query parameters" });
+                return res.status(400).json({ message: "invalid order_by query parameter" });
         }
 
         // Paginate classmates

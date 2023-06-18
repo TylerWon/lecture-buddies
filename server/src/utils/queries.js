@@ -57,23 +57,13 @@ const queries = {
             FROM social_medias 
             WHERE student_id = $1
         `,
-        getCourseHistoryForStudentOrderByNameASC: `
+        getCourseHistoryForStudent: `
             SELECT subjects.school_id, subjects.subject_id, subjects.subject_name, courses.course_id, courses.course_number, courses.course_name, sections.section_id, sections.section_number, sections.section_term
             FROM enrolments
             JOIN sections ON enrolments.section_id = sections.section_id 
             JOIN courses ON sections.course_id = courses.course_id 
             JOIN subjects ON courses.subject_id = subjects.subject_id 
             WHERE enrolments.student_id = $1 
-            ORDER BY subjects.subject_name ASC, courses.course_number ASC, courses.course_name ASC, sections.section_number ASC
-        `,
-        getCourseHistoryForStudentOrderByNameDESC: `
-            SELECT subjects.school_id, subjects.subject_id, subjects.subject_name, courses.course_id, courses.course_number, courses.course_name, sections.section_id, sections.section_number, sections.section_term
-            FROM enrolments
-            JOIN sections ON enrolments.section_id = sections.section_id 
-            JOIN courses ON sections.course_id = courses.course_id 
-            JOIN subjects ON courses.subject_id = subjects.subject_id 
-            WHERE enrolments.student_id = $1 
-            ORDER BY subjects.subject_name DESC, courses.course_number DESC, courses.course_name DESC, sections.section_number DESC
         `,
         getClassmatesForStudentInSection: `
             SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
