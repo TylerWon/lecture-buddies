@@ -142,22 +142,10 @@ const getCourseHistoryForStudent = async (req, res, next) => {
         // Sort course history
         switch (orderBy) {
             case "name":
-                courseHistory.sort(
-                    (a, b) =>
-                        a.subject_name.localeCompare(b.subject_name) ||
-                        a.course_number.localeCompare(b.course_number) ||
-                        a.course_name.localeCompare(b.course_name) ||
-                        a.section_number.localeCompare(b.section_number)
-                );
+                sortCoursesByNameASC(courseHistory);
                 break;
             case "-name":
-                courseHistory.sort(
-                    (a, b) =>
-                        b.subject_name.localeCompare(a.subject_name) ||
-                        b.course_number.localeCompare(a.course_number) ||
-                        b.course_name.localeCompare(a.course_name) ||
-                        b.section_number.localeCompare(a.section_number)
-                );
+                sortCoursesByNameDESC(courseHistory);
                 break;
             default:
                 return res.status(400).json({ message: "invalid order_by query parameter" });
@@ -206,24 +194,13 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
         // Get classmates
         let classmates = await db.any(queries.students.getClassmatesForStudentInSection, [studentId, sectionId]);
 
-        // Get mutual courses with the student for each classmate (sort the courses by name ascending)
-        for (const classmate of classmates) {
-            const mutualCoursesForTerm = await db.any(queries.students.getMutualCoursesForTwoStudentsForTerm, [
-                studentId,
-                classmate.student_id,
-                section.section_term,
-            ]);
-
-            classmate.mutual_courses_for_term = mutualCoursesForTerm;
-
-            classmate.mutual_courses_for_term.sort(
-                (a, b) =>
-                    a.subject_name.localeCompare(b.subject_name) ||
-                    a.course_number.localeCompare(b.course_number) ||
-                    a.course_name.localeCompare(b.course_name) ||
-                    a.section_number.localeCompare(b.section_number)
-            );
-        }
+        // Get mutual courses with the student for each classmate
+        await getMutualCoursesForStudentsForTerm(
+            studentId,
+            classmates,
+            section.section_term,
+            "mutual_courses_for_term"
+        );
 
         // Sort classmates
         switch (orderBy) {
@@ -234,18 +211,10 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
                 classmates.sort((a, b) => b.mutual_courses_for_term.length - a.mutual_courses_for_term.length);
                 break;
             case "name":
-                classmates.sort((a, b) => {
-                    const aName = `${a.first_name} ${a.last_name}`;
-                    const bName = `${b.first_name} ${b.last_name}`;
-                    return aName.localeCompare(bName);
-                });
+                sortStudentsByNameASC(classmates);
                 break;
             case "-name":
-                classmates.sort((a, b) => {
-                    const aName = `${a.first_name} ${a.last_name}`;
-                    const bName = `${b.first_name} ${b.last_name}`;
-                    return bName.localeCompare(aName);
-                });
+                sortStudentsByNameDESC(classmates);
                 break;
             case "year":
                 classmates.sort((a, b) => a.year.localeCompare(b.year));
@@ -267,16 +236,10 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
         classmates = classmates.slice(offset, offset + limit);
 
         // Get interests for each classmate
-        for (const classmate of classmates) {
-            const interests = await db.any(queries.students.getInterestsForStudent, [classmate.student_id]);
-            classmate.interests = interests;
-        }
+        await getInterestsForStudents(classmates);
 
         // Get social medias for each classmate
-        for (const classmate of classmates) {
-            const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [classmate.student_id]);
-            classmate.social_medias = socialMedias;
-        }
+        await getSocialMediasForStudents(classmates);
 
         return res.json(classmates);
     } catch (err) {
@@ -299,7 +262,62 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const getBuddiesForStudent = async (req, res, next) => {
-    res.send("Not implemented");
+    const studentId = req.params.student_id;
+    const orderBy = req.query.order_by;
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    // Check if student exists
+    try {
+        await db.one(queries.students.getStudent, [studentId]);
+    } catch (err) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    try {
+        // Get buddies
+        let buddies = await db.any(queries.students.getBuddiesForStudent, [studentId]);
+
+        // Sort buddies
+        switch (orderBy) {
+            case "name":
+                sortStudentsByNameASC(buddies);
+                break;
+            case "-name":
+                sortStudentsByNameDESC(buddies);
+                break;
+            default:
+                return res.status(400).json({ message: "invalid order_by query parameter" });
+        }
+
+        // Paginate buddies
+        buddies = buddies.slice(offset, offset + limit);
+
+        // Get interests for each buddy
+        await getInterestsForStudents(buddies);
+
+        // Get social medias for each buddy
+        await getSocialMediasForStudents(buddies);
+
+        // Get school
+        const student = await db.one(queries.students.getStudent, [studentId]);
+        const school = await db.one(queries.schools.getSchool, [student.school_id]);
+
+        // Get current mutual courses with the student for each buddy
+        await getMutualCoursesForStudentsForTerm(studentId, buddies, school.current_term, "current_mutual_courses");
+
+        // Get previous mutual courses with the student for each buddy
+        await getMutualCoursesForStudentsExcludingTerm(
+            studentId,
+            buddies,
+            school.current_term,
+            "previous_mutual_courses"
+        );
+
+        return res.json(buddies);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 /**
@@ -336,6 +354,130 @@ const getBuddyRequestsForStudent = async (req, res, next) => {
  */
 const getConversationHistoryForStudent = async (req, res, next) => {
     res.send("Not implemented");
+};
+
+/**
+ * Sorts an array of courses by name in ascending order
+ *
+ * @param {object[]} courses - the array of courses to sort
+ */
+const sortCoursesByNameASC = (courses) => {
+    courses.sort(
+        (a, b) =>
+            a.subject_name.localeCompare(b.subject_name) ||
+            a.course_number.localeCompare(b.course_number) ||
+            a.course_name.localeCompare(b.course_name) ||
+            a.section_number.localeCompare(b.section_number)
+    );
+};
+
+/**
+ * Sorts an array of courses by name in descending order
+ *
+ * @param {object[]} courses - the array of courses to sort
+ */
+const sortCoursesByNameDESC = (courses) => {
+    courses.sort(
+        (a, b) =>
+            b.subject_name.localeCompare(a.subject_name) ||
+            b.course_number.localeCompare(a.course_number) ||
+            b.course_name.localeCompare(a.course_name) ||
+            b.section_number.localeCompare(a.section_number)
+    );
+};
+
+/**
+ * Sorts an array of students by name in ascending order
+ *
+ * @param {object[]} students - the array of students to sort
+ */
+const sortStudentsByNameASC = (students) => {
+    students.sort((a, b) => {
+        const aName = `${a.first_name} ${a.last_name}`;
+        const bName = `${b.first_name} ${b.last_name}`;
+        return aName.localeCompare(bName);
+    });
+};
+
+/**
+ * Sorts an array of students by name in descending order
+ *
+ * @param {object[]} students - the array of students to sort
+ */
+const sortStudentsByNameDESC = (students) => {
+    students.sort((a, b) => {
+        const aName = `${a.first_name} ${a.last_name}`;
+        const bName = `${b.first_name} ${b.last_name}`;
+        return bName.localeCompare(aName);
+    });
+};
+
+/**
+ * Gets the interests for every student in an array of students
+ *
+ * @param {object[]} students - the array of students to get interests for
+ */
+const getInterestsForStudents = async (students) => {
+    for (const student of students) {
+        const interests = await db.any(queries.students.getInterestsForStudent, [student.student_id]);
+        student.interests = interests;
+    }
+};
+
+/**
+ * Gets the social medias for every student in an array of students
+ *
+ * @param {object[]} students - the array of students to get social medias for
+ */
+const getSocialMediasForStudents = async (students) => {
+    for (const student of students) {
+        const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [student.student_id]);
+        student.social_medias = socialMedias;
+    }
+};
+
+/**
+ * Gets the mutual courses every student in an array of students has with another student for a term and sorts them by
+ * name in ascending order
+ *
+ * @param {number} studentId - the ID of the student to check every student in the array of students against for
+ * mutual courses
+ * @param {object[]} students - the array of students to get mutual courses for
+ * @param {string} term - the term to get mutual courses for
+ * @param {string} field - the name of the field to store the mutual courses in for each student
+ */
+const getMutualCoursesForStudentsForTerm = async (studentId, students, term, field) => {
+    for (const student of students) {
+        const mutualCoursesForTerm = await db.any(queries.students.getMutualCoursesForTwoStudentsForTerm, [
+            studentId,
+            student.student_id,
+            term,
+        ]);
+        student[field] = mutualCoursesForTerm;
+        sortCoursesByNameASC(student[field]);
+    }
+};
+
+/**
+ * Gets the mutual courses every student in an array of students has with another student for all terms besides a
+ * specified term and sorts them by name in ascending order
+ *
+ * @param {number} studentId - the ID of the student to check every student in the array of students against for
+ * mutual courses
+ * @param {object[]} students - the array of students to get mutual courses for
+ * @param {string} term - the term to exclude from getting mutual courses
+ * @param {string} field - the name of the field to store the mutual courses in for each student
+ */
+const getMutualCoursesForStudentsExcludingTerm = async (studentId, students, term, field) => {
+    for (const student of students) {
+        const mutualCoursesForTerm = await db.any(queries.students.getMutualCoursesForTwoStudentsExcludingTerm, [
+            studentId,
+            student.student_id,
+            term,
+        ]);
+        student[field] = mutualCoursesForTerm;
+        sortCoursesByNameASC(student[field]);
+    }
 };
 
 module.exports = {

@@ -90,6 +90,29 @@ const queries = {
                 WHERE enrolments.student_id = $2
             )
         `,
+        getMutualCoursesForTwoStudentsExcludingTerm: `
+            SELECT subjects.school_id, subjects.subject_id, subjects.subject_name, courses.course_id, courses.course_number, courses.course_name, sections.section_id, sections.section_number, sections.section_term
+            FROM enrolments
+            JOIN sections ON enrolments.section_id = sections.section_id 
+            JOIN courses ON sections.course_id = courses.course_id 
+            JOIN subjects ON courses.subject_id = subjects.subject_id 
+            WHERE enrolments.student_id = $1 AND sections.section_term != $3 AND enrolments.section_id IN (
+                SELECT enrolments.section_id
+                FROM enrolments
+                WHERE enrolments.student_id = $2
+            )
+        `,
+        getBuddiesForStudent: `
+            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
+            FROM buddies
+            JOIN students ON buddies.requestee_id = students.student_id
+            WHERE buddies.requestor_id = $1 AND buddies.status = 'accepted'
+            UNION
+            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
+            FROM buddies
+            JOIN students ON buddies.requestor_id = students.student_id
+            WHERE buddies.requestee_id = $1 AND buddies.status = 'accepted'
+        `,
     },
     users: {
         getUser: `

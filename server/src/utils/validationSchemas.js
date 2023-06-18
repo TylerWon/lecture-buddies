@@ -120,7 +120,8 @@ const getCourseHistoryForStudentValidationSchema = () =>
         ["query"]
     );
 
-const getClassmatesForStudentInSectionValidationSchema = () =>
+// General
+const sortingAndPaginationValidationSchema = (orderByOptions, orderByMessage) =>
     checkSchema(
         {
             order_by: {
@@ -128,9 +129,8 @@ const getClassmatesForStudentInSectionValidationSchema = () =>
                     errorMessage: "order_by is required",
                 },
                 matches: {
-                    options: [/^(-?)(num_mutual_courses|name|year|major)$/],
-                    errorMessage:
-                        "order_by must be one of 'num_mutual_courses', '-num_mutual_courses', 'name', '-name', 'year', '-year', 'major', '-major''",
+                    options: orderByOptions,
+                    errorMessage: orderByMessage,
                 },
             },
             offset: {
@@ -159,5 +159,5 @@ module.exports = {
     authValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
-    getClassmatesForStudentInSectionValidationSchema,
+    sortingAndPaginationValidationSchema,
 };

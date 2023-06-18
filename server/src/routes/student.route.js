@@ -33,12 +33,24 @@ router.get(
 );
 router.get(
     "/:student_id(\\d+)/sections/:section_id(\\d+)/classmates",
-    validationSchemas.getClassmatesForStudentInSectionValidationSchema(),
+    validationSchemas.sortingAndPaginationValidationSchema(
+        [/^(-?)(num_mutual_courses|name|year|major)$/],
+        "order_by must be one of 'num_mutual_courses', '-num_mutual_courses', 'name', '-name', 'year', '-year', 'major', '-major''"
+    ),
     validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     studentController.getClassmatesForStudentInSection
 );
-router.get("/:student_id(\\d+)/buddies", authMiddleware.authenticateRequest, studentController.getBuddiesForStudent);
+router.get(
+    "/:student_id(\\d+)/buddies",
+    validationSchemas.sortingAndPaginationValidationSchema(
+        [/^(-?)(name)$/],
+        "order_by must be one of 'name' or '-name'"
+    ),
+    validationMiddleware.validateRequest,
+    authMiddleware.authenticateRequest,
+    studentController.getBuddiesForStudent
+);
 router.get(
     "/:student_id(\\d+)/buddy-requests",
     authMiddleware.authenticateRequest,
