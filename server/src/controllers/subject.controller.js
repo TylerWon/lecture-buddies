@@ -20,6 +20,7 @@ const getCoursesForSubject = async (req, res, next) => {
         return res.status(400).json({ message: `subject with id '${subjectId}' does not exist` });
     }
 
+    // Get courses
     try {
         const courses = await db.any(queries.subjects.getCoursesForSubject, [subjectId]);
         return res.json(courses);

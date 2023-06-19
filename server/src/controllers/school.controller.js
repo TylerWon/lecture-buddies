@@ -24,6 +24,7 @@ const getSchools = async (req, res, next) => {
  *
  * @returns
  * - 200 OK if successful
+ * - 400 Bad Request if school does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const getSubjectsForSchool = async (req, res, next) => {
@@ -36,6 +37,7 @@ const getSubjectsForSchool = async (req, res, next) => {
         return res.status(400).json({ message: `school with id '${schoolId}' does not exist` });
     }
 
+    // Get subjects
     try {
         const subjects = await db.any(queries.schools.getSubjectsForSchool, [schoolId]);
         return res.json(subjects);

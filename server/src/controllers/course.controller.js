@@ -8,6 +8,7 @@ const queries = require("../utils/queries");
  *
  * @returns
  * - 200 OK if successful
+ * - 400 Bad Request if course does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const getSectionsForCourse = async (req, res, next) => {
@@ -20,6 +21,7 @@ const getSectionsForCourse = async (req, res, next) => {
         return res.status(400).json({ message: `course with id ${courseId} does not exist` });
     }
 
+    // Get sections
     try {
         const sections = await db.any(queries.courses.getSectionsForCourse, [courseId]);
         return res.json(sections);

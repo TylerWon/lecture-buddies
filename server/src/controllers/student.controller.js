@@ -16,7 +16,7 @@ const queries = require("../utils/queries");
  *
  * @returns
  * - 201 Created if successful
- * - 400 Bad Request if missing or invalid body fields
+ * - 400 Bad Request if user or school does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const createStudent = async (req, res, next) => {
@@ -66,6 +66,7 @@ const createStudent = async (req, res, next) => {
  *
  * @returns
  * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const getStudent = async (req, res, next) => {
@@ -76,6 +77,7 @@ const getStudent = async (req, res, next) => {
         return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
     }
 
+    // Get student
     try {
         const student = await db.one(queries.students.getStudent, [studentId]);
         return res.json(student);
@@ -91,6 +93,7 @@ const getStudent = async (req, res, next) => {
  *
  * @returns
  * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const getInterestsForStudent = async (req, res, next) => {
@@ -101,6 +104,7 @@ const getInterestsForStudent = async (req, res, next) => {
         return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
     }
 
+    // Get interests
     try {
         const interests = await db.any(queries.students.getInterestsForStudent, [studentId]);
         return res.json(interests);
@@ -116,6 +120,7 @@ const getInterestsForStudent = async (req, res, next) => {
  *
  * @returns
  * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const getSocialMediasForStudent = async (req, res, next) => {
@@ -126,6 +131,7 @@ const getSocialMediasForStudent = async (req, res, next) => {
         return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
     }
 
+    // Get social medias
     try {
         const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [studentId]);
         return res.json(socialMedias);
@@ -143,7 +149,7 @@ const getSocialMediasForStudent = async (req, res, next) => {
  *
  * @returns
  * - 200 OK if successful
- * - 400 Bad Request if missing or invalid query paramaters
+ * - 400 Bad Request if student does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const getCourseHistoryForStudent = async (req, res, next) => {
@@ -167,8 +173,6 @@ const getCourseHistoryForStudent = async (req, res, next) => {
             case "-name":
                 sortCoursesByNameDESC(courseHistory);
                 break;
-            default:
-                return res.status(400).json({ message: "invalid order_by query parameter" });
         }
 
         return res.json(courseHistory);
@@ -190,7 +194,7 @@ const getCourseHistoryForStudent = async (req, res, next) => {
  *
  * @returns
  * - 200 OK if successful
- * - 400 Bad Request if missing or invalid query paramaters
+ * - 400 Bad Request if student or section does not exist or student is not enrolled in section
  * - 500 Internal Server Error if unexpected error
  */
 const getClassmatesForStudentInSection = async (req, res, next) => {
@@ -262,8 +266,6 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
             case "-major":
                 classmates.sort((a, b) => b.major.localeCompare(a.major));
                 break;
-            default:
-                return res.status(400).json({ message: "invalid order_by query parameter" });
         }
 
         // Paginate classmates
@@ -292,7 +294,7 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
  *
  * @returns
  * - 200 OK if successful
- * - 400 Bad Request if missing or invalid query paramaters
+ * - 400 Bad Request if student does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const getBuddiesForStudent = async (req, res, next) => {
@@ -318,8 +320,6 @@ const getBuddiesForStudent = async (req, res, next) => {
             case "-name":
                 sortStudentsByNameDESC(buddies);
                 break;
-            default:
-                return res.status(400).json({ message: "invalid order_by query parameter" });
         }
 
         // Paginate buddies

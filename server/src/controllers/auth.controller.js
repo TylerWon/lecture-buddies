@@ -10,12 +10,16 @@ const queries = require("../utils/queries");
 passport.use(
     new LocalStrategy(async (username, password, cb) => {
         let hashedPassword;
+        let user;
 
-        const user = await db.oneOrNone(queries.users.getUserByUsername, [username]);
-        if (!user) {
+        // Check if user exists
+        try {
+            user = await db.one(queries.users.getUserByUsername, [username]);
+        } catch (err) {
             return cb(null, false); // authentication failure - username incorrect
         }
 
+        // Check if password correct
         try {
             hashedPassword = crypto.pbkdf2Sync(password, user.salt, 1024, 32, "sha256");
         } catch (err) {
@@ -99,6 +103,7 @@ const signup = async (req, res, next) => {
     const password = req.body.password;
     const salt = crypto.randomBytes(16);
 
+    // Create hashed password and token
     try {
         hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
         token = jwt.sign({ username: username }, process.env.JWT_SECRET);
@@ -106,12 +111,14 @@ const signup = async (req, res, next) => {
         return next(err); // error when computing hashed password or token
     }
 
+    // Create user
     try {
         user = await db.one(queries.users.createUser, [username, hashedPassword, salt, token]);
     } catch (err) {
         return res.status(400).json({ message: "an account with that username already exists" });
     }
 
+    // Login user
     req.login(user, (err) => {
         if (err) {
             return next(err);
