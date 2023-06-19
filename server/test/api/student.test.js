@@ -30,9 +30,11 @@ describe("student routes tests", () => {
     let course1;
     let course2;
     let course3;
+    let course4;
     let section1;
     let section2;
     let section3;
+    let section4;
     let interest1;
     let interest2;
     let interest3;
@@ -60,9 +62,11 @@ describe("student routes tests", () => {
         course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");
         course2 = await createCourse(db, subject1.subject_id, "121", "Models of Computation");
         course3 = await createCourse(db, subject2.subject_id, "110", "Approaches to Literature and Culture");
+        course4 = await createCourse(db, subject2.subject_id, "112", "Studies in Composition");
         section1 = await createSection(db, course1.course_id, "001", "2023W1");
         section2 = await createSection(db, course2.course_id, "001", "2023W1");
         section3 = await createSection(db, course3.course_id, "001", "2023W2");
+        section4 = await createSection(db, course3.course_id, "001", "2023W2");
         student1 = await createStudent(
             db,
             user1.user_id,
@@ -212,8 +216,10 @@ describe("student routes tests", () => {
             await verifyGetRequestResponse(app, `/students/${student1.student_id}`, user1.token, 200, student1);
         });
 
-        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}`, user1.token, 200, null);
+        test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
+            await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}`, user1.token, 400, {
+                message: `student with id '${student1.student_id + 100}' does not exist`,
+            });
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {
@@ -230,14 +236,10 @@ describe("student routes tests", () => {
             ]);
         });
 
-        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id + 100}/interests`,
-                user1.token,
-                200,
-                []
-            );
+        test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
+            await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}/interests`, user1.token, 400, {
+                message: `student with id '${student1.student_id + 100}' does not exist`,
+            });
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {
@@ -254,13 +256,15 @@ describe("student routes tests", () => {
             ]);
         });
 
-        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
+        test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id + 100}/social-medias`,
                 user1.token,
-                200,
-                []
+                400,
+                {
+                    message: `student with id '${student1.student_id + 100}' does not exist`,
+                }
             );
         });
 
@@ -334,13 +338,15 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
+        test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id + 100}/course-history?order_by=-name`,
                 user1.token,
-                200,
-                []
+                400,
+                {
+                    message: `student with id '${student1.student_id + 100}' does not exist`,
+                }
             );
         });
 
@@ -544,27 +550,43 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
+        test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id + 100}/sections/${
                     section1.section_id
                 }/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
                 user1.token,
-                200,
-                []
+                400,
+                {
+                    message: `student with id '${student1.student_id + 100}' does not exist`,
+                }
             );
         });
 
-        test("GET - should return nothing when the section_id path parameter does not correspond to a section", async () => {
+        test("GET - should return error message when the section_id path parameter does not correspond to a section", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/sections/${
                     section1.section_id + 100
                 }/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
                 user1.token,
-                200,
-                []
+                400,
+                {
+                    message: `section with id '${section1.section_id + 100}' does not exist`,
+                }
+            );
+        });
+
+        test("GET - should return error message when the student is not enrolled in the section", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/sections/${section4.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
+                user1.token,
+                400,
+                {
+                    message: `student with id '${student1.student_id}' is not enrolled in section with id '${section4.section_id}'`,
+                }
             );
         });
 
@@ -766,7 +788,7 @@ describe("student routes tests", () => {
         test("GET - should return the buddies for a student (order by -name)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id}/buddies?order_by=-name&offset=0&limit=2`,
                 user1.token,
                 200,
                 [classmateDetails1, classmateDetails2]
@@ -803,13 +825,13 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return nothing when the student_id path parameter does not correspond to a student", async () => {
+        test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id + 100}/buddies?order_by=name&offset=0&limit=2`,
                 user1.token,
-                200,
-                []
+                400,
+                { message: `student with id '${student1.student_id + 100}' does not exist` }
             );
         });
 

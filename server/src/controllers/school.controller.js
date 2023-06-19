@@ -29,6 +29,13 @@ const getSchools = async (req, res, next) => {
 const getSubjectsForSchool = async (req, res, next) => {
     const schoolId = req.params.school_id;
 
+    // Check if school exists
+    try {
+        await db.one(queries.schools.getSchool, [schoolId]);
+    } catch (err) {
+        return res.status(400).json({ message: `school with id '${schoolId}' does not exist` });
+    }
+
     try {
         const subjects = await db.any(queries.schools.getSubjectsForSchool, [schoolId]);
         return res.json(subjects);

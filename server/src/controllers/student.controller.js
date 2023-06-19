@@ -71,8 +71,13 @@ const createStudent = async (req, res, next) => {
 const getStudent = async (req, res, next) => {
     const studentId = req.params.student_id;
 
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
     try {
-        const student = await db.oneOrNone(queries.students.getStudent, [studentId]);
+        const student = await db.one(queries.students.getStudent, [studentId]);
         return res.json(student);
     } catch (err) {
         return next(err); // unexpected error
@@ -90,6 +95,11 @@ const getStudent = async (req, res, next) => {
  */
 const getInterestsForStudent = async (req, res, next) => {
     const studentId = req.params.student_id;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
 
     try {
         const interests = await db.any(queries.students.getInterestsForStudent, [studentId]);
@@ -110,6 +120,11 @@ const getInterestsForStudent = async (req, res, next) => {
  */
 const getSocialMediasForStudent = async (req, res, next) => {
     const studentId = req.params.student_id;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
 
     try {
         const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [studentId]);
@@ -134,6 +149,11 @@ const getSocialMediasForStudent = async (req, res, next) => {
 const getCourseHistoryForStudent = async (req, res, next) => {
     const studentId = req.params.student_id;
     const orderBy = req.query.order_by;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
 
     try {
         // Get course history
@@ -180,11 +200,25 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
     const offset = req.query.offset;
     const limit = req.query.limit;
 
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    // Check if section exists
+    try {
+        await db.one(queries.sections.getSection, [sectionId]);
+    } catch (err) {
+        return res.status(400).json({ message: `section with id '${sectionId}' does not exist` });
+    }
+
     // Check if student is enrolled in section
     try {
         await db.one(queries.enrolments.getEnrolment, [studentId, sectionId]);
     } catch (err) {
-        return res.json([]);
+        return res.status(400).json({
+            message: `student with id '${studentId}' is not enrolled in section with id '${sectionId}'`,
+        });
     }
 
     try {
@@ -268,9 +302,7 @@ const getBuddiesForStudent = async (req, res, next) => {
     const limit = req.query.limit;
 
     // Check if student exists
-    try {
-        await db.one(queries.students.getStudent, [studentId]);
-    } catch (err) {
+    if (!(await studentExists(studentId))) {
         return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
     }
 
@@ -354,6 +386,24 @@ const getBuddyRequestsForStudent = async (req, res, next) => {
  */
 const getConversationHistoryForStudent = async (req, res, next) => {
     res.send("Not implemented");
+};
+
+/**
+ * Checks if a student exists
+ *
+ * @param {number} studentId - the student's ID
+ *
+ * @returns
+ * - true if the student exists
+ * - false if the student does not exist
+ */
+const studentExists = async (studentId) => {
+    try {
+        await db.one(queries.students.getStudent, [studentId]);
+        return true;
+    } catch (err) {
+        return false;
+    }
 };
 
 /**

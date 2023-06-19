@@ -37,8 +37,10 @@ describe("subject routes tests", () => {
             ]);
         });
 
-        test("GET - should return nothing when the subject_id path parameter does not correspond to a subject", async () => {
-            await verifyGetRequestResponse(app, `/subjects/100/courses`, user1.token, 200, []);
+        test("GET - should return error message when the subject_id path parameter does not correspond to a subject", async () => {
+            await verifyGetRequestResponse(app, `/subjects/${subject1.subject_id + 100}/courses`, user1.token, 400, {
+                message: `subject with id '${subject1.subject_id + 100}' does not exist`,
+            });
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {

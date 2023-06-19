@@ -37,8 +37,10 @@ describe("course routes tests", () => {
             await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, user1.token, 200, [section1]);
         });
 
-        test("GET - should return nothing when the course_id path parameter does not correspond to a course", async () => {
-            await verifyGetRequestResponse(app, `/courses/${course1.course_id + 100}/sections`, user1.token, 200, []);
+        test("GET - should return error message when the course_id path parameter does not correspond to a course", async () => {
+            await verifyGetRequestResponse(app, `/courses/${course1.course_id + 100}/sections`, user1.token, 400, {
+                message: `course with id ${course1.course_id + 100} does not exist`,
+            });
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {

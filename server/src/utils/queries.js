@@ -1,5 +1,10 @@
 const queries = {
     courses: {
+        getCourse: `
+            SELECT *
+            FROM courses
+            WHERE course_id = $1
+        `,
         getSectionsForCourse: `
             SELECT * 
             FROM sections 
@@ -37,6 +42,11 @@ const queries = {
         `,
     },
     subjects: {
+        getSubject: `
+            SELECT *
+            FROM subjects
+            WHERE subject_id = $1    
+        `,
         getCoursesForSubject: `
             SELECT * 
             FROM courses 

@@ -13,6 +13,13 @@ const queries = require("../utils/queries");
 const getCoursesForSubject = async (req, res, next) => {
     const subjectId = req.params.subject_id;
 
+    // Check if subject exists
+    try {
+        await db.one(queries.subjects.getSubject, [subjectId]);
+    } catch (err) {
+        return res.status(400).json({ message: `subject with id '${subjectId}' does not exist` });
+    }
+
     try {
         const courses = await db.any(queries.subjects.getCoursesForSubject, [subjectId]);
         return res.json(courses);
