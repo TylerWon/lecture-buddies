@@ -112,16 +112,27 @@ const queries = {
                 WHERE enrolments.student_id = $2
             )
         `,
-        getBuddiesForStudent: `
+        getBuddiesOrBuddyRequestsForStudent: `
             SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
             FROM buddies
             JOIN students ON buddies.requestee_id = students.student_id
-            WHERE buddies.requestor_id = $1 AND buddies.status = 'accepted'
+            WHERE buddies.requestor_id = $1 AND buddies.status = $2
             UNION
             SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
             FROM buddies
             JOIN students ON buddies.requestor_id = students.student_id
-            WHERE buddies.requestee_id = $1 AND buddies.status = 'accepted'
+            WHERE buddies.requestee_id = $1 AND buddies.status = $2
+        `,
+        getBuddyRequestsForStudent: `
+            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
+            FROM buddies
+            JOIN students ON buddies.requestee_id = students.student_id
+            WHERE buddies.requestor_id = $1 AND buddies.status = $2
+            UNION
+            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
+            FROM buddies
+            JOIN students ON buddies.requestor_id = students.student_id
+            WHERE buddies.requestee_id = $1 AND buddies.status = $2
         `,
     },
     users: {

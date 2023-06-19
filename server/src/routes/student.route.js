@@ -53,6 +53,11 @@ router.get(
 );
 router.get(
     "/:student_id(\\d+)/buddy-requests",
+    validationSchemas.sortingAndPaginationValidationSchema(
+        [/^(-?)(name)$/],
+        "order_by must be one of 'name' or '-name'"
+    ),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     studentController.getBuddyRequestsForStudent
 );
