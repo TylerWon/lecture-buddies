@@ -1220,20 +1220,25 @@ describe("student routes tests", () => {
         });
     });
 
-    describe("/students/{student_id}/conversation-history", () => {
+    describe("/students/{student_id}/conversations", () => {
         let conversationDetails1;
         let conversationDetails2;
 
         beforeAll(() => {
+            message2.sent_datetime = message2.sent_datetime.toJSON();
+            message3.sent_datetime = message3.sent_datetime.toJSON();
+
             conversationDetails1 = {
                 conversation_id: conversation1.conversation_id,
                 conversation_name: conversation1.conversation_name,
+                conversation_members: [student1, student2],
                 most_recent_message: message2,
             };
 
             conversationDetails2 = {
                 conversation_id: conversation2.conversation_id,
                 conversation_name: conversation2.conversation_name,
+                conversation_members: [student1, student3],
                 most_recent_message: message3,
             };
         });
@@ -1241,7 +1246,7 @@ describe("student routes tests", () => {
         test("GET - should return the conversation history for a student (order by date)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=date&offset=0&limit=2`,
+                `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=2`,
                 user1.token,
                 200,
                 [conversationDetails1, conversationDetails2]
@@ -1251,7 +1256,7 @@ describe("student routes tests", () => {
         test("GET - should return the conversation history for a student (order by -date)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=-date&offset=0&limit=2`,
+                `/students/${student1.student_id}/conversations?order_by=-date&offset=0&limit=2`,
                 user1.token,
                 200,
                 [conversationDetails2, conversationDetails1]
@@ -1261,7 +1266,7 @@ describe("student routes tests", () => {
         test("GET - should return the conversation history for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=date&offset=1&limit=1`,
+                `/students/${student1.student_id}/conversations?order_by=date&offset=1&limit=1`,
                 user1.token,
                 200,
                 [conversationDetails2]
@@ -1271,7 +1276,7 @@ describe("student routes tests", () => {
         test("GET - should return the conversation history for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=date&offset=0&limit=10`,
+                `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=10`,
                 user1.token,
                 200,
                 [conversationDetails1, conversationDetails2]
@@ -1281,7 +1286,7 @@ describe("student routes tests", () => {
         test("GET - should return nothing when offset >= total number of results", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=date&offset=2&limit=2`,
+                `/students/${student1.student_id}/conversations?order_by=date&offset=2&limit=2`,
                 user1.token,
                 200,
                 []
@@ -1291,11 +1296,11 @@ describe("student routes tests", () => {
         test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id + 100}/conversation-history?order_by=date&offset=0&limit=2`,
+                `/students/${student1.student_id + 100}/conversations?order_by=date&offset=0&limit=2`,
                 user1.token,
                 400,
                 {
-                    message: `student with id ${student1.student_id + 100} does not exist`,
+                    message: `student with id '${student1.student_id + 100}' does not exist`,
                 }
             );
         });
@@ -1303,7 +1308,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when missing the order_by query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?offset=0&limit=2`,
+                `/students/${student1.student_id}/conversations?offset=0&limit=2`,
                 user1.token,
                 400,
                 [
@@ -1320,7 +1325,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when missing the offset query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=name&limit=2`,
+                `/students/${student1.student_id}/conversations?order_by=date&limit=2`,
                 user1.token,
                 400,
                 [
@@ -1337,7 +1342,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when missing the limit query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=name&offset=0`,
+                `/students/${student1.student_id}/conversations?order_by=date&offset=0`,
                 user1.token,
                 400,
                 [
@@ -1356,7 +1361,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=${orderBy}&offset=0&limit=2`,
+                `/students/${student1.student_id}/conversations?order_by=${orderBy}&offset=0&limit=2`,
                 user1.token,
                 400,
                 [
@@ -1376,7 +1381,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=name&offset=${offset}&limit=2`,
+                `/students/${student1.student_id}/conversations?order_by=date&offset=${offset}&limit=2`,
                 user1.token,
                 400,
                 [
@@ -1396,7 +1401,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=name&offset=0&limit=${limit}`,
+                `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=${limit}`,
                 user1.token,
                 400,
                 [
@@ -1414,7 +1419,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when request is unauthenticated", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/conversation-history?order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=2`,
                 undefined,
                 401,
                 {

@@ -404,8 +404,8 @@ const getBuddiesForStudent = async (req, res, next) => getBuddiesOrBuddyRequests
 const getBuddyRequestsForStudent = async (req, res, next) => getBuddiesOrBuddyRequestsForStudent(req, res, next, false);
 
 /**
- * Gets the conversation history for a student. The conversation history is all the conversations a student has had.
- * Information about the conversation and the most recent message in the conversation is included.
+ * Gets the conversations for a student. Information about the conversation, members of the conversation, and the most
+ * recent message in the conversation is included.
  *
  * @param {number} req.params.student_id - The student's ID
  * @param {string} req.query.order_by - the field to order the response by (options: date, -date)
@@ -417,26 +417,153 @@ const getBuddyRequestsForStudent = async (req, res, next) => getBuddiesOrBuddyRe
  * - 400 Bad Request if student does not exist
  * - 500 Internal Server Error if unexpected error
  */
-const getConversationHistoryForStudent = async (req, res, next) => {
-    res.send("Not implemented");
+const getConversationsForStudent = async (req, res, next) => {
+    const studentId = req.params.student_id;
+    const orderBy = req.query.order_by;
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    try {
+        // Get conversations
+        let conversations = await db.any(queries.students.getConversationsForStudent, [studentId]);
+
+        // Get members of each conversation
+        await getMembersForConversations(conversations);
+
+        // Get most recent message for each conversation
+        await getMostRecentMessageForConversations(conversations);
+
+        // Sort conversations
+        switch (orderBy) {
+            case "date":
+                sortConversationsByDateASC(conversations);
+                break;
+            case "-date":
+                sortConversationsByDateDESC(conversations);
+                break;
+        }
+
+        // Paginate conversations
+        conversations = conversations.slice(offset, offset + limit);
+
+        return res.json(conversations);
+    } catch (err) {
+        console.log(err);
+        return next(err); // unexpected error
+    }
 };
 
 /**
- * Checks if a student exists
+ * Gets the interests for every student in an array of students
  *
- * @param {number} studentId - the student's ID
- *
- * @returns
- * - true if the student exists
- * - false if the student does not exist
+ * @param {object[]} students - the array of students to get interests for
  */
-const studentExists = async (studentId) => {
-    try {
-        await db.one(queries.students.getStudent, [studentId]);
-        return true;
-    } catch (err) {
-        return false;
+const getInterestsForStudents = async (students) => {
+    for (const student of students) {
+        student.interests = await db.any(queries.students.getInterestsForStudent, [student.student_id]);
     }
+};
+
+/**
+ * Gets the members of a conversation for every conversation in an array of conversations
+ *
+ * @param {object[]} conversations - the array of conversations to get members for
+ */
+const getMembersForConversations = async (conversations) => {
+    for (const conversation of conversations) {
+        conversation.conversation_members = await db.any(queries.conversations.getMembersForConversation, [
+            conversation.conversation_id,
+        ]);
+    }
+};
+
+/**
+ * Gets the most recent message for every conversation in an array of conversations
+ *
+ * @param {object[]} conversations - the array of conversations to get the most recent message for
+ */
+const getMostRecentMessageForConversations = async (conversations) => {
+    for (const conversation of conversations) {
+        conversation.most_recent_message = await db.one(queries.conversations.getMostRecentMessageForConversation, [
+            conversation.conversation_id,
+        ]);
+    }
+};
+
+/**
+ * Gets the mutual courses every student in an array of students has with another student for a term and sorts them by
+ * name in ascending order
+ *
+ * @param {number} studentId - the ID of the student to check every student in the array of students against for
+ * mutual courses
+ * @param {object[]} students - the array of students to get mutual courses for
+ * @param {string} term - the term to get mutual courses for
+ * @param {string} field - the name of the field to store the mutual courses in for each student
+ */
+const getMutualCoursesForStudentsForTerm = async (studentId, students, term, field) => {
+    for (const student of students) {
+        student[field] = await db.any(queries.students.getMutualCoursesForTwoStudentsForTerm, [
+            studentId,
+            student.student_id,
+            term,
+        ]);
+        sortCoursesByNameASC(student[field]);
+    }
+};
+
+/**
+ * Gets the mutual courses every student in an array of students has with another student for all terms besides a
+ * specified term and sorts them by name in ascending order
+ *
+ * @param {number} studentId - the ID of the student to check every student in the array of students against for
+ * mutual courses
+ * @param {object[]} students - the array of students to get mutual courses for
+ * @param {string} term - the term to exclude from getting mutual courses
+ * @param {string} field - the name of the field to store the mutual courses in for each student
+ */
+const getMutualCoursesForStudentsExcludingTerm = async (studentId, students, term, field) => {
+    for (const student of students) {
+        student[field] = await db.any(queries.students.getMutualCoursesForTwoStudentsExcludingTerm, [
+            studentId,
+            student.student_id,
+            term,
+        ]);
+        sortCoursesByNameASC(student[field]);
+    }
+};
+
+/**
+ * Gets the social medias for every student in an array of students
+ *
+ * @param {object[]} students - the array of students to get social medias for
+ */
+const getSocialMediasForStudents = async (students) => {
+    for (const student of students) {
+        student.social_medias = await db.any(queries.students.getSocialMediasForStudent, [student.student_id]);
+    }
+};
+
+/**
+ * Sorts an array of conversations by date in ascending order
+ *
+ * @param {object[]} conversations - the array of conversations to sort
+ */
+const sortConversationsByDateASC = (conversations) => {
+    conversations.sort((a, b) => a.most_recent_message.sent_datetime - b.most_recent_message.sent_datetime);
+};
+
+/**
+ * Sorts an array of conversations by date in descending order
+ *
+ * @param {object[]} conversations - the array of conversations to sort
+ */
+const sortConversationsByDateDESC = (conversations) => {
+    conversations.sort((a, b) => b.most_recent_message.sent_datetime - a.most_recent_message.sent_datetime);
 };
 
 /**
@@ -496,70 +623,20 @@ const sortStudentsByNameDESC = (students) => {
 };
 
 /**
- * Gets the interests for every student in an array of students
+ * Checks if a student exists
  *
- * @param {object[]} students - the array of students to get interests for
- */
-const getInterestsForStudents = async (students) => {
-    for (const student of students) {
-        const interests = await db.any(queries.students.getInterestsForStudent, [student.student_id]);
-        student.interests = interests;
-    }
-};
-
-/**
- * Gets the social medias for every student in an array of students
+ * @param {number} studentId - the student's ID
  *
- * @param {object[]} students - the array of students to get social medias for
+ * @returns
+ * - true if the student exists
+ * - false if the student does not exist
  */
-const getSocialMediasForStudents = async (students) => {
-    for (const student of students) {
-        const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [student.student_id]);
-        student.social_medias = socialMedias;
-    }
-};
-
-/**
- * Gets the mutual courses every student in an array of students has with another student for a term and sorts them by
- * name in ascending order
- *
- * @param {number} studentId - the ID of the student to check every student in the array of students against for
- * mutual courses
- * @param {object[]} students - the array of students to get mutual courses for
- * @param {string} term - the term to get mutual courses for
- * @param {string} field - the name of the field to store the mutual courses in for each student
- */
-const getMutualCoursesForStudentsForTerm = async (studentId, students, term, field) => {
-    for (const student of students) {
-        const mutualCoursesForTerm = await db.any(queries.students.getMutualCoursesForTwoStudentsForTerm, [
-            studentId,
-            student.student_id,
-            term,
-        ]);
-        student[field] = mutualCoursesForTerm;
-        sortCoursesByNameASC(student[field]);
-    }
-};
-
-/**
- * Gets the mutual courses every student in an array of students has with another student for all terms besides a
- * specified term and sorts them by name in ascending order
- *
- * @param {number} studentId - the ID of the student to check every student in the array of students against for
- * mutual courses
- * @param {object[]} students - the array of students to get mutual courses for
- * @param {string} term - the term to exclude from getting mutual courses
- * @param {string} field - the name of the field to store the mutual courses in for each student
- */
-const getMutualCoursesForStudentsExcludingTerm = async (studentId, students, term, field) => {
-    for (const student of students) {
-        const mutualCoursesForTerm = await db.any(queries.students.getMutualCoursesForTwoStudentsExcludingTerm, [
-            studentId,
-            student.student_id,
-            term,
-        ]);
-        student[field] = mutualCoursesForTerm;
-        sortCoursesByNameASC(student[field]);
+const studentExists = async (studentId) => {
+    try {
+        await db.one(queries.students.getStudent, [studentId]);
+        return true;
+    } catch (err) {
+        return false;
     }
 };
 
@@ -572,5 +649,5 @@ module.exports = {
     getClassmatesForStudentInSection,
     getBuddiesForStudent,
     getBuddyRequestsForStudent,
-    getConversationHistoryForStudent,
+    getConversationsForStudent,
 };

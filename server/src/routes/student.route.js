@@ -62,9 +62,14 @@ router.get(
     studentController.getBuddyRequestsForStudent
 );
 router.get(
-    "/:student_id(\\d+)/conversation-history",
+    "/:student_id(\\d+)/conversations",
+    validationSchemas.sortingAndPaginationValidationSchema(
+        [/^(-?)(date)$/],
+        "order_by must be one of 'date' or '-date'"
+    ),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
-    studentController.getConversationHistoryForStudent
+    studentController.getConversationsForStudent
 );
 
 module.exports = router;
