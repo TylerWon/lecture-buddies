@@ -21,6 +21,31 @@ async function createBuddy(db, requestorId, requesteeId, status) {
 }
 
 /**
+ * Creates a conversation
+ *
+ * @param {object} db - the database connection
+ * @param {string} conversationName - the conversation's name
+ *
+ * @returns {object} the created conversation
+ */
+async function createConversation(db, conversationName) {
+    return await db.one(queries.conversations.createConversation, [conversationName]);
+}
+
+/**
+ * Creates a conversation member (i.e. adds a student to a conversation)
+ *
+ * @param {object} db - the database connection
+ * @param {number} conversationId - the id of the conversation to add the student to
+ * @param {number} studentId - the id of the student to add to the conversation
+ *
+ * @returns {object} the created conversation member
+ */
+async function createConversationMember(db, conversationId, studentId) {
+    return await db.one(queries.conversationMembers.createConversationMember, [conversationId, studentId]);
+}
+
+/**
  * Creates a course
  *
  * @param {object} db - the database connection
@@ -35,7 +60,7 @@ async function createCourse(db, subjectId, courseNumber, courseName) {
 }
 
 /**
- * Creates an enrolment
+ * Creates an enrolment (i.e enrol a student in a section)
  *
  * @param {object} db - the database connection
  * @param {number} studentId - the id of the student who is enrolled in the section
@@ -58,6 +83,20 @@ async function createEnrolment(db, studentId, sectionId) {
  */
 async function createInterest(db, studentId, interestName) {
     return await db.one(queries.interests.createInterest, [studentId, interestName]);
+}
+
+/**
+ * Creates a message
+ *
+ * @param {object} db - the database connection
+ * @param {number} conversationId - the id of the conversation the message belongs to
+ * @param {number} authorId - the id of the student who sent the message
+ * @param {string} messageContent - the message's content
+ *
+ * @returns {object} the created message
+ */
+async function createMessage(db, conversationId, authorId, messageContent) {
+    return await db.one(queries.messages.createMessage, [conversationId, authorId, messageContent]);
 }
 
 /**
@@ -231,8 +270,11 @@ async function verifyPostRequestResponseWithoutAuth(app, endpoint, payload, expe
 module.exports = {
     createBuddy,
     createCourse,
+    createConversation,
+    createConversationMember,
     createEnrolment,
     createInterest,
+    createMessage,
     createSchool,
     createSection,
     createSocialMedia,

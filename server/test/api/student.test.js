@@ -3,13 +3,16 @@ const db = require("../../src/configs/db.config");
 const {
     createBuddy,
     createCourse,
+    createConversation,
+    createConversationMember,
     createEnrolment,
     createInterest,
+    createMessage,
     createSchool,
     createSection,
     createSocialMedia,
-    createStudent,
     createSubject,
+    createStudent,
     createUser,
     cleanUpDatabase,
     verifyGetRequestResponse,
@@ -41,6 +44,11 @@ describe("student routes tests", () => {
     let socialMedia1;
     let socialMedia2;
     let socialMedia3;
+    let conversation1;
+    let conversation2;
+    let message1;
+    let message2;
+    let message3;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
@@ -116,6 +124,30 @@ describe("student routes tests", () => {
         await createEnrolment(db, student2.student_id, section2.section_id);
         await createEnrolment(db, student2.student_id, section3.section_id);
         await createEnrolment(db, student3.student_id, section1.section_id);
+        conversation1 = await createConversation(db, "DM");
+        conversation2 = await createConversation(db, "DM");
+        await createConversationMember(db, conversation1.conversation_id, student1.student_id);
+        await createConversationMember(db, conversation1.conversation_id, student2.student_id);
+        await createConversationMember(db, conversation2.conversation_id, student1.student_id);
+        await createConversationMember(db, conversation2.conversation_id, student3.student_id);
+        message1 = await createMessage(
+            db,
+            conversation1.conversation_id,
+            student1.student_id,
+            "This is message 1 in conversation 1"
+        );
+        message2 = await createMessage(
+            db,
+            conversation1.conversation_id,
+            student2.student_id,
+            "This is message 2 in conversation 1"
+        );
+        message3 = await createMessage(
+            db,
+            conversation2.conversation_id,
+            student1.student_id,
+            "This is message 1 in conversation 2"
+        );
     });
 
     afterAll(async () => {
@@ -518,7 +550,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return the classmates for a student (0 < offset <= total number of results)", async () => {
+        test("GET - should return the classmates for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=1&limit=1`,
@@ -528,7 +560,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return the classmates for a student (limit > total number of results)", async () => {
+        test("GET - should return the classmates for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=10`,
@@ -538,7 +570,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return nothing when offset > total number of results", async () => {
+        test("GET - should return nothing when offset >= total number of results", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=2&limit=2`,
@@ -800,7 +832,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return the buddies for a student (0 < offset <= total number of results)", async () => {
+        test("GET - should return the buddies for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/buddies?order_by=name&offset=1&limit=1`,
@@ -810,7 +842,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return the buddies for a student (limit > total number of results)", async () => {
+        test("GET - should return the buddies for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=10`,
@@ -820,7 +852,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return nothing when offset > total number of results", async () => {
+        test("GET - should return nothing when offset >= total number of results", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/buddies?order_by=name&offset=2&limit=2`,
@@ -967,35 +999,9 @@ describe("student routes tests", () => {
     describe("/students/{student_id}/buddy-requests", () => {
         let classmateDetails1;
         let classmateDetails2;
-        let courseDetails1;
-        let courseDetails2;
         let courseDetails3;
 
         beforeAll(async () => {
-            courseDetails1 = {
-                school_id: school1.school_id,
-                subject_id: subject1.subject_id,
-                subject_name: subject1.subject_name,
-                course_id: course1.course_id,
-                course_number: course1.course_number,
-                course_name: course1.course_name,
-                section_id: section1.section_id,
-                section_number: section1.section_number,
-                section_term: section1.section_term,
-            };
-
-            courseDetails2 = {
-                school_id: school1.school_id,
-                subject_id: subject1.subject_id,
-                subject_name: subject1.subject_name,
-                course_id: course2.course_id,
-                course_number: course2.course_number,
-                course_name: course2.course_name,
-                section_id: section2.section_id,
-                section_number: section2.section_number,
-                section_term: section2.section_term,
-            };
-
             courseDetails3 = {
                 school_id: school1.school_id,
                 subject_id: subject2.subject_id,
@@ -1050,7 +1056,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return the buddy requests for a student (0 < offset <= total number of results)", async () => {
+        test("GET - should return the buddy requests for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/buddy-requests?order_by=name&offset=1&limit=1`,
@@ -1060,7 +1066,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return the buddy requests for a student (limit > total number of results)", async () => {
+        test("GET - should return the buddy requests for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/buddy-requests?order_by=name&offset=0&limit=10`,
@@ -1070,7 +1076,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return nothing when offset > total number of results", async () => {
+        test("GET - should return nothing when offset >= total number of results", async () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/buddy-requests?order_by=name&offset=2&limit=2`,
@@ -1205,6 +1211,210 @@ describe("student routes tests", () => {
             await verifyGetRequestResponse(
                 app,
                 `/students/${student1.student_id}/buddy-requests?order_by=name&offset=0&limit=2`,
+                undefined,
+                401,
+                {
+                    message: "unauthorized",
+                }
+            );
+        });
+    });
+
+    describe("/students/{student_id}/conversation-history", () => {
+        let conversationDetails1;
+        let conversationDetails2;
+
+        beforeAll(() => {
+            conversationDetails1 = {
+                conversation_id: conversation1.conversation_id,
+                conversation_name: conversation1.conversation_name,
+                most_recent_message: message2,
+            };
+
+            conversationDetails2 = {
+                conversation_id: conversation2.conversation_id,
+                conversation_name: conversation2.conversation_name,
+                most_recent_message: message3,
+            };
+        });
+
+        test("GET - should return the conversation history for a student (order by date)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=date&offset=0&limit=2`,
+                user1.token,
+                200,
+                [conversationDetails1, conversationDetails2]
+            );
+        });
+
+        test("GET - should return the conversation history for a student (order by -date)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=-date&offset=0&limit=2`,
+                user1.token,
+                200,
+                [conversationDetails2, conversationDetails1]
+            );
+        });
+
+        test("GET - should return the conversation history for a student (0 < offset < total number of results)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=date&offset=1&limit=1`,
+                user1.token,
+                200,
+                [conversationDetails2]
+            );
+        });
+
+        test("GET - should return the conversation history for a student (limit >= total number of results)", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=date&offset=0&limit=10`,
+                user1.token,
+                200,
+                [conversationDetails1, conversationDetails2]
+            );
+        });
+
+        test("GET - should return nothing when offset >= total number of results", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=date&offset=2&limit=2`,
+                user1.token,
+                200,
+                []
+            );
+        });
+
+        test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id + 100}/conversation-history?order_by=date&offset=0&limit=2`,
+                user1.token,
+                400,
+                {
+                    message: `student with id ${student1.student_id + 100} does not exist`,
+                }
+            );
+        });
+
+        test("GET - should return error message when missing the order_by query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?offset=0&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "order_by",
+                        msg: "order_by is required",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when missing the offset query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=name&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "offset",
+                        msg: "offset is required",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when missing the limit query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=name&offset=0`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "limit",
+                        msg: "limit is required",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when the order_by query parameter value is not a valid option", async () => {
+            const orderBy = "conversation_name";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=${orderBy}&offset=0&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "order_by",
+                        value: orderBy,
+                        msg: "order_by must be one of 'date' or '-date'",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when the offset query parameter value is negative", async () => {
+            const offset = "-1";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=name&offset=${offset}&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "offset",
+                        value: offset,
+                        msg: "offset must be a positive integer",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when the limit query parameter value is negative", async () => {
+            const limit = "-1";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=name&offset=0&limit=${limit}`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "limit",
+                        value: limit,
+                        msg: "limit must be a positive integer",
+                    },
+                ]
+            );
+        });
+
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/conversation-history?order_by=name&offset=0&limit=2`,
                 undefined,
                 401,
                 {
