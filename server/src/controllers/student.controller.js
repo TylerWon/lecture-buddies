@@ -405,7 +405,7 @@ const getBuddyRequestsForStudent = async (req, res, next) => getBuddiesOrBuddyRe
 
 /**
  * Gets the conversation history for a student. The conversation history is all the conversations a student has had.
- * Information about the conversation and messages is included.
+ * Information about the conversation and the most recent message in the conversation is included.
  *
  * @param {number} req.params.student_id - The student's ID
  * @param {string} req.query.order_by - the field to order the response by (options: date, -date)

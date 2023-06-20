@@ -107,7 +107,7 @@ CREATE TABLE social_medias (
 
 CREATE TABLE conversations (
 	conversation_id SERIAL PRIMARY KEY,
-	conversation_name CHAR(150)
+	conversation_name CHAR(150) DEFAULT 'DM'
 );
 
 CREATE TABLE conversation_members (
