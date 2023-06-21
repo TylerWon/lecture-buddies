@@ -11,6 +11,7 @@ const authRouter = require("./routes/auth.route");
 const courseRouter = require("./routes/course.route");
 const enrolmentRouter = require("./routes/enrolment.route");
 const schoolRouter = require("./routes/school.route");
+const socialMediaRouter = require("./routes/socialMedia.route");
 const subjectRouter = require("./routes/subject.route");
 const studentRouter = require("./routes/student.route");
 
@@ -43,6 +44,7 @@ app.use("/auth", authRouter);
 app.use("/courses", courseRouter);
 app.use("/enrolments", enrolmentRouter);
 app.use("/schools", schoolRouter);
+app.use("/social-medias", socialMediaRouter);
 app.use("/subjects", subjectRouter);
 app.use("/students", studentRouter);
 
