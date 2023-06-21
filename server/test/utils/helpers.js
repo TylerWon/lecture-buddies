@@ -16,9 +16,9 @@ const queries = require("../utils/queries");
  *
  * @returns {object} the created buddy
  */
-async function createBuddy(db, requestorId, requesteeId, status) {
+const createBuddy = async (db, requestorId, requesteeId, status) => {
     return await db.one(queries.buddies.createBuddy, [requestorId, requesteeId, status]);
-}
+};
 
 /**
  * Creates a conversation
@@ -28,9 +28,9 @@ async function createBuddy(db, requestorId, requesteeId, status) {
  *
  * @returns {object} the created conversation
  */
-async function createConversation(db, conversationName) {
+const createConversation = async (db, conversationName) => {
     return await db.one(queries.conversations.createConversation, [conversationName]);
-}
+};
 
 /**
  * Creates a conversation member (i.e. adds a student to a conversation)
@@ -41,9 +41,9 @@ async function createConversation(db, conversationName) {
  *
  * @returns {object} the created conversation member
  */
-async function createConversationMember(db, conversationId, studentId) {
+const createConversationMember = async (db, conversationId, studentId) => {
     return await db.one(queries.conversationMembers.createConversationMember, [conversationId, studentId]);
-}
+};
 
 /**
  * Creates a course
@@ -55,9 +55,9 @@ async function createConversationMember(db, conversationId, studentId) {
  *
  * @returns {object} the created course
  */
-async function createCourse(db, subjectId, courseNumber, courseName) {
+const createCourse = async (db, subjectId, courseNumber, courseName) => {
     return await db.one(queries.courses.createCourse, [subjectId, courseNumber, courseName]);
-}
+};
 
 /**
  * Creates an enrolment (i.e enrol a student in a section)
@@ -68,9 +68,9 @@ async function createCourse(db, subjectId, courseNumber, courseName) {
  *
  * @returns {object} the created enrolment
  */
-async function createEnrolment(db, studentId, sectionId) {
+const createEnrolment = async (db, studentId, sectionId) => {
     return await db.one(queries.enrolments.createEnrolment, [studentId, sectionId]);
-}
+};
 
 /**
  * Creates an interest
@@ -81,9 +81,9 @@ async function createEnrolment(db, studentId, sectionId) {
  *
  * @returns {object} the created interest
  */
-async function createInterest(db, studentId, interestName) {
+const createInterest = async (db, studentId, interestName) => {
     return await db.one(queries.interests.createInterest, [studentId, interestName]);
-}
+};
 
 /**
  * Creates a message
@@ -95,9 +95,9 @@ async function createInterest(db, studentId, interestName) {
  *
  * @returns {object} the created message
  */
-async function createMessage(db, conversationId, authorId, messageContent) {
+const createMessage = async (db, conversationId, authorId, messageContent) => {
     return await db.one(queries.messages.createMessage, [conversationId, authorId, messageContent]);
-}
+};
 
 /**
  * Creates a school
@@ -109,9 +109,9 @@ async function createMessage(db, conversationId, authorId, messageContent) {
  *
  * @returns {object} the created school
  */
-async function createSchool(db, schoolName, currentTerm, logoUrl) {
+const createSchool = async (db, schoolName, currentTerm, logoUrl) => {
     return await db.one(queries.schools.createSchool, [schoolName, currentTerm, logoUrl]);
-}
+};
 
 /**
  * Creates a section
@@ -123,9 +123,9 @@ async function createSchool(db, schoolName, currentTerm, logoUrl) {
  *
  * @returns {object} the created section
  */
-async function createSection(db, courseId, sectionNumber, sectionTerm) {
+const createSection = async (db, courseId, sectionNumber, sectionTerm) => {
     return await db.one(queries.sections.createSection, [courseId, sectionNumber, sectionTerm]);
-}
+};
 
 /**
  * Creates a social media
@@ -137,9 +137,9 @@ async function createSection(db, courseId, sectionNumber, sectionTerm) {
  *
  * @returns {object} the created social media
  */
-async function createSocialMedia(db, studentId, socialMediaName, socialMediaUrl) {
+const createSocialMedia = async (db, studentId, socialMediaName, socialMediaUrl) => {
     return await db.one(queries.socialMedias.createSocialMedia, [studentId, socialMediaName, socialMediaUrl]);
-}
+};
 
 /**
  * Creates a subject
@@ -150,9 +150,9 @@ async function createSocialMedia(db, studentId, socialMediaName, socialMediaUrl)
  *
  * @returns {object} the created subject
  */
-async function createSubject(db, schoolId, subjectName) {
+const createSubject = async (db, schoolId, subjectName) => {
     return await db.one(queries.subjects.createSubject, [schoolId, subjectName]);
-}
+};
 
 /**
  * Creates a student
@@ -170,7 +170,7 @@ async function createSubject(db, schoolId, subjectName) {
  *
  * @returns {object} the created student
  */
-async function createStudent(db, userId, schoolId, firstName, lastName, year, faculty, major, profilePhotoUrl, bio) {
+const createStudent = async (db, userId, schoolId, firstName, lastName, year, faculty, major, profilePhotoUrl, bio) => {
     return await db.one(queries.students.createStudent, [
         userId,
         schoolId,
@@ -182,7 +182,7 @@ async function createStudent(db, userId, schoolId, firstName, lastName, year, fa
         profilePhotoUrl,
         bio,
     ]);
-}
+};
 
 /**
  * Creates a user
@@ -193,24 +193,24 @@ async function createStudent(db, userId, schoolId, firstName, lastName, year, fa
  *
  * @returns {object} the created user
  */
-async function createUser(db, username, password) {
+const createUser = async (db, username, password) => {
     const salt = crypto.randomBytes(16);
     const hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
     const token = jwt.sign({ username: username }, process.env.JWT_SECRET);
 
     return await db.one(queries.users.createUser, [username, hashedPassword, salt, token]);
-}
+};
 
 /**
  * Deletes all data from the database
  *
  * @param {object} db - the database connection
  */
-async function cleanUpDatabase(db) {
+const cleanUpDatabase = async (db) => {
     await db.none(
         "TRUNCATE schools, subjects, courses, sections, users, students, enrolments, interests, social_medias, conversations, conversation_members, messages, buddies RESTART IDENTITY CASCADE"
     );
-}
+};
 
 /**
  * Checks that a GET request to an endpoint returns the expected status code and body
@@ -223,12 +223,12 @@ async function cleanUpDatabase(db) {
  *
  * @returns {object} the response
  */
-async function verifyGetRequestResponse(app, endpoint, token, expectedStatusCode, expectedBody) {
+const verifyGetRequestResponse = async (app, endpoint, token, expectedStatusCode, expectedBody) => {
     const response = await request(app).get(endpoint).auth(token, { type: "bearer" });
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
     return response;
-}
+};
 
 /**
  * Checks that a POST request to an endpoint that requires authentiation returns the expected status code and body
@@ -242,12 +242,12 @@ async function verifyGetRequestResponse(app, endpoint, token, expectedStatusCode
  *
  * @returns {object} the response
  */
-async function verifyPostRequestResponseWithAuth(app, endpoint, token, payload, expectedStatusCode, expectedBody) {
+const verifyPostRequestResponseWithAuth = async (app, endpoint, token, payload, expectedStatusCode, expectedBody) => {
     const response = await request(app).post(endpoint).auth(token, { type: "bearer" }).send(payload);
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
     return response;
-}
+};
 
 /**
  * Checks that a POST request to an endpoint returns the expected status code and body
@@ -260,12 +260,12 @@ async function verifyPostRequestResponseWithAuth(app, endpoint, token, payload, 
  *
  * @returns {object} the response
  */
-async function verifyPostRequestResponseWithoutAuth(app, endpoint, payload, expectedStatusCode, expectedBody) {
+const verifyPostRequestResponseWithoutAuth = async (app, endpoint, payload, expectedStatusCode, expectedBody) => {
     const response = await request(app).post(endpoint).send(payload);
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
     return response;
-}
+};
 
 module.exports = {
     createBuddy,
