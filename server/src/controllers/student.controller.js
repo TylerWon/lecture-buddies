@@ -87,203 +87,6 @@ const getStudent = async (req, res, next) => {
 };
 
 /**
- * Gets the interests for a student
- *
- * @param {number} req.params.student_id - The student's ID
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getInterestsForStudent = async (req, res, next) => {
-    const studentId = req.params.student_id;
-
-    // Check if student exists
-    if (!(await studentExists(studentId))) {
-        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
-    }
-
-    // Get interests
-    try {
-        const interests = await db.any(queries.students.getInterestsForStudent, [studentId]);
-        return res.json(interests);
-    } catch (err) {
-        return next(err); // unexpected error
-    }
-};
-
-/**
- * Gets the social medias for a student
- *
- * @param {number} req.params.student_id - The student's ID
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getSocialMediasForStudent = async (req, res, next) => {
-    const studentId = req.params.student_id;
-
-    // Check if student exists
-    if (!(await studentExists(studentId))) {
-        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
-    }
-
-    // Get social medias
-    try {
-        const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [studentId]);
-        return res.json(socialMedias);
-    } catch (err) {
-        return next(err); // unexpected error
-    }
-};
-
-/**
- * Gets the course history for a student. The course history is all the courses a student has taken. Information about
- * the subject, course, and section is included.
- *
- * @param {number} req.params.student_id - The student's ID
- * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getCourseHistoryForStudent = async (req, res, next) => {
-    const studentId = req.params.student_id;
-    const orderBy = req.query.order_by;
-
-    // Check if student exists
-    if (!(await studentExists(studentId))) {
-        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
-    }
-
-    try {
-        // Get course history
-        let courseHistory = await db.any(queries.students.getCourseHistoryForStudent, [studentId]);
-
-        // Sort course history
-        switch (orderBy) {
-            case "name":
-                sortCoursesByNameASC(courseHistory);
-                break;
-            case "-name":
-                sortCoursesByNameDESC(courseHistory);
-                break;
-        }
-
-        return res.json(courseHistory);
-    } catch (err) {
-        return next(err); // unexpected error
-    }
-};
-
-/**
- * Gets the classmates for a student in a section. Information about each classmate and their interests, social medias,
- * and mutual courses with the student for the term the section is in is included.
- *
- * @param {number} req.params.student_id - The student's ID
- * @param {number} req.params.section_id - The section's ID
- * @param {string} req.query.order_by - the field to order the response by (options: num_mutual_courses,
- * -num_mutual_courses, name, -name, year, -year, major, -major)
- * @param {string} req.query.offset - the position to start returning results from
- * @param {string} req.query.limit - the number of results to return
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student or section does not exist or student is not enrolled in section
- * - 500 Internal Server Error if unexpected error
- */
-const getClassmatesForStudentInSection = async (req, res, next) => {
-    const studentId = req.params.student_id;
-    const sectionId = req.params.section_id;
-    const orderBy = req.query.order_by;
-    const offset = req.query.offset;
-    const limit = req.query.limit;
-
-    // Check if student exists
-    if (!(await studentExists(studentId))) {
-        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
-    }
-
-    // Check if section exists
-    try {
-        await db.one(queries.sections.getSection, [sectionId]);
-    } catch (err) {
-        return res.status(400).json({ message: `section with id '${sectionId}' does not exist` });
-    }
-
-    // Check if student is enrolled in section
-    try {
-        await db.one(queries.enrolments.getEnrolment, [studentId, sectionId]);
-    } catch (err) {
-        return res.status(400).json({
-            message: `student with id '${studentId}' is not enrolled in section with id '${sectionId}'`,
-        });
-    }
-
-    try {
-        // Get section
-        const section = await db.one(queries.sections.getSection, [sectionId]);
-
-        // Get classmates
-        let classmates = await db.any(queries.students.getClassmatesForStudentInSection, [studentId, sectionId]);
-
-        // Get mutual courses with the student for each classmate
-        await getMutualCoursesForStudentsForTerm(
-            studentId,
-            classmates,
-            section.section_term,
-            "mutual_courses_for_term"
-        );
-
-        // Sort classmates
-        switch (orderBy) {
-            case "num_mutual_courses":
-                classmates.sort((a, b) => a.mutual_courses_for_term.length - b.mutual_courses_for_term.length);
-                break;
-            case "-num_mutual_courses":
-                classmates.sort((a, b) => b.mutual_courses_for_term.length - a.mutual_courses_for_term.length);
-                break;
-            case "name":
-                sortStudentsByNameASC(classmates);
-                break;
-            case "-name":
-                sortStudentsByNameDESC(classmates);
-                break;
-            case "year":
-                classmates.sort((a, b) => a.year.localeCompare(b.year));
-                break;
-            case "-year":
-                classmates.sort((a, b) => b.year.localeCompare(a.year));
-                break;
-            case "major":
-                classmates.sort((a, b) => a.major.localeCompare(b.major));
-                break;
-            case "-major":
-                classmates.sort((a, b) => b.major.localeCompare(a.major));
-                break;
-        }
-
-        // Paginate classmates
-        classmates = classmates.slice(offset, offset + limit);
-
-        // Get interests for each classmate
-        await getInterestsForStudents(classmates);
-
-        // Get social medias for each classmate
-        await getSocialMediasForStudents(classmates);
-
-        return res.json(classmates);
-    } catch (err) {
-        return next(err); // unexpected error
-    }
-};
-
-/**
  * Gets the buddies or buddy requests for a student
 
  * @param {number} req.params.student_id - The student's ID
@@ -454,6 +257,203 @@ const getConversationsForStudent = async (req, res, next) => {
         return res.json(conversations);
     } catch (err) {
         console.log(err);
+        return next(err); // unexpected error
+    }
+};
+
+/**
+ * Gets the course history for a student. The course history is all the courses a student has taken. Information about
+ * the subject, course, and section is included.
+ *
+ * @param {number} req.params.student_id - The student's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const getCourseHistoryForStudent = async (req, res, next) => {
+    const studentId = req.params.student_id;
+    const orderBy = req.query.order_by;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    try {
+        // Get course history
+        let courseHistory = await db.any(queries.students.getCourseHistoryForStudent, [studentId]);
+
+        // Sort course history
+        switch (orderBy) {
+            case "name":
+                sortCoursesByNameASC(courseHistory);
+                break;
+            case "-name":
+                sortCoursesByNameDESC(courseHistory);
+                break;
+        }
+
+        return res.json(courseHistory);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+};
+
+/**
+ * Gets the interests for a student
+ *
+ * @param {number} req.params.student_id - The student's ID
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const getInterestsForStudent = async (req, res, next) => {
+    const studentId = req.params.student_id;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    // Get interests
+    try {
+        const interests = await db.any(queries.students.getInterestsForStudent, [studentId]);
+        return res.json(interests);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+};
+
+/**
+ * Gets the classmates for a student in a section. Information about each classmate and their interests, social medias,
+ * and mutual courses with the student for the term the section is in is included.
+ *
+ * @param {number} req.params.student_id - The student's ID
+ * @param {number} req.params.section_id - The section's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: num_mutual_courses,
+ * -num_mutual_courses, name, -name, year, -year, major, -major)
+ * @param {string} req.query.offset - the position to start returning results from
+ * @param {string} req.query.limit - the number of results to return
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student or section does not exist or student is not enrolled in section
+ * - 500 Internal Server Error if unexpected error
+ */
+const getClassmatesForStudentInSection = async (req, res, next) => {
+    const studentId = req.params.student_id;
+    const sectionId = req.params.section_id;
+    const orderBy = req.query.order_by;
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    // Check if section exists
+    try {
+        await db.one(queries.sections.getSection, [sectionId]);
+    } catch (err) {
+        return res.status(400).json({ message: `section with id '${sectionId}' does not exist` });
+    }
+
+    // Check if student is enrolled in section
+    try {
+        await db.one(queries.enrolments.getEnrolment, [studentId, sectionId]);
+    } catch (err) {
+        return res.status(400).json({
+            message: `student with id '${studentId}' is not enrolled in section with id '${sectionId}'`,
+        });
+    }
+
+    try {
+        // Get section
+        const section = await db.one(queries.sections.getSection, [sectionId]);
+
+        // Get classmates
+        let classmates = await db.any(queries.students.getClassmatesForStudentInSection, [studentId, sectionId]);
+
+        // Get mutual courses with the student for each classmate
+        await getMutualCoursesForStudentsForTerm(
+            studentId,
+            classmates,
+            section.section_term,
+            "mutual_courses_for_term"
+        );
+
+        // Sort classmates
+        switch (orderBy) {
+            case "num_mutual_courses":
+                classmates.sort((a, b) => a.mutual_courses_for_term.length - b.mutual_courses_for_term.length);
+                break;
+            case "-num_mutual_courses":
+                classmates.sort((a, b) => b.mutual_courses_for_term.length - a.mutual_courses_for_term.length);
+                break;
+            case "name":
+                sortStudentsByNameASC(classmates);
+                break;
+            case "-name":
+                sortStudentsByNameDESC(classmates);
+                break;
+            case "year":
+                classmates.sort((a, b) => a.year.localeCompare(b.year));
+                break;
+            case "-year":
+                classmates.sort((a, b) => b.year.localeCompare(a.year));
+                break;
+            case "major":
+                classmates.sort((a, b) => a.major.localeCompare(b.major));
+                break;
+            case "-major":
+                classmates.sort((a, b) => b.major.localeCompare(a.major));
+                break;
+        }
+
+        // Paginate classmates
+        classmates = classmates.slice(offset, offset + limit);
+
+        // Get interests for each classmate
+        await getInterestsForStudents(classmates);
+
+        // Get social medias for each classmate
+        await getSocialMediasForStudents(classmates);
+
+        return res.json(classmates);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+};
+
+/**
+ * Gets the social medias for a student
+ *
+ * @param {number} req.params.student_id - The student's ID
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const getSocialMediasForStudent = async (req, res, next) => {
+    const studentId = req.params.student_id;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    // Get social medias
+    try {
+        const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [studentId]);
+        return res.json(socialMedias);
+    } catch (err) {
         return next(err); // unexpected error
     }
 };

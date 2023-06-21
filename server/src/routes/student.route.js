@@ -15,33 +15,6 @@ router.post(
 );
 router.get("/:student_id(\\d+)", authMiddleware.authenticateRequest, studentController.getStudent);
 router.get(
-    "/:student_id(\\d+)/interests",
-    authMiddleware.authenticateRequest,
-    studentController.getInterestsForStudent
-);
-router.get(
-    "/:student_id(\\d+)/social-medias",
-    authMiddleware.authenticateRequest,
-    studentController.getSocialMediasForStudent
-);
-router.get(
-    "/:student_id(\\d+)/course-history",
-    validationSchemas.getCourseHistoryForStudentValidationSchema(),
-    validationMiddleware.validateRequest,
-    authMiddleware.authenticateRequest,
-    studentController.getCourseHistoryForStudent
-);
-router.get(
-    "/:student_id(\\d+)/sections/:section_id(\\d+)/classmates",
-    validationSchemas.sortingAndPaginationValidationSchema(
-        [/^(-?)(num_mutual_courses|name|year|major)$/],
-        "order_by must be one of 'num_mutual_courses', '-num_mutual_courses', 'name', '-name', 'year', '-year', 'major', '-major''"
-    ),
-    validationMiddleware.validateRequest,
-    authMiddleware.authenticateRequest,
-    studentController.getClassmatesForStudentInSection
-);
-router.get(
     "/:student_id(\\d+)/buddies",
     validationSchemas.sortingAndPaginationValidationSchema(
         [/^(-?)(name)$/],
@@ -70,6 +43,33 @@ router.get(
     validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     studentController.getConversationsForStudent
+);
+router.get(
+    "/:student_id(\\d+)/course-history",
+    validationSchemas.getCourseHistoryForStudentValidationSchema(),
+    validationMiddleware.validateRequest,
+    authMiddleware.authenticateRequest,
+    studentController.getCourseHistoryForStudent
+);
+router.get(
+    "/:student_id(\\d+)/interests",
+    authMiddleware.authenticateRequest,
+    studentController.getInterestsForStudent
+);
+router.get(
+    "/:student_id(\\d+)/sections/:section_id(\\d+)/classmates",
+    validationSchemas.sortingAndPaginationValidationSchema(
+        [/^(-?)(num_mutual_courses|name|year|major)$/],
+        "order_by must be one of 'num_mutual_courses', '-num_mutual_courses', 'name', '-name', 'year', '-year', 'major', '-major''"
+    ),
+    validationMiddleware.validateRequest,
+    authMiddleware.authenticateRequest,
+    studentController.getClassmatesForStudentInSection
+);
+router.get(
+    "/:student_id(\\d+)/social-medias",
+    authMiddleware.authenticateRequest,
+    studentController.getSocialMediasForStudent
 );
 
 module.exports = router;
