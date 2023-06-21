@@ -234,6 +234,14 @@ describe("student routes tests", () => {
             });
         });
 
+        test("POST - should not create a student when user is already associated with another student", async () => {
+            payload.user_id = user1.user_id;
+
+            await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 400, {
+                message: `user with id '${payload.user_id}' is already associated with another student`,
+            });
+        });
+
         test("POST - should not create a student when request is unauthenticated", async () => {
             await verifyPostRequestResponseWithAuth(app, "/students", undefined, payload, 401, {
                 message: "unauthorized",

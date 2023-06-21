@@ -16,7 +16,7 @@ const queries = require("../utils/queries");
  *
  * @returns
  * - 201 Created if successful
- * - 400 Bad Request if user or school does not exist
+ * - 400 Bad Request if user or school does not exist or user is already associated with a student
  * - 500 Internal Server Error if unexpected error
  */
 const createStudent = async (req, res, next) => {
@@ -37,6 +37,15 @@ const createStudent = async (req, res, next) => {
     } catch (err) {
         return res.status(400).json({
             message: `school with id '${payload.school_id}' does not exist`,
+        });
+    }
+
+    // Check if user is already associated with a student
+    try {
+        await db.none(queries.students.getStudent, [payload.student_id]);
+    } catch (err) {
+        return res.status(400).json({
+            message: `user with id '${payload.user_id}' is already associated with another student`,
         });
     }
 
