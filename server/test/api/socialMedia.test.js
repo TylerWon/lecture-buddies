@@ -4,7 +4,6 @@ const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
     createSchool,
-    createSocialMedia,
     createStudent,
     createUser,
     cleanUpDatabase,
@@ -15,7 +14,6 @@ describe("social media routes tests", () => {
     let user1;
     let school1;
     let student1;
-    let socialMedia1;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
@@ -35,7 +33,6 @@ describe("social media routes tests", () => {
             "www.tylerwon.com/profile_photo.jpg",
             "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
         );
-        socialMedia1 = await createSocialMedia(db, student1.student_id, "LinkedIn", "www.linkedin.com/tylerwon");
     });
 
     afterAll(async () => {
@@ -48,9 +45,9 @@ describe("social media routes tests", () => {
 
         beforeEach(() => {
             payload = {
-                student_id: socialMedia1.student_id,
-                social_media_platform: socialMedia1.social_media_platform,
-                social_media_url: socialMedia1.social_media_url,
+                student_id: student1.student_id,
+                social_media_platform: "LinkedIn",
+                social_media_url: "www.linkedin.com/tylerwon",
             };
         });
 
@@ -98,6 +95,20 @@ describe("social media routes tests", () => {
             await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, {
                 message: `student with id '${payload.student_id}' does not exist`,
             });
+        });
+
+        test("GET - should not create a social media when the social_media_platform body parameter is not a valid option", async () => {
+            payload.social_media_platform = "Youtube";
+
+            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, [
+                {
+                    type: "field",
+                    location: "body",
+                    path: "social_media_platform",
+                    value: payload.social_media_platform,
+                    msg: "social_media_platform must be one of 'Facebook', 'Instagram', 'LinkedIn', or 'Twitter'",
+                },
+            ]);
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {

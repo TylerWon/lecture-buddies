@@ -183,8 +183,9 @@ const createSocialMediaValidationSchema = () =>
             exists: {
                 errorMessage: "social_media_platform is required",
             },
-            isString: {
-                errorMessage: "social_media_platform must be a string",
+            matches: {
+                options: [/^(Facebook|Instagram|LinkedIn|Twitter)$/],
+                errorMessage: "social_media_platform must be one of 'Facebook', 'Instagram', 'LinkedIn', or 'Twitter'",
             },
         },
         social_media_url: {
