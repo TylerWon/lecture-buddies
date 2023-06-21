@@ -27,6 +27,11 @@ const queries = {
         `,
     },
     enrolments: {
+        createEnrolment: `
+            INSERT INTO enrolments (student_id, section_id) 
+            VALUES ($1, $2) 
+            RETURNING *
+        `,
         getEnrolment: `
             SELECT *
             FROM enrolments

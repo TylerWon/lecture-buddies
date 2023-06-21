@@ -24,6 +24,29 @@ const authValidationSchema = () =>
         ["body"]
     );
 
+// Enrolments
+const createEnrolmentValidationSchema = () =>
+    checkSchema({
+        student_id: {
+            exists: {
+                errorMessage: "student_id is required",
+            },
+            isInt: {
+                options: { gt: -1 },
+                errorMessage: "student_id must be a positive integer",
+            },
+        },
+        section_id: {
+            exists: {
+                errorMessage: "section_id is required",
+            },
+            isInt: {
+                options: { gt: -1 },
+                errorMessage: "section_id must be a positive integer",
+            },
+        },
+    });
+
 // Students
 const createStudentValidationSchema = () =>
     checkSchema(
@@ -33,7 +56,8 @@ const createStudentValidationSchema = () =>
                     errorMessage: "student_id is required",
                 },
                 isInt: {
-                    errorMessage: "student_id must be an integer",
+                    options: { gt: -1 },
+                    errorMessage: "student_id must be a positive integer",
                 },
             },
             school_id: {
@@ -41,7 +65,8 @@ const createStudentValidationSchema = () =>
                     errorMessage: "school_id is required",
                 },
                 isInt: {
-                    errorMessage: "school_id must be an integer",
+                    options: { gt: -1 },
+                    errorMessage: "school_id must be a positive integer",
                 },
             },
             first_name: {
@@ -157,6 +182,7 @@ const sortingAndPaginationValidationSchema = (orderByOptions, orderByMessage) =>
 
 module.exports = {
     authValidationSchema,
+    createEnrolmentValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
     sortingAndPaginationValidationSchema,

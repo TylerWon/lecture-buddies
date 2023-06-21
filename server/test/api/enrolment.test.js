@@ -66,6 +66,12 @@ describe("enrolment routes tests", () => {
             expect(response.body.section_id).toEqual(payload.section_id);
         });
 
+        test("GET - should not create an enrolment when the student is already enrolled in the section", async () => {
+            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, {
+                message: `student with id '${student1.student_id}' is already enrolled in section with id '${section1.section_id}'`,
+            });
+        });
+
         test("GET - should not create an enrolment when missing some fields", async () => {
             delete payload.student_id;
 
@@ -80,7 +86,7 @@ describe("enrolment routes tests", () => {
         });
 
         test("GET - should not create an enrolment when some fields are the wrong type", async () => {
-            payload.section_id = "1";
+            payload.section_id = "-1";
 
             await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, [
                 {
@@ -88,17 +94,9 @@ describe("enrolment routes tests", () => {
                     location: "body",
                     path: "section_id",
                     value: payload.section_id,
-                    msg: "section_id must a positive integer",
+                    msg: "section_id must be a positive integer",
                 },
             ]);
-        });
-
-        test("GET - should not create an enrolment when the student is already enrolled in the section", async () => {
-            await createEnrolment(db, student1.student_id, section1.section_id);
-
-            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, {
-                message: `student with id '${student1.student_id}' is already enrolled in section with id '${section1.section_id}'`,
-            });
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {

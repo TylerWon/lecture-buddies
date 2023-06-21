@@ -13,7 +13,24 @@ const queries = require("../utils/queries");
  * - 500 Internal Server Error if an unexpected error occurs
  */
 const createEnrolment = async (req, res, next) => {
-    res.send("Not implemented");
+    const payload = req.body;
+
+    // Check if the student is already enrolled in the section
+    try {
+        await db.none(queries.enrolments.getEnrolment, [payload.student_id, payload.section_id]);
+    } catch (err) {
+        return res.status(400).json({
+            message: `student with id '${payload.student_id}' is already enrolled in section with id '${payload.section_id}'`,
+        });
+    }
+
+    // Create enrolment
+    try {
+        const enrolment = await db.one(queries.enrolments.createEnrolment, [payload.student_id, payload.section_id]);
+        return res.status(201).json(enrolment);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 module.exports = {
