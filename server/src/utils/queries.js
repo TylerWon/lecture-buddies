@@ -38,6 +38,13 @@ const queries = {
             WHERE student_id = $1 AND section_id = $2
         `,
     },
+    interests: {
+        createInterest: `
+            INSERT INTO interests (student_id, interest_name)
+            VALUES ($1, $2)
+            RETURNING *
+        `,
+    },
     schools: {
         getSchools: `
             SELECT * 

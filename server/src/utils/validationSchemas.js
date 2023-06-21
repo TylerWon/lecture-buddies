@@ -47,6 +47,28 @@ const createEnrolmentValidationSchema = () =>
         },
     });
 
+// Interests
+const createInterestValidationSchema = () =>
+    checkSchema({
+        student_id: {
+            exists: {
+                errorMessage: "student_id is required",
+            },
+            isInt: {
+                options: { gt: -1 },
+                errorMessage: "student_id must be a positive integer",
+            },
+        },
+        interest_name: {
+            exists: {
+                errorMessage: "interest_name is required",
+            },
+            isString: {
+                errorMessage: "interest_name must be a string",
+            },
+        },
+    });
+
 // Students
 const createStudentValidationSchema = () =>
     checkSchema(
@@ -213,6 +235,7 @@ const sortingAndPaginationValidationSchema = (orderByOptions, orderByMessage) =>
 module.exports = {
     authValidationSchema,
     createEnrolmentValidationSchema,
+    createInterestValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
     createSocialMediaValidationSchema,

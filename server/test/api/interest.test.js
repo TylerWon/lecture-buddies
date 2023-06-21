@@ -3,7 +3,6 @@ const request = require("supertest");
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
-    createInterest,
     createSchool,
     createStudent,
     createUser,
@@ -35,7 +34,6 @@ describe("interest routes tests", () => {
             "www.tylerwon.com/profile_photo.jpg",
             "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
         );
-        interest1 = await createInterest(db, student1.student_id, "reading");
     });
 
     afterAll(async () => {
@@ -48,8 +46,8 @@ describe("interest routes tests", () => {
 
         beforeEach(() => {
             payload = {
-                student_id: interest1.student_id,
-                interest_name: interest1.interest_name,
+                student_id: student1.student_id,
+                interest_name: "reading",
             };
         });
 

@@ -87,7 +87,7 @@ CREATE TABLE enrolments (
 CREATE TABLE interests (
 	interest_id SERIAL PRIMARY KEY,
 	student_id INTEGER,
-	interest_name VARCHAR(50) UNIQUE,
+	interest_name VARCHAR(50),
 	FOREIGN KEY (student_id) REFERENCES students
 		ON DELETE CASCADE
 		ON UPDATE CASCADE

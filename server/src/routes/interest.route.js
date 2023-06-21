@@ -8,8 +8,8 @@ const validationSchemas = require("../utils/validationSchemas");
 
 router.post(
     "/",
-    // validationSchemas.createInterestValidationSchema(),
-    // validationMiddleware.validateRequest,
+    validationSchemas.createInterestValidationSchema(),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     interestController.createInterest
 );
