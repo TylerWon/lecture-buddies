@@ -61,6 +61,13 @@ const queries = {
             WHERE section_id = $1
         `,
     },
+    socialMedias: {
+        createSocialMedia: `
+            INSERT INTO social_medias (student_id, social_media_platform, social_media_url)
+            VALUES ($1, $2, $3)
+            RETURNING *
+        `,
+    },
     subjects: {
         getSubject: `
             SELECT *

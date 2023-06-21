@@ -145,6 +145,36 @@ const getCourseHistoryForStudentValidationSchema = () =>
         ["query"]
     );
 
+// Social media
+const createSocialMediaValidationSchema = () =>
+    checkSchema({
+        student_id: {
+            exists: {
+                errorMessage: "student_id is required",
+            },
+            isInt: {
+                options: { gt: -1 },
+                errorMessage: "student_id must be a positive integer",
+            },
+        },
+        social_media_platform: {
+            exists: {
+                errorMessage: "social_media_platform is required",
+            },
+            isString: {
+                errorMessage: "social_media_platform must be a string",
+            },
+        },
+        social_media_url: {
+            exists: {
+                errorMessage: "social_media_url is required",
+            },
+            isString: {
+                errorMessage: "social_media_url must be a string",
+            },
+        },
+    });
+
 // General
 const sortingAndPaginationValidationSchema = (orderByOptions, orderByMessage) =>
     checkSchema(
@@ -185,5 +215,6 @@ module.exports = {
     createEnrolmentValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
+    createSocialMediaValidationSchema,
     sortingAndPaginationValidationSchema,
 };

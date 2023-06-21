@@ -93,6 +93,8 @@ describe("social media routes tests", () => {
         });
 
         test("GET - should not create a social media when student does not exist", async () => {
+            payload.student_id = student1.student_id + 100;
+
             await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, {
                 message: `student with id '${payload.student_id}' does not exist`,
             });

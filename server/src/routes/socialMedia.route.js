@@ -8,8 +8,8 @@ const validationSchemas = require("../utils/validationSchemas");
 
 router.post(
     "/",
-    // validationSchemas.createSocialMediaValidationSchema(),
-    // validationMiddleware.validateRequest,
+    validationSchemas.createSocialMediaValidationSchema(),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     socialMediaController.createSocialMedia
 );

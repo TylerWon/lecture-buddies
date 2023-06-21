@@ -10,10 +10,30 @@ const queries = require("../utils/queries");
  *
  * @returns
  * - 201 Created if successful
+ * - 400 Bad Request if student does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const createSocialMedia = async (req, res, next) => {
-    res.send("Not implemented");
+    const payload = req.body;
+
+    // Check if student exists
+    try {
+        await db.one(queries.students.getStudent, [payload.student_id]);
+    } catch (err) {
+        return res.status(400).json({ message: `student with id '${payload.student_id}' does not exist` });
+    }
+
+    // Create social media
+    try {
+        const socialMedia = await db.one(queries.socialMedias.createSocialMedia, [
+            payload.student_id,
+            payload.social_media_platform,
+            payload.social_media_url,
+        ]);
+        return res.status(201).json(socialMedia);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 module.exports = {
