@@ -15,15 +15,15 @@ router.post(
 );
 router.get("/:student_id(\\d+)", authMiddleware.authenticateRequest, studentController.getStudent);
 router.get(
-    "/:student_id(\\d+)/buddies",
-    validationSchemas.getBuddiesForStudentValidationSchema(),
+    "/:student_id(\\d+)/friends",
+    validationSchemas.getFriendsForStudentValidationSchema(),
     validationSchemas.sortingAndPaginationValidationSchema(
         [/^(-?)(name)$/],
         "order_by must be one of 'name' or '-name'"
     ),
     validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
-    studentController.getBuddiesForStudent
+    studentController.getFriendsForStudent
 );
 router.get(
     "/:student_id(\\d+)/conversations",

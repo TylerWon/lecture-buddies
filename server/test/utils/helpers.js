@@ -13,22 +13,22 @@ const queries = require("../utils/queries");
  */
 const cleanUpDatabase = async (db) => {
     await db.none(
-        "TRUNCATE schools, subjects, courses, sections, users, students, enrolments, interests, social_medias, conversations, conversation_members, messages, buddies RESTART IDENTITY CASCADE"
+        "TRUNCATE schools, subjects, courses, sections, users, students, enrolments, interests, social_medias, conversations, conversation_members, messages, friendships RESTART IDENTITY CASCADE"
     );
 };
 
 /**
- * Creates a buddy
+ * Creates a friendship
  *
  * @param {object} db - the database connection
- * @param {number} requestorId - the id of the student who sent the buddy request
- * @param {number} requesteeId - the id of the student who received the buddy request
- * @param {string} status - the status of the buddy request
+ * @param {number} requestorId - the id of the student that is requesting to be the other student’s friend
+ * @param {number} requesteeId -  the id of the student that is receiving the request to be the other student’s friend
+ * @param {string} friendshipStatus - the status of the friendship
  *
- * @returns {object} the created buddy
+ * @returns {object} the created friendship
  */
-const createBuddy = async (db, requestorId, requesteeId, status) => {
-    return await db.one(queries.buddies.createBuddy, [requestorId, requesteeId, status]);
+const createFriendship = async (db, requestorId, requesteeId, friendshipStatus) => {
+    return await db.one(queries.friendships.createFriendship, [requestorId, requesteeId, friendshipStatus]);
 };
 
 /**
@@ -213,16 +213,17 @@ const createUser = async (db, username, password) => {
 };
 
 /**
- * Updates a buddy
+ * Updates a friendship
  *
  * @param {object} db - the database connection
- * @param {number} requestorId - the id of the student who sent the buddy request
- * @param {number} requesteeId - the id of the student who received the buddy request
- * @param {string} status - the status of the buddy request
+ * @param {number} requestorId - the id of the student that is requesting to be the other student’s friend
+ * @param {number} requesteeId -  the id of the student that is receiving the request to be the other student’s friend
+ * @param {string} friendshipStatus - the status of the friendship
  *
+ * @returns {object} the updated friendship
  */
-const updateBuddy = async (db, requestor_id, requestee_id, status) => {
-    return await db.one(queries.buddies.updateBuddy, [status, requestor_id, requestee_id]);
+const updateFriendship = async (db, requestor_id, requestee_id, friendshipStatus) => {
+    return await db.one(queries.friendships.updateFriendship, [friendshipStatus, requestor_id, requestee_id]);
 };
 
 /**
@@ -282,7 +283,7 @@ const verifyPostRequestResponseWithoutAuth = async (app, endpoint, payload, expe
 
 module.exports = {
     cleanUpDatabase,
-    createBuddy,
+    createFriendship,
     createCourse,
     createConversation,
     createConversationMember,
@@ -295,7 +296,7 @@ module.exports = {
     createSubject,
     createStudent,
     createUser,
-    updateBuddy,
+    updateFriendship,
     verifyGetRequestResponse,
     verifyPostRequestResponseWithAuth,
     verifyPostRequestResponseWithoutAuth,

@@ -1,13 +1,13 @@
 const queries = {
-    buddies: {
-        createBuddy: `
-            INSERT INTO buddies (requestor_id, requestee_id, status) 
+    friendships: {
+        createFriendship: `
+            INSERT INTO friendships (requestor_id, requestee_id, friendship_status) 
             VALUES ($1, $2, $3) 
             RETURNING *
         `,
-        updateBuddy: `
-            UPDATE buddies
-            SET status = $1
+        updateFriendship: `
+            UPDATE friendships
+            SET friendship_status = $1
             WHERE requestor_id = $2 AND requestee_id = $3
             RETURNING *
         `,

@@ -1,7 +1,7 @@
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
-    createBuddy,
+    createFriendship,
     createCourse,
     createConversation,
     createConversationMember,
@@ -17,7 +17,7 @@ const {
     cleanUpDatabase,
     verifyGetRequestResponse,
     verifyPostRequestResponseWithAuth,
-    updateBuddy,
+    updateFriendship,
 } = require("../utils/helpers");
 
 describe("student routes tests", () => {
@@ -268,7 +268,7 @@ describe("student routes tests", () => {
         });
     });
 
-    describe("/students/{student_id}/buddies", () => {
+    describe("/students/{student_id}/friends", () => {
         let classmateDetails1;
         let classmateDetails2;
         let courseDetails3;
@@ -300,32 +300,32 @@ describe("student routes tests", () => {
                 current_mutual_courses: [],
             };
 
-            await createBuddy(db, student1.student_id, student2.student_id, "pending");
-            await createBuddy(db, student1.student_id, student3.student_id, "pending");
+            await createFriendship(db, student1.student_id, student2.student_id, "pending");
+            await createFriendship(db, student1.student_id, student3.student_id, "pending");
         });
 
         describe("status tests", () => {
             afterAll(async () => {
-                await updateBuddy(db, student1.student_id, student2.student_id, "pending");
-                await updateBuddy(db, student1.student_id, student3.student_id, "pending");
+                await updateFriendship(db, student1.student_id, student2.student_id, "pending");
+                await updateFriendship(db, student1.student_id, student3.student_id, "pending");
             });
 
-            test("GET - should return the buddies for a student (status pending)", async () => {
-                await updateBuddy(db, student1.student_id, student2.student_id, "pending");
-                await updateBuddy(db, student1.student_id, student3.student_id, "pending");
+            test("GET - should return the friends for a student (status pending)", async () => {
+                await updateFriendship(db, student1.student_id, student2.student_id, "pending");
+                await updateFriendship(db, student1.student_id, student3.student_id, "pending");
 
                 await verifyGetRequestResponse(
                     app,
-                    `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=2`,
+                    `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=2`,
                     user1.token,
                     200,
                     [classmateDetails2, classmateDetails1]
                 );
             });
 
-            test("GET - should return the buddies for a student (status accepted)", async () => {
-                await updateBuddy(db, student1.student_id, student2.student_id, "accepted");
-                await updateBuddy(db, student1.student_id, student3.student_id, "accepted");
+            test("GET - should return the friends for a student (status accepted)", async () => {
+                await updateFriendship(db, student1.student_id, student2.student_id, "accepted");
+                await updateFriendship(db, student1.student_id, student3.student_id, "accepted");
 
                 const courseDetails1 = {
                     school_id: school1.school_id,
@@ -356,7 +356,7 @@ describe("student routes tests", () => {
 
                 await verifyGetRequestResponse(
                     app,
-                    `/students/${student1.student_id}/buddies?status=accepted&order_by=name&offset=0&limit=2`,
+                    `/students/${student1.student_id}/friends?status=accepted&order_by=name&offset=0&limit=2`,
                     user1.token,
                     200,
                     [classmateDetails2, classmateDetails1]
@@ -366,13 +366,13 @@ describe("student routes tests", () => {
                 delete classmateDetails2.previous_mutual_courses;
             });
 
-            test("GET - should return the buddies for a student (status declined)", async () => {
-                await updateBuddy(db, student1.student_id, student2.student_id, "declined");
-                await updateBuddy(db, student1.student_id, student3.student_id, "declined");
+            test("GET - should return the friends for a student (status declined)", async () => {
+                await updateFriendship(db, student1.student_id, student2.student_id, "declined");
+                await updateFriendship(db, student1.student_id, student3.student_id, "declined");
 
                 await verifyGetRequestResponse(
                     app,
-                    `/students/${student1.student_id}/buddies?status=declined&order_by=name&offset=0&limit=2`,
+                    `/students/${student1.student_id}/friends?status=declined&order_by=name&offset=0&limit=2`,
                     user1.token,
                     200,
                     [classmateDetails2, classmateDetails1]
@@ -380,40 +380,40 @@ describe("student routes tests", () => {
             });
         });
 
-        test("GET - should return the buddies for a student (order by name)", async () => {
+        test("GET - should return the friends for a student (order by name)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=2`,
                 user1.token,
                 200,
                 [classmateDetails2, classmateDetails1]
             );
         });
 
-        test("GET - should return the buddies for a student (order by -name)", async () => {
+        test("GET - should return the friends for a student (order by -name)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=-name&offset=0&limit=2`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=-name&offset=0&limit=2`,
                 user1.token,
                 200,
                 [classmateDetails1, classmateDetails2]
             );
         });
 
-        test("GET - should return the buddies for a student (0 < offset < total number of results)", async () => {
+        test("GET - should return the friends for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=1&limit=1`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=1&limit=1`,
                 user1.token,
                 200,
                 [classmateDetails1]
             );
         });
 
-        test("GET - should return the buddies for a student (limit >= total number of results)", async () => {
+        test("GET - should return the friends for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=10`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=10`,
                 user1.token,
                 200,
                 [classmateDetails2, classmateDetails1]
@@ -423,7 +423,7 @@ describe("student routes tests", () => {
         test("GET - should return nothing when offset >= total number of results", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=2&limit=2`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=2&limit=2`,
                 user1.token,
                 200,
                 []
@@ -433,7 +433,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id + 100}/buddies?status=pending&order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id + 100}/friends?status=pending&order_by=name&offset=0&limit=2`,
                 user1.token,
                 400,
                 { message: `student with id '${student1.student_id + 100}' does not exist` }
@@ -443,7 +443,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when missing the status query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id}/friends?order_by=name&offset=0&limit=2`,
                 user1.token,
                 400,
                 [
@@ -460,7 +460,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when missing the order_by query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&offset=0&limit=2`,
+                `/students/${student1.student_id}/friends?status=pending&offset=0&limit=2`,
                 user1.token,
                 400,
                 [
@@ -477,7 +477,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when missing the offset query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=name&limit=2`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=name&limit=2`,
                 user1.token,
                 400,
                 [
@@ -494,7 +494,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when missing the limit query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0`,
                 user1.token,
                 400,
                 [
@@ -513,7 +513,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=${status}&order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id}/friends?status=${status}&order_by=name&offset=0&limit=2`,
                 user1.token,
                 400,
                 [
@@ -533,7 +533,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=${orderBy}&offset=0&limit=2`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=${orderBy}&offset=0&limit=2`,
                 user1.token,
                 400,
                 [
@@ -553,7 +553,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=${offset}&limit=2`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=${offset}&limit=2`,
                 user1.token,
                 400,
                 [
@@ -573,7 +573,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=${limit}`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=${limit}`,
                 user1.token,
                 400,
                 [
@@ -591,7 +591,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when request is unauthenticated", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=2`,
                 undefined,
                 401,
                 {

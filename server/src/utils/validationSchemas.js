@@ -167,7 +167,7 @@ const getCourseHistoryForStudentValidationSchema = () =>
         ["query"]
     );
 
-const getBuddiesForStudentValidationSchema = () =>
+const getFriendsForStudentValidationSchema = () =>
     checkSchema(
         {
             status: {
@@ -255,7 +255,7 @@ module.exports = {
     createInterestValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
-    getBuddiesForStudentValidationSchema,
+    getFriendsForStudentValidationSchema,
     createSocialMediaValidationSchema,
     sortingAndPaginationValidationSchema,
 };

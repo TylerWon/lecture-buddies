@@ -138,10 +138,10 @@ CREATE TABLE messages (
 
 CREATE TYPE STATUS AS ENUM ('pending', 'accepted', 'declined');
 
-CREATE TABLE buddies (
+CREATE TABLE friendships (
 	requestor_id INTEGER,
 	requestee_id INTEGER,
-	status STATUS DEFAULT 'pending',
+	friendship_status STATUS DEFAULT 'pending',
 	created_datetime TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 	updated_datetime TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (requestor_id, requestee_id),
