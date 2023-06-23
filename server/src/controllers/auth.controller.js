@@ -37,7 +37,7 @@ passport.use(
 // Passport user serializer and deserializer for sessions
 passport.serializeUser((user, cb) => {
     process.nextTick(() => {
-        return cb(null, { user_id: user.user_id, token: user.token });
+        return cb(null, { token: user.token });
     });
 });
 
@@ -64,7 +64,6 @@ const login = passport.authenticate("local");
  */
 const afterLogin = (req, res, next) => {
     return res.json({
-        user_id: req.user.user_id,
         token: req.user.token,
     });
 };
@@ -103,19 +102,26 @@ const signup = async (req, res, next) => {
     const password = req.body.password;
     const salt = crypto.randomBytes(16);
 
+    // Create user with just username
+    try {
+        user = await db.one(queries.users.createUser, [username, null, null, null]);
+    } catch (err) {
+        return res.status(400).json({ message: "an account with that username already exists" });
+    }
+
     // Create hashed password and token
     try {
         hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
-        token = jwt.sign({ username: username }, process.env.JWT_SECRET);
+        token = jwt.sign({ user_id: user.user_id, username: user.username }, process.env.JWT_SECRET);
     } catch (err) {
         return next(err); // error when computing hashed password or token
     }
 
-    // Create user
+    // Update user with hashed password, salt, and token
     try {
-        user = await db.one(queries.users.createUser, [username, hashedPassword, salt, token]);
+        user = await db.one(queries.users.updateUser, [user.username, hashedPassword, salt, token, user.user_id]);
     } catch (err) {
-        return res.status(400).json({ message: "an account with that username already exists" });
+        return next(err); // error when updating user
     }
 
     // Login user
@@ -124,7 +130,7 @@ const signup = async (req, res, next) => {
             return next(err);
         }
 
-        return res.json({ user_id: user.user_id, token: user.token });
+        return res.json({ token: user.token });
     });
 };
 

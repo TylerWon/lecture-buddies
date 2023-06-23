@@ -37,8 +37,7 @@ describe("auth routes tests", () => {
         });
 
         test("POST - should log a user in", async () => {
-            verifyPostRequestResponseWithoutAuth(app, "/auth/login", payload, 200, {
-                user_id: user1.user_id,
+            await verifyPostRequestResponseWithoutAuth(app, "/auth/login", payload, 200, {
                 token: user1.token,
             });
         });

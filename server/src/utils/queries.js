@@ -191,6 +191,12 @@ const queries = {
             VALUES ($1, $2, $3, $4) 
             RETURNING *
         `,
+        updateUser: `
+            UPDATE users
+            SET username = $1, password = $2, salt = $3, token = $4
+            WHERE user_id = $5
+            RETURNING *
+        `,
     },
 };
 
