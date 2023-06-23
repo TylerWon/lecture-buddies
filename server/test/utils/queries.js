@@ -5,6 +5,12 @@ const queries = {
             VALUES ($1, $2, $3) 
             RETURNING *
         `,
+        updateBuddy: `
+            UPDATE buddies
+            SET status = $1
+            WHERE requestor_id = $2 AND requestee_id = $3
+            RETURNING *
+        `,
     },
     courses: {
         createCourse: `

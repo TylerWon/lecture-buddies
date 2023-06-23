@@ -7,6 +7,17 @@ const jwt = require("jsonwebtoken");
 const queries = require("../utils/queries");
 
 /**
+ * Deletes all data from the database
+ *
+ * @param {object} db - the database connection
+ */
+const cleanUpDatabase = async (db) => {
+    await db.none(
+        "TRUNCATE schools, subjects, courses, sections, users, students, enrolments, interests, social_medias, conversations, conversation_members, messages, buddies RESTART IDENTITY CASCADE"
+    );
+};
+
+/**
  * Creates a buddy
  *
  * @param {object} db - the database connection
@@ -202,14 +213,16 @@ const createUser = async (db, username, password) => {
 };
 
 /**
- * Deletes all data from the database
+ * Updates a buddy
  *
  * @param {object} db - the database connection
+ * @param {number} requestorId - the id of the student who sent the buddy request
+ * @param {number} requesteeId - the id of the student who received the buddy request
+ * @param {string} status - the status of the buddy request
+ *
  */
-const cleanUpDatabase = async (db) => {
-    await db.none(
-        "TRUNCATE schools, subjects, courses, sections, users, students, enrolments, interests, social_medias, conversations, conversation_members, messages, buddies RESTART IDENTITY CASCADE"
-    );
+const updateBuddy = async (db, requestor_id, requestee_id, status) => {
+    return await db.one(queries.buddies.updateBuddy, [status, requestor_id, requestee_id]);
 };
 
 /**
@@ -268,6 +281,7 @@ const verifyPostRequestResponseWithoutAuth = async (app, endpoint, payload, expe
 };
 
 module.exports = {
+    cleanUpDatabase,
     createBuddy,
     createCourse,
     createConversation,
@@ -281,7 +295,7 @@ module.exports = {
     createSubject,
     createStudent,
     createUser,
-    cleanUpDatabase,
+    updateBuddy,
     verifyGetRequestResponse,
     verifyPostRequestResponseWithAuth,
     verifyPostRequestResponseWithoutAuth,

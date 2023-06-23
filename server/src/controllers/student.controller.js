@@ -96,21 +96,24 @@ const getStudent = async (req, res, next) => {
 };
 
 /**
- * Gets the buddies or buddy requests for a student
-
+ * Gets the buddies for a student. Information about the buddy and their interests and social medias is included. If the
+ * status is 'accepted', information about the buddy's current/previous mutual courses with the student is included.
+ * Otherwise, only information about the buddy's current mutual courses with the student is included
+ *
  * @param {number} req.params.student_id - The student's ID
+ * @param {string} req.query.status - the status of the buddies to get (options: pending, accepted, declined)
  * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
  * @param {string} req.query.offset - the position to start returning results from
  * @param {string} req.query.limit - the number of results to return
- * @param {boolean} isBuddies - whether to get buddies or buddy requests
  *
  * @returns
  * - 200 OK if successful
  * - 400 Bad Request if student does not exist
  * - 500 Internal Server Error if unexpected error
  */
-const getBuddiesOrBuddyRequestsForStudent = async (req, res, next, isBuddies) => {
+const getBuddiesForStudent = async (req, res, next) => {
     const studentId = req.params.student_id;
+    const status = req.query.status;
     const orderBy = req.query.order_by;
     const offset = req.query.offset;
     const limit = req.query.limit;
@@ -121,99 +124,62 @@ const getBuddiesOrBuddyRequestsForStudent = async (req, res, next, isBuddies) =>
     }
 
     try {
-        let buddiesOrBuddyRequests;
+        let buddies;
 
-        // Determine whether to get buddies or buddy requests
-        if (isBuddies) {
-            buddiesOrBuddyRequests = await db.any(queries.students.getBuddiesOrBuddyRequestsForStudent, [
-                studentId,
-                "accepted",
-            ]);
-        } else {
-            buddiesOrBuddyRequests = await db.any(queries.students.getBuddiesOrBuddyRequestsForStudent, [
-                studentId,
-                "pending",
-            ]);
+        // Get buddies based on status
+        switch (status) {
+            case "pending":
+                buddies = await db.any(queries.students.getBuddiesForStudent, [studentId, status]);
+                break;
+            case "accepted":
+                buddies = await db.any(queries.students.getBuddiesForStudent, [studentId, status]);
+                break;
+            case "declined":
+                buddies = await db.any(queries.students.getBuddiesForStudent, [studentId, status]);
+                break;
         }
 
-        // Sort buddies/buddy requests
+        // Sort buddies
         switch (orderBy) {
             case "name":
-                sortStudentsByNameASC(buddiesOrBuddyRequests);
+                sortStudentsByNameASC(buddies);
                 break;
             case "-name":
-                sortStudentsByNameDESC(buddiesOrBuddyRequests);
+                sortStudentsByNameDESC(buddies);
                 break;
         }
 
-        // Paginate buddies/buddy requests
-        buddiesOrBuddyRequests = buddiesOrBuddyRequests.slice(offset, offset + limit);
+        // Paginate buddies
+        buddies = buddies.slice(offset, offset + limit);
 
-        // Get interests for each buddy/buddy request
-        await getInterestsForStudents(buddiesOrBuddyRequests);
+        // Get interests for each buddy
+        await getInterestsForStudents(buddies);
 
-        // Get social medias for each buddy/buddy request
-        await getSocialMediasForStudents(buddiesOrBuddyRequests);
+        // Get social medias for each buddy
+        await getSocialMediasForStudents(buddies);
 
         // Get school
         const student = await db.one(queries.students.getStudent, [studentId]);
         const school = await db.one(queries.schools.getSchool, [student.school_id]);
 
-        // Get current mutual courses with the student for each buddy/buddy request
-        await getMutualCoursesForStudentsForTerm(
-            studentId,
-            buddiesOrBuddyRequests,
-            school.current_term,
-            "current_mutual_courses"
-        );
+        // Get current mutual courses with the student for each buddy
+        await getMutualCoursesForStudentsForTerm(studentId, buddies, school.current_term, "current_mutual_courses");
 
-        // Get previous mutual courses with the student for each buddy
-        if (isBuddies) {
+        // Get previous mutual courses with the student for each buddy if status is 'accepted'
+        if (status === "accepted") {
             await getMutualCoursesForStudentsExcludingTerm(
                 studentId,
-                buddiesOrBuddyRequests,
+                buddies,
                 school.current_term,
                 "previous_mutual_courses"
             );
         }
 
-        return res.json(buddiesOrBuddyRequests);
+        return res.json(buddies);
     } catch (err) {
         return next(err); // unexpected error
     }
 };
-
-/**
- * Gets the buddies for a student. Information about each buddy and their interests, social medias, and
- * current/previous mutual courses with the student is included.
- *
- * @param {number} req.params.student_id - The student's ID
- * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
- * @param {string} req.query.offset - the position to start returning results from
- * @param {string} req.query.limit - the number of results to return
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getBuddiesForStudent = async (req, res, next) => getBuddiesOrBuddyRequestsForStudent(req, res, next, true);
-
-/**
- * Gets the buddy requests for a student. Information about each requestor and their interests, social medias, and
- * current mutual courses with the student is included.
- *
- * @param {number} req.params.student_id - The student's ID
- * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
- * @param {string} req.query.offset - the position to start returning results from
- * @param {string} req.query.limit - the number of results to return
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getBuddyRequestsForStudent = async (req, res, next) => getBuddiesOrBuddyRequestsForStudent(req, res, next, false);
 
 /**
  * Gets the conversations for a student. Information about the conversation, members of the conversation, and the most
@@ -657,6 +623,5 @@ module.exports = {
     getCourseHistoryForStudent,
     getClassmatesForStudentInSection,
     getBuddiesForStudent,
-    getBuddyRequestsForStudent,
     getConversationsForStudent,
 };

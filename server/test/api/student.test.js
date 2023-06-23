@@ -17,6 +17,7 @@ const {
     cleanUpDatabase,
     verifyGetRequestResponse,
     verifyPostRequestResponseWithAuth,
+    updateBuddy,
 } = require("../utils/helpers");
 
 describe("student routes tests", () => {
@@ -270,258 +271,6 @@ describe("student routes tests", () => {
     describe("/students/{student_id}/buddies", () => {
         let classmateDetails1;
         let classmateDetails2;
-        let courseDetails1;
-        let courseDetails2;
-        let courseDetails3;
-
-        beforeAll(async () => {
-            courseDetails1 = {
-                school_id: school1.school_id,
-                subject_id: subject1.subject_id,
-                subject_name: subject1.subject_name,
-                course_id: course1.course_id,
-                course_number: course1.course_number,
-                course_name: course1.course_name,
-                section_id: section1.section_id,
-                section_number: section1.section_number,
-                section_term: section1.section_term,
-            };
-
-            courseDetails2 = {
-                school_id: school1.school_id,
-                subject_id: subject1.subject_id,
-                subject_name: subject1.subject_name,
-                course_id: course2.course_id,
-                course_number: course2.course_number,
-                course_name: course2.course_name,
-                section_id: section2.section_id,
-                section_number: section2.section_number,
-                section_term: section2.section_term,
-            };
-
-            courseDetails3 = {
-                school_id: school1.school_id,
-                subject_id: subject2.subject_id,
-                subject_name: subject2.subject_name,
-                course_id: course3.course_id,
-                course_number: course3.course_number,
-                course_name: course3.course_name,
-                section_id: section3.section_id,
-                section_number: section3.section_number,
-                section_term: section3.section_term,
-            };
-
-            classmateDetails1 = {
-                ...student2,
-                interests: [interest2],
-                social_medias: [socialMedia2],
-                current_mutual_courses: [courseDetails3],
-                previous_mutual_courses: [courseDetails1, courseDetails2],
-            };
-
-            classmateDetails2 = {
-                ...student3,
-                interests: [interest3],
-                social_medias: [socialMedia3],
-                current_mutual_courses: [],
-                previous_mutual_courses: [courseDetails1],
-            };
-
-            await createBuddy(db, student1.student_id, student2.student_id, "accepted");
-            await createBuddy(db, student1.student_id, student3.student_id, "accepted");
-        });
-
-        afterAll(async () => {
-            await db.none("TRUNCATE buddies RESTART IDENTITY CASCADE");
-        });
-
-        test("GET - should return the buddies for a student (order by name)", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=2`,
-                user1.token,
-                200,
-                [classmateDetails2, classmateDetails1]
-            );
-        });
-
-        test("GET - should return the buddies for a student (order by -name)", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=-name&offset=0&limit=2`,
-                user1.token,
-                200,
-                [classmateDetails1, classmateDetails2]
-            );
-        });
-
-        test("GET - should return the buddies for a student (0 < offset < total number of results)", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=1&limit=1`,
-                user1.token,
-                200,
-                [classmateDetails1]
-            );
-        });
-
-        test("GET - should return the buddies for a student (limit >= total number of results)", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=10`,
-                user1.token,
-                200,
-                [classmateDetails2, classmateDetails1]
-            );
-        });
-
-        test("GET - should return nothing when offset >= total number of results", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=2&limit=2`,
-                user1.token,
-                200,
-                []
-            );
-        });
-
-        test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id + 100}/buddies?order_by=name&offset=0&limit=2`,
-                user1.token,
-                400,
-                { message: `student with id '${student1.student_id + 100}' does not exist` }
-            );
-        });
-
-        test("GET - should return error message when missing the order_by query parameter", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?offset=0&limit=2`,
-                user1.token,
-                400,
-                [
-                    {
-                        type: "field",
-                        location: "query",
-                        path: "order_by",
-                        msg: "order_by is required",
-                    },
-                ]
-            );
-        });
-
-        test("GET - should return error message when missing the offset query parameter", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=name&limit=2`,
-                user1.token,
-                400,
-                [
-                    {
-                        type: "field",
-                        location: "query",
-                        path: "offset",
-                        msg: "offset is required",
-                    },
-                ]
-            );
-        });
-
-        test("GET - should return error message when missing the limit query parameter", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=0`,
-                user1.token,
-                400,
-                [
-                    {
-                        type: "field",
-                        location: "query",
-                        path: "limit",
-                        msg: "limit is required",
-                    },
-                ]
-            );
-        });
-
-        test("GET - should return error message when the order_by query parameter value is not a valid option", async () => {
-            const orderBy = "num_mutual_courses";
-
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=${orderBy}&offset=0&limit=2`,
-                user1.token,
-                400,
-                [
-                    {
-                        type: "field",
-                        location: "query",
-                        path: "order_by",
-                        value: orderBy,
-                        msg: "order_by must be one of 'name' or '-name'",
-                    },
-                ]
-            );
-        });
-
-        test("GET - should return error message when the offset query parameter value is negative", async () => {
-            const offset = "-1";
-
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=${offset}&limit=2`,
-                user1.token,
-                400,
-                [
-                    {
-                        type: "field",
-                        location: "query",
-                        path: "offset",
-                        value: offset,
-                        msg: "offset must be a positive integer",
-                    },
-                ]
-            );
-        });
-
-        test("GET - should return error message when the limit query parameter value is negative", async () => {
-            const limit = "-1";
-
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=${limit}`,
-                user1.token,
-                400,
-                [
-                    {
-                        type: "field",
-                        location: "query",
-                        path: "limit",
-                        value: limit,
-                        msg: "limit must be a positive integer",
-                    },
-                ]
-            );
-        });
-
-        test("GET - should return error message when request is unauthenticated", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=2`,
-                undefined,
-                401,
-                {
-                    message: "unauthorized",
-                }
-            );
-        });
-    });
-
-    describe("/students/{student_id}/buddy-requests", () => {
-        let classmateDetails1;
-        let classmateDetails2;
         let courseDetails3;
 
         beforeAll(async () => {
@@ -555,44 +304,116 @@ describe("student routes tests", () => {
             await createBuddy(db, student1.student_id, student3.student_id, "pending");
         });
 
-        afterAll(async () => {
-            await db.none("TRUNCATE buddies RESTART IDENTITY CASCADE");
+        describe("status tests", () => {
+            afterAll(async () => {
+                await updateBuddy(db, student1.student_id, student2.student_id, "pending");
+                await updateBuddy(db, student1.student_id, student3.student_id, "pending");
+            });
+
+            test("GET - should return the buddies for a student (status pending)", async () => {
+                await updateBuddy(db, student1.student_id, student2.student_id, "pending");
+                await updateBuddy(db, student1.student_id, student3.student_id, "pending");
+
+                await verifyGetRequestResponse(
+                    app,
+                    `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=2`,
+                    user1.token,
+                    200,
+                    [classmateDetails2, classmateDetails1]
+                );
+            });
+
+            test("GET - should return the buddies for a student (status accepted)", async () => {
+                await updateBuddy(db, student1.student_id, student2.student_id, "accepted");
+                await updateBuddy(db, student1.student_id, student3.student_id, "accepted");
+
+                const courseDetails1 = {
+                    school_id: school1.school_id,
+                    subject_id: subject1.subject_id,
+                    subject_name: subject1.subject_name,
+                    course_id: course1.course_id,
+                    course_number: course1.course_number,
+                    course_name: course1.course_name,
+                    section_id: section1.section_id,
+                    section_number: section1.section_number,
+                    section_term: section1.section_term,
+                };
+
+                const courseDetails2 = {
+                    school_id: school1.school_id,
+                    subject_id: subject1.subject_id,
+                    subject_name: subject1.subject_name,
+                    course_id: course2.course_id,
+                    course_number: course2.course_number,
+                    course_name: course2.course_name,
+                    section_id: section2.section_id,
+                    section_number: section2.section_number,
+                    section_term: section2.section_term,
+                };
+
+                classmateDetails1.previous_mutual_courses = [courseDetails1, courseDetails2];
+                classmateDetails2.previous_mutual_courses = [courseDetails1];
+
+                await verifyGetRequestResponse(
+                    app,
+                    `/students/${student1.student_id}/buddies?status=accepted&order_by=name&offset=0&limit=2`,
+                    user1.token,
+                    200,
+                    [classmateDetails2, classmateDetails1]
+                );
+
+                delete classmateDetails1.previous_mutual_courses;
+                delete classmateDetails2.previous_mutual_courses;
+            });
+
+            test("GET - should return the buddies for a student (status declined)", async () => {
+                await updateBuddy(db, student1.student_id, student2.student_id, "declined");
+                await updateBuddy(db, student1.student_id, student3.student_id, "declined");
+
+                await verifyGetRequestResponse(
+                    app,
+                    `/students/${student1.student_id}/buddies?status=declined&order_by=name&offset=0&limit=2`,
+                    user1.token,
+                    200,
+                    [classmateDetails2, classmateDetails1]
+                );
+            });
         });
 
-        test("GET - should return the buddy requests for a student (order by name)", async () => {
+        test("GET - should return the buddies for a student (order by name)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=2`,
                 user1.token,
                 200,
                 [classmateDetails2, classmateDetails1]
             );
         });
 
-        test("GET - should return the buddy requests for a student (order by -name)", async () => {
+        test("GET - should return the buddies for a student (order by -name)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=-name&offset=0&limit=2`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=-name&offset=0&limit=2`,
                 user1.token,
                 200,
                 [classmateDetails1, classmateDetails2]
             );
         });
 
-        test("GET - should return the buddy requests for a student (0 < offset < total number of results)", async () => {
+        test("GET - should return the buddies for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=name&offset=1&limit=1`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=1&limit=1`,
                 user1.token,
                 200,
                 [classmateDetails1]
             );
         });
 
-        test("GET - should return the buddy requests for a student (limit >= total number of results)", async () => {
+        test("GET - should return the buddies for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=name&offset=0&limit=10`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=10`,
                 user1.token,
                 200,
                 [classmateDetails2, classmateDetails1]
@@ -602,7 +423,7 @@ describe("student routes tests", () => {
         test("GET - should return nothing when offset >= total number of results", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=name&offset=2&limit=2`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=2&limit=2`,
                 user1.token,
                 200,
                 []
@@ -612,17 +433,34 @@ describe("student routes tests", () => {
         test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id + 100}/buddy-requests?order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id + 100}/buddies?status=pending&order_by=name&offset=0&limit=2`,
                 user1.token,
                 400,
                 { message: `student with id '${student1.student_id + 100}' does not exist` }
             );
         });
 
+        test("GET - should return error message when missing the status query parameter", async () => {
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?order_by=name&offset=0&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "status",
+                        msg: "status is required",
+                    },
+                ]
+            );
+        });
+
         test("GET - should return error message when missing the order_by query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?offset=0&limit=2`,
+                `/students/${student1.student_id}/buddies?status=pending&offset=0&limit=2`,
                 user1.token,
                 400,
                 [
@@ -639,7 +477,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when missing the offset query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=name&limit=2`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=name&limit=2`,
                 user1.token,
                 400,
                 [
@@ -656,7 +494,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when missing the limit query parameter", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=name&offset=0`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0`,
                 user1.token,
                 400,
                 [
@@ -670,12 +508,32 @@ describe("student routes tests", () => {
             );
         });
 
+        test("GET - should return error message when the status query parameter value is not a valid option", async () => {
+            const status = "invalid";
+
+            await verifyGetRequestResponse(
+                app,
+                `/students/${student1.student_id}/buddies?status=${status}&order_by=name&offset=0&limit=2`,
+                user1.token,
+                400,
+                [
+                    {
+                        type: "field",
+                        location: "query",
+                        path: "status",
+                        value: status,
+                        msg: "status must be one of 'pending', 'accepted', or 'declined'",
+                    },
+                ]
+            );
+        });
+
         test("GET - should return error message when the order_by query parameter value is not a valid option", async () => {
             const orderBy = "num_mutual_courses";
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=${orderBy}&offset=0&limit=2`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=${orderBy}&offset=0&limit=2`,
                 user1.token,
                 400,
                 [
@@ -695,7 +553,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=name&offset=${offset}&limit=2`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=${offset}&limit=2`,
                 user1.token,
                 400,
                 [
@@ -715,7 +573,7 @@ describe("student routes tests", () => {
 
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=name&offset=0&limit=${limit}`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=${limit}`,
                 user1.token,
                 400,
                 [
@@ -733,7 +591,7 @@ describe("student routes tests", () => {
         test("GET - should return error message when request is unauthenticated", async () => {
             await verifyGetRequestResponse(
                 app,
-                `/students/${student1.student_id}/buddy-requests?order_by=name&offset=0&limit=2`,
+                `/students/${student1.student_id}/buddies?status=pending&order_by=name&offset=0&limit=2`,
                 undefined,
                 401,
                 {

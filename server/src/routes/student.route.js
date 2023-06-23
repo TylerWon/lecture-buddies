@@ -16,6 +16,7 @@ router.post(
 router.get("/:student_id(\\d+)", authMiddleware.authenticateRequest, studentController.getStudent);
 router.get(
     "/:student_id(\\d+)/buddies",
+    validationSchemas.getBuddiesForStudentValidationSchema(),
     validationSchemas.sortingAndPaginationValidationSchema(
         [/^(-?)(name)$/],
         "order_by must be one of 'name' or '-name'"
@@ -23,16 +24,6 @@ router.get(
     validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     studentController.getBuddiesForStudent
-);
-router.get(
-    "/:student_id(\\d+)/buddy-requests",
-    validationSchemas.sortingAndPaginationValidationSchema(
-        [/^(-?)(name)$/],
-        "order_by must be one of 'name' or '-name'"
-    ),
-    validationMiddleware.validateRequest,
-    authMiddleware.authenticateRequest,
-    studentController.getBuddyRequestsForStudent
 );
 router.get(
     "/:student_id(\\d+)/conversations",

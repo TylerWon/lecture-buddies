@@ -167,6 +167,22 @@ const getCourseHistoryForStudentValidationSchema = () =>
         ["query"]
     );
 
+const getBuddiesForStudentValidationSchema = () =>
+    checkSchema(
+        {
+            status: {
+                exists: {
+                    errorMessage: "status is required",
+                },
+                matches: {
+                    options: [/^(pending|accepted|declined)$/],
+                    errorMessage: "status must be one of 'pending', 'accepted', or 'declined'",
+                },
+            },
+        },
+        ["query"]
+    );
+
 // Social media
 const createSocialMediaValidationSchema = () =>
     checkSchema({
@@ -239,6 +255,7 @@ module.exports = {
     createInterestValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
+    getBuddiesForStudentValidationSchema,
     createSocialMediaValidationSchema,
     sortingAndPaginationValidationSchema,
 };
