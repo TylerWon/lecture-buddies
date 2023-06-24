@@ -64,7 +64,31 @@ const createFriendship = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const updateFriendship = async (req, res, next) => {
-    res.send("Not implemented");
+    const requestor_id = req.params.requestor_id;
+    const requestee_id = req.params.requestee_id;
+    const payload = req.body;
+
+    // Check if friendship exists
+    try {
+        await db.one(queries.friendships.getFriendship, [requestor_id, requestee_id]);
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({
+            message: `friendship between students with ids '${requestor_id}' and '${requestee_id}' does not exist`,
+        });
+    }
+
+    // Update friendship
+    try {
+        const friendship = await db.one(queries.friendships.updateFriendship, [
+            payload.friendship_status,
+            requestor_id,
+            requestee_id,
+        ]);
+        return res.status(200).json(friendship);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 module.exports = {

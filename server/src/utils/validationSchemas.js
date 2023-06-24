@@ -70,6 +70,22 @@ const createFriendshipValidationSchema = () =>
         },
     });
 
+const updateFriendshipValidationSchema = () =>
+    checkSchema(
+        {
+            friendship_status: {
+                exists: {
+                    errorMessage: "friendship_status is required",
+                },
+                matches: {
+                    options: [/^(pending|accepted|declined)$/],
+                    errorMessage: "friendship_status must be one of 'pending', 'accepted', or 'declined'",
+                },
+            },
+        },
+        ["body"]
+    );
+
 // Interests
 const createInterestValidationSchema = () =>
     checkSchema({
@@ -276,6 +292,7 @@ module.exports = {
     authValidationSchema,
     createEnrolmentValidationSchema,
     createFriendshipValidationSchema,
+    updateFriendshipValidationSchema,
     createInterestValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,

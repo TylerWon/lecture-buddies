@@ -15,8 +15,8 @@ router.post(
 );
 router.put(
     "/:requestor_id(\\d+)/:requestee_id(\\d+)",
-    // validationSchemas.updateFriendshipValidationSchema(),
-    // validationMiddleware.validateRequest,
+    validationSchemas.updateFriendshipValidationSchema(),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     friendshipController.updateFriendship
 );

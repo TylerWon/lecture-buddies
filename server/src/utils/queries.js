@@ -49,6 +49,12 @@ const queries = {
             VALUES ($1, $2)
             RETURNING *
         `,
+        updateFriendship: `
+            UPDATE friendships
+            SET friendship_status = $1
+            WHERE requestor_id = $2 AND requestee_id = $3 OR requestor_id = $3 AND requestee_id = $2
+            RETURNING *
+        `,
     },
     interests: {
         createInterest: `

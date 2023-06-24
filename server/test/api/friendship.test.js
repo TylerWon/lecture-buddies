@@ -1,5 +1,3 @@
-const request = require("supertest");
-
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
@@ -183,12 +181,14 @@ describe("enrolment routes tests", () => {
         test("PUT - should not update a friendship when friendship does not exist", async () => {
             await verifyPutRequestResponse(
                 app,
-                `/friendships/${student1.student_id}/${student2.student_id}`,
+                `/friendships/${student1.student_id + 100}/${student2.student_id}`,
                 user1.token,
                 payload,
                 400,
                 {
-                    message: `friendship between students with ids '${student1.requestor_id}' and '${student2.requestee_id}' does not exist`,
+                    message: `friendship between students with ids '${student1.student_id + 100}' and '${
+                        student2.student_id
+                    }' does not exist`,
                 }
             );
         });
