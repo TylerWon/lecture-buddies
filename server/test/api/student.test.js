@@ -127,6 +127,8 @@ describe("student routes tests", () => {
         await createEnrolment(db, student2.student_id, section2.section_id);
         await createEnrolment(db, student2.student_id, section3.section_id);
         await createEnrolment(db, student3.student_id, section1.section_id);
+        friendship1 = await createFriendship(db, student1.student_id, student2.student_id, "pending");
+        friendship2 = await createFriendship(db, student1.student_id, student3.student_id, "pending");
         conversation1 = await createConversation(db, "DM");
         conversation2 = await createConversation(db, "DM");
         await createConversationMember(db, conversation1.conversation_id, student1.student_id);
@@ -287,9 +289,6 @@ describe("student routes tests", () => {
                 section_number: section3.section_number,
                 section_term: section3.section_term,
             };
-
-            friendship1 = await createFriendship(db, student1.student_id, student2.student_id, "pending");
-            friendship2 = await createFriendship(db, student1.student_id, student3.student_id, "pending");
 
             classmateDetails1 = {
                 ...student2,
@@ -998,6 +997,7 @@ describe("student routes tests", () => {
 
             classmateDetails1 = {
                 ...student2,
+                friendship_status: friendship1.friendship_status,
                 interests: [interest2],
                 social_medias: [socialMedia2],
                 mutual_courses_for_term: [courseDetails1, courseDetails2],
@@ -1005,6 +1005,7 @@ describe("student routes tests", () => {
 
             classmateDetails2 = {
                 ...student3,
+                friendship_status: friendship2.friendship_status,
                 interests: [interest3],
                 social_medias: [socialMedia3],
                 mutual_courses_for_term: [courseDetails1],

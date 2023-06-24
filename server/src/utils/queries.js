@@ -38,6 +38,13 @@ const queries = {
             WHERE student_id = $1 AND section_id = $2
         `,
     },
+    friendships: {
+        getFriendship: `
+            SELECT *
+            FROM friendships
+            WHERE requestor_id = $1 AND requestee_id = $2 OR requestor_id = $2 AND requestee_id = $1
+        `,
+    },
     interests: {
         createInterest: `
             INSERT INTO interests (student_id, interest_name)

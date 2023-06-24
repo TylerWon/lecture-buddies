@@ -400,6 +400,9 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
         // Get social medias for each classmate
         await getSocialMediasForStudents(classmates);
 
+        // Get friendship status for each classmate
+        await getFriendshipStatusForStudents(studentId, classmates);
+
         return res.json(classmates);
     } catch (err) {
         return next(err); // unexpected error
@@ -430,6 +433,24 @@ const getSocialMediasForStudent = async (req, res, next) => {
         return res.json(socialMedias);
     } catch (err) {
         return next(err); // unexpected error
+    }
+};
+
+/**
+ * Gets the friendship status for every student in an array of students with a given student
+ *
+ * @param {number} studentId - the student's ID
+ * @param {object[]} students - the array of students to get the friendship status for
+ */
+const getFriendshipStatusForStudents = async (studentId, students) => {
+    for (const student of students) {
+        const friendship = await db.oneOrNone(queries.friendships.getFriendship, [studentId, student.student_id]);
+
+        if (friendship) {
+            student.friendship_status = friendship.friendship_status;
+        } else {
+            student.friendship_status = "none";
+        }
     }
 };
 
