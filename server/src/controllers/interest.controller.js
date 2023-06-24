@@ -9,8 +9,8 @@ const queries = require("../utils/queries");
  *
  * @returns
  * - 201 Created if successful
- * - 400 Bad Request if the student does not exist
- * - 500 Internal Server Error if an unexpected error occurs
+ * - 400 Bad Request if student does not exist
+ * - 500 Internal Server Error if unexpected error
  */
 const createInterest = async (req, res, next) => {
     const payload = req.body;
