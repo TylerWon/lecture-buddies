@@ -51,7 +51,7 @@ describe("social media routes tests", () => {
             };
         });
 
-        test("GET - should create a social media", async () => {
+        test("POST - should create a social media", async () => {
             const response = await request(app)
                 .post("/social-medias")
                 .auth(user1.token, { type: "bearer" })
@@ -62,7 +62,7 @@ describe("social media routes tests", () => {
             expect(response.body.social_media_url).toEqual(payload.social_media_url);
         });
 
-        test("GET - should not create a social media when missing some fields", async () => {
+        test("POST - should not create a social media when missing some fields", async () => {
             delete payload.social_media_platform;
 
             await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, [
@@ -75,7 +75,7 @@ describe("social media routes tests", () => {
             ]);
         });
 
-        test("GET - should not create a social media when some fields are the wrong type", async () => {
+        test("POST - should not create a social media when some fields are the wrong type", async () => {
             payload.social_media_url = false;
 
             await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, [
@@ -89,7 +89,7 @@ describe("social media routes tests", () => {
             ]);
         });
 
-        test("GET - should not create a social media when student does not exist", async () => {
+        test("POST - should not create a social media when student does not exist", async () => {
             payload.student_id = student1.student_id + 100;
 
             await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, {
@@ -97,7 +97,7 @@ describe("social media routes tests", () => {
             });
         });
 
-        test("GET - should not create a social media when the social_media_platform body parameter is not a valid option", async () => {
+        test("POST - should not create a social media when the social_media_platform body parameter is not a valid option", async () => {
             payload.social_media_platform = "Youtube";
 
             await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, [
@@ -111,7 +111,7 @@ describe("social media routes tests", () => {
             ]);
         });
 
-        test("GET - should return error message when request is unauthenticated", async () => {
+        test("POST - should return error message when request is unauthenticated", async () => {
             await verifyPostRequestResponseWithAuth(app, `/social-medias`, undefined, payload, 401, {
                 message: "unauthorized",
             });

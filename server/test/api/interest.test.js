@@ -51,14 +51,14 @@ describe("interest routes tests", () => {
             };
         });
 
-        test("GET - should create an interest", async () => {
+        test("POST - should create an interest", async () => {
             const response = await request(app).post("/interests").auth(user1.token, { type: "bearer" }).send(payload);
             expect(response.statusCode).toEqual(201);
             expect(response.body.student_id).toEqual(payload.student_id);
             expect(response.body.interest_name).toEqual(payload.interest_name);
         });
 
-        test("GET - should not create an interest when missing some fields", async () => {
+        test("POST - should not create an interest when missing some fields", async () => {
             delete payload.student_id;
 
             await verifyPostRequestResponseWithAuth(app, "/interests", user1.token, payload, 400, [
@@ -71,7 +71,7 @@ describe("interest routes tests", () => {
             ]);
         });
 
-        test("GET - should not create an interest when some fields are the wrong type", async () => {
+        test("POST - should not create an interest when some fields are the wrong type", async () => {
             payload.student_id = "-1";
 
             await verifyPostRequestResponseWithAuth(app, "/interests", user1.token, payload, 400, [
@@ -85,7 +85,7 @@ describe("interest routes tests", () => {
             ]);
         });
 
-        test("GET - should not create an interest when student does not exist", async () => {
+        test("POST - should not create an interest when student does not exist", async () => {
             payload.student_id = student1.student_id + 100;
 
             await verifyPostRequestResponseWithAuth(app, "/interests", user1.token, payload, 400, {
@@ -93,7 +93,7 @@ describe("interest routes tests", () => {
             });
         });
 
-        test("GET - should return error message when request is unauthenticated", async () => {
+        test("POST - should return error message when request is unauthenticated", async () => {
             await verifyPostRequestResponseWithAuth(app, `/interests`, undefined, payload, 401, {
                 message: "unauthorized",
             });

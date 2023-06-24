@@ -59,14 +59,14 @@ describe("enrolment routes tests", () => {
             };
         });
 
-        test("GET - should create an enrolment", async () => {
+        test("POST - should create an enrolment", async () => {
             const response = await request(app).post("/enrolments").auth(user1.token, { type: "bearer" }).send(payload);
             expect(response.statusCode).toEqual(201);
             expect(response.body.student_id).toEqual(payload.student_id);
             expect(response.body.section_id).toEqual(payload.section_id);
         });
 
-        test("GET - should not create an enrolment when missing some fields", async () => {
+        test("POST - should not create an enrolment when missing some fields", async () => {
             delete payload.student_id;
 
             await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, [
@@ -79,7 +79,7 @@ describe("enrolment routes tests", () => {
             ]);
         });
 
-        test("GET - should not create an enrolment when some fields are the wrong type", async () => {
+        test("POST - should not create an enrolment when some fields are the wrong type", async () => {
             payload.section_id = "-1";
 
             await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, [
@@ -93,13 +93,13 @@ describe("enrolment routes tests", () => {
             ]);
         });
 
-        test("GET - should not create an enrolment when the student is already enrolled in the section", async () => {
+        test("POST - should not create an enrolment when the student is already enrolled in the section", async () => {
             await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, {
                 message: `student with id '${payload.student_id}' is already enrolled in section with id '${payload.section_id}'`,
             });
         });
 
-        test("GET - should return error message when request is unauthenticated", async () => {
+        test("POST - should return error message when request is unauthenticated", async () => {
             await verifyPostRequestResponseWithAuth(app, `/enrolments`, undefined, payload, 401, {
                 message: "unauthorized",
             });

@@ -248,7 +248,7 @@ const verifyGetRequestResponse = async (app, endpoint, token, expectedStatusCode
  * Checks that a POST request to an endpoint that requires authentiation returns the expected status code and body
  *
  * @param {object} app - the express app
- * @param {string} endpoint - the endpoint to send the GET request to
+ * @param {string} endpoint - the endpoint to send the POST request to
  * @param {string} token - the token to send with the POST request
  * @param {any} payload - the payload to send with the POST request
  * @param {number} expectedStatusCode - the expected status code of the response
@@ -267,7 +267,7 @@ const verifyPostRequestResponseWithAuth = async (app, endpoint, token, payload, 
  * Checks that a POST request to an endpoint returns the expected status code and body
  *
  * @param {object} app - the express app
- * @param {string} endpoint - the endpoint to send the GET request to
+ * @param {string} endpoint - the endpoint to send the POST request to
  * @param {any} payload - the payload to send with the POST request
  * @param {number} expectedStatusCode - the expected status code of the response
  * @param {any} expectedBody - the expected body of the response
@@ -276,6 +276,25 @@ const verifyPostRequestResponseWithAuth = async (app, endpoint, token, payload, 
  */
 const verifyPostRequestResponseWithoutAuth = async (app, endpoint, payload, expectedStatusCode, expectedBody) => {
     const response = await request(app).post(endpoint).send(payload);
+    expect(response.statusCode).toEqual(expectedStatusCode);
+    expect(response.body).toEqual(expectedBody);
+    return response;
+};
+
+/**
+ * Checks that a PUT request to an endpoint returns the expected status code and body
+ *
+ * @param {object} app - the express app
+ * @param {string} endpoint - the endpoint to send the PUT request to
+ * @param {string} token - the token to send with the POST request
+ * @param {any} payload - the payload to send with the PUT request
+ * @param {number} expectedStatusCode - the expected status code of the response
+ * @param {any} expectedBody - the expected body of the response
+ *
+ * @returns {object} the response
+ */
+const verifyPutRequestResponse = async (app, endpoint, token, payload, expectedStatusCode, expectedBody) => {
+    const response = await request(app).put(endpoint).auth(token, { type: "bearer" }).send(payload);
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
     return response;
@@ -300,4 +319,5 @@ module.exports = {
     verifyGetRequestResponse,
     verifyPostRequestResponseWithAuth,
     verifyPostRequestResponseWithoutAuth,
+    verifyPutRequestResponse,
 };
