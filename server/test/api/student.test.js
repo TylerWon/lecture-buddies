@@ -50,6 +50,8 @@ describe("student routes tests", () => {
     let message1;
     let message2;
     let message3;
+    let friendship1;
+    let friendship2;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
@@ -286,8 +288,12 @@ describe("student routes tests", () => {
                 section_term: section3.section_term,
             };
 
+            friendship1 = await createFriendship(db, student1.student_id, student2.student_id, "pending");
+            friendship2 = await createFriendship(db, student1.student_id, student3.student_id, "pending");
+
             classmateDetails1 = {
                 ...student2,
+                friendship_status: friendship1.friendship_status,
                 interests: [interest2],
                 social_medias: [socialMedia2],
                 current_mutual_courses: [courseDetails3],
@@ -295,24 +301,28 @@ describe("student routes tests", () => {
 
             classmateDetails2 = {
                 ...student3,
+                friendship_status: friendship2.friendship_status,
                 interests: [interest3],
                 social_medias: [socialMedia3],
                 current_mutual_courses: [],
             };
-
-            await createFriendship(db, student1.student_id, student2.student_id, "pending");
-            await createFriendship(db, student1.student_id, student3.student_id, "pending");
         });
 
         describe("status tests", () => {
             afterAll(async () => {
-                await updateFriendship(db, student1.student_id, student2.student_id, "pending");
-                await updateFriendship(db, student1.student_id, student3.student_id, "pending");
+                friendship1 = await updateFriendship(db, student1.student_id, student2.student_id, "pending");
+                friendship2 = await updateFriendship(db, student1.student_id, student3.student_id, "pending");
+
+                classmateDetails1.friendship_status = friendship1.friendship_status;
+                classmateDetails2.friendship_status = friendship2.friendship_status;
             });
 
             test("GET - should return the friends for a student (status pending)", async () => {
-                await updateFriendship(db, student1.student_id, student2.student_id, "pending");
-                await updateFriendship(db, student1.student_id, student3.student_id, "pending");
+                friendship1 = await updateFriendship(db, student1.student_id, student2.student_id, "pending");
+                friendship2 = await updateFriendship(db, student1.student_id, student3.student_id, "pending");
+
+                classmateDetails1.friendship_status = friendship1.friendship_status;
+                classmateDetails2.friendship_status = friendship2.friendship_status;
 
                 await verifyGetRequestResponse(
                     app,
@@ -324,8 +334,11 @@ describe("student routes tests", () => {
             });
 
             test("GET - should return the friends for a student (status accepted)", async () => {
-                await updateFriendship(db, student1.student_id, student2.student_id, "accepted");
-                await updateFriendship(db, student1.student_id, student3.student_id, "accepted");
+                friendship1 = await updateFriendship(db, student1.student_id, student2.student_id, "accepted");
+                friendship2 = await updateFriendship(db, student1.student_id, student3.student_id, "accepted");
+
+                classmateDetails1.friendship_status = friendship1.friendship_status;
+                classmateDetails2.friendship_status = friendship2.friendship_status;
 
                 const courseDetails1 = {
                     school_id: school1.school_id,
@@ -367,8 +380,11 @@ describe("student routes tests", () => {
             });
 
             test("GET - should return the friends for a student (status declined)", async () => {
-                await updateFriendship(db, student1.student_id, student2.student_id, "declined");
-                await updateFriendship(db, student1.student_id, student3.student_id, "declined");
+                friendship1 = await updateFriendship(db, student1.student_id, student2.student_id, "declined");
+                friendship2 = await updateFriendship(db, student1.student_id, student3.student_id, "declined");
+
+                classmateDetails1.friendship_status = friendship1.friendship_status;
+                classmateDetails2.friendship_status = friendship2.friendship_status;
 
                 await verifyGetRequestResponse(
                     app,

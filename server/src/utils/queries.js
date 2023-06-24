@@ -147,12 +147,12 @@ const queries = {
             )
         `,
         getFriendsForStudent: `
-            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
+            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio, friendships.friendship_status
             FROM friendships
             JOIN students ON friendships.requestee_id = students.student_id
             WHERE friendships.requestor_id = $1 AND friendships.friendship_status = $2
             UNION
-            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
+            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio, friendships.friendship_status
             FROM friendships
             JOIN students ON friendships.requestor_id = students.student_id
             WHERE friendships.requestee_id = $1 AND friendships.friendship_status = $2
