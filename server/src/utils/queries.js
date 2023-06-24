@@ -44,6 +44,11 @@ const queries = {
             FROM friendships
             WHERE requestor_id = $1 AND requestee_id = $2 OR requestor_id = $2 AND requestee_id = $1
         `,
+        createFriendship: `
+            INSERT INTO friendships (requestor_id, requestee_id)
+            VALUES ($1, $2)
+            RETURNING *
+        `,
     },
     interests: {
         createInterest: `

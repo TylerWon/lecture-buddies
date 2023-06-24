@@ -8,8 +8,8 @@ const validationSchemas = require("../utils/validationSchemas");
 
 router.post(
     "/",
-    // validationSchemas.createFriendshipValidationSchema(),
-    // validationMiddleware.validateRequest,
+    validationSchemas.createFriendshipValidationSchema(),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     friendshipController.createFriendship
 );

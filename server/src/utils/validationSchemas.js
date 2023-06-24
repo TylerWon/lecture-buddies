@@ -47,6 +47,29 @@ const createEnrolmentValidationSchema = () =>
         },
     });
 
+// Friendships
+const createFriendshipValidationSchema = () =>
+    checkSchema({
+        requestor_id: {
+            exists: {
+                errorMessage: "requestor_id is required",
+            },
+            isInt: {
+                options: { gt: -1 },
+                errorMessage: "requestor_id must be a positive integer",
+            },
+        },
+        requestee_id: {
+            exists: {
+                errorMessage: "requestee_id is required",
+            },
+            isInt: {
+                options: { gt: -1 },
+                errorMessage: "requestee_id must be a positive integer",
+            },
+        },
+    });
+
 // Interests
 const createInterestValidationSchema = () =>
     checkSchema({
@@ -252,6 +275,7 @@ const sortingAndPaginationValidationSchema = (orderByOptions, orderByMessage) =>
 module.exports = {
     authValidationSchema,
     createEnrolmentValidationSchema,
+    createFriendshipValidationSchema,
     createInterestValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,

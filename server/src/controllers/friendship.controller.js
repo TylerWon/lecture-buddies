@@ -14,7 +14,40 @@ const queries = require("../utils/queries");
  * - 500 Internal Server Error if unexpected error
  */
 const createFriendship = async (req, res, next) => {
-    res.send("Not implemented");
+    const payload = req.body;
+
+    // Check if students exist
+    try {
+        await db.one(queries.students.getStudent, [payload.requestor_id]);
+    } catch (err) {
+        return res.status(400).json({ message: `student with id '${payload.requestor_id}' does not exist` });
+    }
+
+    try {
+        await db.one(queries.students.getStudent, [payload.requestee_id]);
+    } catch (err) {
+        return res.status(400).json({ message: `student with id '${payload.requestee_id}' does not exist` });
+    }
+
+    // Check if friendship exists
+    try {
+        await db.none(queries.friendships.getFriendship, [payload.requestor_id, payload.requestee_id]);
+    } catch (err) {
+        return res.status(400).json({
+            message: `friendship already exists between students with ids '${payload.requestor_id}' and '${payload.requestee_id}'`,
+        });
+    }
+
+    // Create friendship
+    try {
+        const friendship = await db.one(queries.friendships.createFriendship, [
+            payload.requestor_id,
+            payload.requestee_id,
+        ]);
+        return res.status(201).json(friendship);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 /**

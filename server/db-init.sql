@@ -142,8 +142,6 @@ CREATE TABLE friendships (
 	requestor_id INTEGER,
 	requestee_id INTEGER,
 	friendship_status STATUS DEFAULT 'pending',
-	created_datetime TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	updated_datetime TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (requestor_id, requestee_id),
 	FOREIGN KEY (requestor_id) REFERENCES students(student_id)
 		ON DELETE CASCADE
