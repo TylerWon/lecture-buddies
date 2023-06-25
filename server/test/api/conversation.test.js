@@ -72,6 +72,8 @@ describe("conversation routes tests", () => {
             student2.student_id,
             "This is message 2 in conversation 1"
         );
+        message1.sent_datetime = message1.sent_datetime.toJSON();
+        message2.sent_datetime = message2.sent_datetime.toJSON();
     });
 
     afterAll(async () => {

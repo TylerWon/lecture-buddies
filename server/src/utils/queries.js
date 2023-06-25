@@ -18,6 +18,16 @@ const queries = {
             VALUES ($1)
             RETURNING *
         `,
+        getConversation: `
+            SELECT *
+            FROM conversations
+            WHERE conversation_id = $1
+        `,
+        getMessagesForConversation: `
+            SELECT *
+            FROM messages
+            WHERE conversation_id = $1
+        `,
     },
     conversationMembers: {
         createConversationMember: `

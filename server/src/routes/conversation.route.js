@@ -15,6 +15,11 @@ router.post(
 );
 router.get(
     "/:conversation_id(\\d+)/messages",
+    validationSchemas.sortingAndPaginationValidationSchema(
+        [/^(-?)(date)$/],
+        "order_by must be one of 'date' or '-date'"
+    ),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     conversationController.getMessagesForConversation
 );

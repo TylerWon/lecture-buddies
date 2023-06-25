@@ -53,6 +53,9 @@ const createConversation = async (req, res, next) => {
  * Gets the messages for a conversation
  *
  * @param {number} req.params.conversation_id - the conversation's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: date, -date)
+ * @param {string} req.query.offset - the position to start returning results from
+ * @param {string} req.query.limit - the number of results to return
  *
  * @returns
  * - 200 OK if successful
@@ -60,7 +63,39 @@ const createConversation = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const getMessagesForConversation = async (req, res, next) => {
-    res.send("Not implemented");
+    const conversation_id = req.params.conversation_id;
+    const orderBy = req.query.order_by;
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    // Check if conversation exists
+    try {
+        await db.one(queries.conversations.getConversation, [conversation_id]);
+    } catch (err) {
+        return res.status(400).send({ message: `conversation with id '${conversation_id}' does not exist` });
+    }
+
+    try {
+        // Get messages for conversation
+        let messages = await db.any(queries.conversations.getMessagesForConversation, [conversation_id]);
+
+        // Sort messages
+        switch (orderBy) {
+            case "date":
+                messages.sort((a, b) => a.sent_datetime - b.sent_datetime);
+                break;
+            case "-date":
+                messages.sort((a, b) => b.sent_datetime - a.sent_datetime);
+                break;
+        }
+
+        // Paginate messages
+        messages = messages.slice(offset, offset + limit);
+
+        return res.json(messages);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 module.exports = {
