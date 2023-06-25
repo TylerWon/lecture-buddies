@@ -56,49 +56,55 @@ const createConversationValidationSchema = () =>
 
 // Enrolments
 const createEnrolmentValidationSchema = () =>
-    checkSchema({
-        student_id: {
-            exists: {
-                errorMessage: "student_id is required",
+    checkSchema(
+        {
+            student_id: {
+                exists: {
+                    errorMessage: "student_id is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "student_id must be a positive integer",
+                },
             },
-            isInt: {
-                options: { gt: -1 },
-                errorMessage: "student_id must be a positive integer",
+            section_id: {
+                exists: {
+                    errorMessage: "section_id is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "section_id must be a positive integer",
+                },
             },
         },
-        section_id: {
-            exists: {
-                errorMessage: "section_id is required",
-            },
-            isInt: {
-                options: { gt: -1 },
-                errorMessage: "section_id must be a positive integer",
-            },
-        },
-    });
+        ["body"]
+    );
 
 // Friendships
 const createFriendshipValidationSchema = () =>
-    checkSchema({
-        requestor_id: {
-            exists: {
-                errorMessage: "requestor_id is required",
+    checkSchema(
+        {
+            requestor_id: {
+                exists: {
+                    errorMessage: "requestor_id is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "requestor_id must be a positive integer",
+                },
             },
-            isInt: {
-                options: { gt: -1 },
-                errorMessage: "requestor_id must be a positive integer",
+            requestee_id: {
+                exists: {
+                    errorMessage: "requestee_id is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "requestee_id must be a positive integer",
+                },
             },
         },
-        requestee_id: {
-            exists: {
-                errorMessage: "requestee_id is required",
-            },
-            isInt: {
-                options: { gt: -1 },
-                errorMessage: "requestee_id must be a positive integer",
-            },
-        },
-    });
+        ["body"]
+    );
 
 const updateFriendshipValidationSchema = () =>
     checkSchema(
@@ -118,25 +124,62 @@ const updateFriendshipValidationSchema = () =>
 
 // Interests
 const createInterestValidationSchema = () =>
-    checkSchema({
-        student_id: {
-            exists: {
-                errorMessage: "student_id is required",
+    checkSchema(
+        {
+            student_id: {
+                exists: {
+                    errorMessage: "student_id is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "student_id must be a positive integer",
+                },
             },
-            isInt: {
-                options: { gt: -1 },
-                errorMessage: "student_id must be a positive integer",
+            interest_name: {
+                exists: {
+                    errorMessage: "interest_name is required",
+                },
+                isString: {
+                    errorMessage: "interest_name must be a string",
+                },
             },
         },
-        interest_name: {
-            exists: {
-                errorMessage: "interest_name is required",
+        ["body"]
+    );
+
+// Messages
+const createMessageValidationSchema = () =>
+    checkSchema(
+        {
+            conversation_id: {
+                exists: {
+                    errorMessage: "conversation_id is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "conversation_id must be a positive integer",
+                },
             },
-            isString: {
-                errorMessage: "interest_name must be a string",
+            author_id: {
+                exists: {
+                    errorMessage: "author_id is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "author_id must be a positive integer",
+                },
+            },
+            message_content: {
+                exists: {
+                    errorMessage: "message_content is required",
+                },
+                isString: {
+                    errorMessage: "message_content must be a string",
+                },
             },
         },
-    });
+        ["body"]
+    );
 
 // Students
 const createStudentValidationSchema = () =>
@@ -254,34 +297,38 @@ const getFriendsForStudentValidationSchema = () =>
 
 // Social media
 const createSocialMediaValidationSchema = () =>
-    checkSchema({
-        student_id: {
-            exists: {
-                errorMessage: "student_id is required",
+    checkSchema(
+        {
+            student_id: {
+                exists: {
+                    errorMessage: "student_id is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "student_id must be a positive integer",
+                },
             },
-            isInt: {
-                options: { gt: -1 },
-                errorMessage: "student_id must be a positive integer",
+            social_media_platform: {
+                exists: {
+                    errorMessage: "social_media_platform is required",
+                },
+                matches: {
+                    options: [/^(Facebook|Instagram|LinkedIn|Twitter)$/],
+                    errorMessage:
+                        "social_media_platform must be one of 'Facebook', 'Instagram', 'LinkedIn', or 'Twitter'",
+                },
+            },
+            social_media_url: {
+                exists: {
+                    errorMessage: "social_media_url is required",
+                },
+                isString: {
+                    errorMessage: "social_media_url must be a string",
+                },
             },
         },
-        social_media_platform: {
-            exists: {
-                errorMessage: "social_media_platform is required",
-            },
-            matches: {
-                options: [/^(Facebook|Instagram|LinkedIn|Twitter)$/],
-                errorMessage: "social_media_platform must be one of 'Facebook', 'Instagram', 'LinkedIn', or 'Twitter'",
-            },
-        },
-        social_media_url: {
-            exists: {
-                errorMessage: "social_media_url is required",
-            },
-            isString: {
-                errorMessage: "social_media_url must be a string",
-            },
-        },
-    });
+        ["body"]
+    );
 
 // General
 const sortingAndPaginationValidationSchema = (orderByOptions, orderByMessage) =>
@@ -325,6 +372,7 @@ module.exports = {
     createFriendshipValidationSchema,
     updateFriendshipValidationSchema,
     createInterestValidationSchema,
+    createMessageValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
     getFriendsForStudentValidationSchema,

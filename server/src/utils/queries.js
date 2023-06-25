@@ -85,6 +85,13 @@ const queries = {
             RETURNING *
         `,
     },
+    messages: {
+        createMessage: `
+            INSERT INTO messages (conversation_id, author_id, message_content)
+            VALUES ($1, $2, $3)
+            RETURNING *
+        `,
+    },
     schools: {
         getSchools: `
             SELECT * 
