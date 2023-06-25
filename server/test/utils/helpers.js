@@ -21,8 +21,8 @@ const cleanUpDatabase = async (db) => {
  * Creates a friendship
  *
  * @param {object} db - the database connection
- * @param {number} requestorId - the id of the student that is requesting to be the other student’s friend
- * @param {number} requesteeId -  the id of the student that is receiving the request to be the other student’s friend
+ * @param {number} requestorId - the ID of the student that is requesting to be the other student’s friend
+ * @param {number} requesteeId -  the ID of the student that is receiving the request to be the other student’s friend
  * @param {string} friendshipStatus - the status of the friendship
  *
  * @returns {object} the created friendship
@@ -47,8 +47,8 @@ const createConversation = async (db, conversationName) => {
  * Creates a conversation member (i.e. adds a student to a conversation)
  *
  * @param {object} db - the database connection
- * @param {number} conversationId - the id of the conversation to add the student to
- * @param {number} studentId - the id of the student to add to the conversation
+ * @param {number} conversationId - the ID of the conversation to add the student to
+ * @param {number} studentId - the ID of the student to add to the conversation
  *
  * @returns {object} the created conversation member
  */
@@ -60,7 +60,7 @@ const createConversationMember = async (db, conversationId, studentId) => {
  * Creates a course
  *
  * @param {object} db - the database connection
- * @param {number} subjectId - the id of the subject of the course
+ * @param {number} subjectId - the ID of the subject of the course
  * @param {string} courseNumber - the course's number
  * @param {string} courseName - the course's name
  *
@@ -74,8 +74,8 @@ const createCourse = async (db, subjectId, courseNumber, courseName) => {
  * Creates an enrolment (i.e enrol a student in a section)
  *
  * @param {object} db - the database connection
- * @param {number} studentId - the id of the student who is enrolled in the section
- * @param {number} sectionId - the id of the section the student is enrolled in
+ * @param {number} studentId - the ID of the student who is enrolled in the section
+ * @param {number} sectionId - the ID of the section the student is enrolled in
  *
  * @returns {object} the created enrolment
  */
@@ -87,7 +87,7 @@ const createEnrolment = async (db, studentId, sectionId) => {
  * Creates an interest
  *
  * @param {object} db - the database connection
- * @param {number} studentId - the id of the student who likes the interest
+ * @param {number} studentId - the ID of the student who likes the interest
  * @param {string} interestName - the interest's name
  *
  * @returns {object} the created interest
@@ -100,8 +100,8 @@ const createInterest = async (db, studentId, interestName) => {
  * Creates a message
  *
  * @param {object} db - the database connection
- * @param {number} conversationId - the id of the conversation the message belongs to
- * @param {number} authorId - the id of the student who sent the message
+ * @param {number} conversationId - the ID of the conversation the message belongs to
+ * @param {number} authorId - the ID of the student who sent the message
  * @param {string} messageContent - the message's content
  *
  * @returns {object} the created message
@@ -128,7 +128,7 @@ const createSchool = async (db, schoolName, currentTerm, logoUrl) => {
  * Creates a section
  *
  * @param {object} db - the database connection
- * @param {number} courseId - the id of the course of the section
+ * @param {number} courseId - the ID of the course of the section
  * @param {string} sectionNumber - the section's number
  * @param {string} sectionTerm - the section's term
  *
@@ -142,7 +142,7 @@ const createSection = async (db, courseId, sectionNumber, sectionTerm) => {
  * Creates a social media
  *
  * @param {object} db - the database connection
- * @param {number} studentId - the id of the Student that the social media belongs to
+ * @param {number} studentId - the ID of the Student that the social media belongs to
  * @param {string} socialMediaPlatform - the social media platform
  * @param {string} socialMediaUrl - the url of the student's profile on the platfor
  *
@@ -156,7 +156,7 @@ const createSocialMedia = async (db, studentId, socialMediaName, socialMediaUrl)
  * Creates a subject
  *
  * @param {object} db - the database connection
- * @param {number} schoolId - the id of the school where the subject is offered
+ * @param {number} schoolId - the ID of the school where the subject is offered
  * @param {string} subjectName - the subject's name
  *
  * @returns {object} the created subject
@@ -169,8 +169,8 @@ const createSubject = async (db, schoolId, subjectName) => {
  * Creates a student
  *
  * @param {object} db - the database connection
- * @param {number} userId - the id of the user associated with the student
- * @param {number} schoolId - the id of the school the student attends
+ * @param {number} userId - the ID of the user associated with the student
+ * @param {number} schoolId - the ID of the school the student attends
  * @param {string} firstName - the student's first name
  * @param {string} lastName - the student's last name
  * @param {string} year - the student's year of schooling
@@ -216,14 +216,55 @@ const createUser = async (db, username, password) => {
  * Updates a friendship
  *
  * @param {object} db - the database connection
- * @param {number} requestorId - the id of the student that is requesting to be the other student’s friend
- * @param {number} requesteeId -  the id of the student that is receiving the request to be the other student’s friend
+ * @param {number} requestorId - the ID of the student that is requesting to be the other student’s friend
+ * @param {number} requesteeId -  the ID of the student that is receiving the request to be the other student’s friend
  * @param {string} friendshipStatus - the status of the friendship
  *
  * @returns {object} the updated friendship
  */
 const updateFriendship = async (db, requestor_id, requestee_id, friendshipStatus) => {
     return await db.one(queries.friendships.updateFriendship, [friendshipStatus, requestor_id, requestee_id]);
+};
+
+/**
+ * Updates a student
+ *
+ * @param {object} db - the database connection
+ * @param {number} studentId - the ID of the student to update
+ * @param {number} schoolId - the ID of the new school the student attends
+ * @param {string} firstName - the student's new first name
+ * @param {string} lastName - the student's new last name
+ * @param {string} year - the student's new year of schooling
+ * @param {string} faculty - the student's new faculty
+ * @param {string} major - the student's new major
+ * @param {string} profilePhotoUrl - the new url of the student's profile photo
+ * @param {string} bio - the student's new bio
+ *
+ * @returns {object} the updated student
+ */
+const updateStudent = async (
+    db,
+    schoolId,
+    firstName,
+    lastName,
+    year,
+    faculty,
+    major,
+    profilePhotoUrl,
+    bio,
+    studentId
+) => {
+    return await db.one(queries.students.updateStudent, [
+        schoolId,
+        firstName,
+        lastName,
+        year,
+        faculty,
+        major,
+        profilePhotoUrl,
+        bio,
+        studentId,
+    ]);
 };
 
 /**
@@ -316,6 +357,7 @@ module.exports = {
     createStudent,
     createUser,
     updateFriendship,
+    updateStudent,
     verifyGetRequestResponse,
     verifyPostRequestResponseWithAuth,
     verifyPostRequestResponseWithoutAuth,

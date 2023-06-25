@@ -18,6 +18,7 @@ const {
     verifyGetRequestResponse,
     verifyPostRequestResponseWithAuth,
     updateFriendship,
+    verifyPutRequestResponse,
 } = require("../utils/helpers");
 
 describe("student routes tests", () => {
@@ -255,19 +256,124 @@ describe("student routes tests", () => {
     });
 
     describe("/students/{student_id}", () => {
-        test("GET - should return a student", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id}`, user1.token, 200, student1);
-        });
+        describe("GET", () => {
+            test("GET - should return a student", async () => {
+                await verifyGetRequestResponse(app, `/students/${student1.student_id}`, user1.token, 200, student1);
+            });
 
-        test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}`, user1.token, 400, {
-                message: `student with id '${student1.student_id + 100}' does not exist`,
+            test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
+                await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}`, user1.token, 400, {
+                    message: `student with id '${student1.student_id + 100}' does not exist`,
+                });
+            });
+
+            test("GET - should return error message when request is unauthenticated", async () => {
+                await verifyGetRequestResponse(app, `/students/${student1.student_id}`, undefined, 401, {
+                    message: "unauthorized",
+                });
             });
         });
 
-        test("GET - should return error message when request is unauthenticated", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id}`, undefined, 401, {
-                message: "unauthorized",
+        describe("PUT", () => {
+            let payload;
+
+            beforeEach(() => {
+                payload = { ...student1 };
+                delete payload.student_id;
+            });
+
+            afterAll(async () => {
+                await updateStudent(
+                    db,
+                    student1.school_id,
+                    student1.first_name,
+                    student1.last_name,
+                    student1.year,
+                    student1.faculty,
+                    student1.major,
+                    student1.profile_photo_url,
+                    student1.bio,
+                    student1.student_id
+                );
+            });
+
+            test("PUT - should update a student", async () => {
+                payload.first_name = "John";
+                payload.major = "Mathematics";
+
+                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, user1.token, payload, 200, {
+                    ...payload,
+                    student_id: student1.student_id,
+                });
+            });
+
+            test("PUT - should not update a student when missing some body parameters", async () => {
+                delete payload.school_id;
+                delete payload.bio;
+
+                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, user1.token, payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "school_id",
+                        msg: "school_id is required",
+                    },
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "bio",
+                        msg: "bio is required",
+                    },
+                ]);
+            });
+
+            test("PUT - should not update a student when some body parameters are the wrong type", async () => {
+                payload.faculty = 1;
+                payload.school_id = "4";
+
+                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, user1.token, payload, 400, [
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "faculty",
+                        value: payload.faculty,
+                        msg: "faculty must be a string",
+                    },
+                    {
+                        type: "field",
+                        location: "body",
+                        path: "school_id",
+                        value: payload.school_id,
+                        msg: "school_id must be a positive integer",
+                    },
+                ]);
+            });
+
+            test("PUT - should return error message when the student_id path parameter does not correspond to a student", async () => {
+                await verifyPutRequestResponse(
+                    app,
+                    `/students/${student1.student_id + 100}`,
+                    user1.token,
+                    payload,
+                    400,
+                    {
+                        message: `student with id '${student1.student_id + 100}' does not exist`,
+                    }
+                );
+            });
+
+            test("PUT - should not update a student when school does not exist", async () => {
+                payload.school_id = school1.school_id + 100;
+
+                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, user1.token, payload, 400, {
+                    message: `school with id '${payload.school_id}' does not exist`,
+                });
+            });
+
+            test("PUT - should not update a student when request is unauthenticated", async () => {
+                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, undefined, payload, 401, {
+                    message: "unauthorized",
+                });
             });
         });
     });

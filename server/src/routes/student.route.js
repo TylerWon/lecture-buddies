@@ -14,6 +14,13 @@ router.post(
     studentController.createStudent
 );
 router.get("/:student_id(\\d+)", authMiddleware.authenticateRequest, studentController.getStudent);
+router.put(
+    "/:student_id(\\d+)",
+    // validationSchemas.updateStudentValidationSchema(),
+    // validationMiddleware.validateRequest,
+    authMiddleware.authenticateRequest,
+    studentController.updateStudent
+);
 router.get(
     "/:student_id(\\d+)/friends",
     validationSchemas.getFriendsForStudentValidationSchema(),

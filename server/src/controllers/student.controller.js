@@ -1,11 +1,12 @@
 const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
+/********** CONTROLLERS **********/
 /**
  * Creates a student
  *
- * @param {number} req.body.student_id - the id of the user associated with the student
- * @param {number} req.body.school_id - the id of the school the student attends
+ * @param {number} req.body.student_id - the ID of the user associated with the student
+ * @param {number} req.body.school_id - the ID of the school the student attends
  * @param {string} req.body.first_name - the student's first name
  * @param {string} req.body.last_name - the student's last name
  * @param {string} req.body.year - the student's year of schooling
@@ -437,6 +438,29 @@ const getStudent = async (req, res, next) => {
 };
 
 /**
+ * Updates a student
+ *
+ * @param {number} req.params.student_id - The student's ID
+ * @param {number} req.body.school_id - the ID of the new school the student attends
+ * @param {string} req.body.first_name - the student's new first name
+ * @param {string} req.body.last_name - the student's new last name
+ * @param {string} req.body.year - the student's new year of schooling
+ * @param {string} req.body.faculty - the student's new faculty
+ * @param {string} req.body.major - the student's new major
+ * @param {string} req.body.profile_photo_url - the new url of the student's profile photo
+ * @param {string} req.body.bio - the student's new bio
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student or school does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const updateStudent = async (req, res, next) => {
+    res.send("Not implemented");
+};
+
+/********** HELPERS **********/
+/**
  * Gets the friendship status for every student in an array of students with a given student
  *
  * @param {number} studentId - the student's ID
@@ -645,4 +669,5 @@ module.exports = {
     getInterestsForStudent,
     getSocialMediasForStudent,
     getStudent,
+    updateStudent,
 };

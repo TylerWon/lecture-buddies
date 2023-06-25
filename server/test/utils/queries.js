@@ -88,6 +88,12 @@ const queries = {
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
             RETURNING *
         `,
+        updateStudent: `
+            UPDATE students
+            SET school_id = $1, first_name = $2, last_name = $3, year = $4, faculty = $5, major = $6, profile_photo_url = $7, bio = $8
+            WHERE student_id = $9
+            RETURNING *
+        `,
     },
     users: {
         createUser: `
