@@ -181,7 +181,7 @@ describe("student routes tests", () => {
             await verifyPostRequestResponseWithAuth(app, "/students", user1.token, payload, 201, payload);
         });
 
-        test("POST - should not create a student when missing some fields", async () => {
+        test("POST - should not create a student when missing some body parameters", async () => {
             delete payload.last_name;
             delete payload.profile_photo_url;
 
@@ -201,7 +201,7 @@ describe("student routes tests", () => {
             ]);
         });
 
-        test("POST - should not create a student when some fields are the wrong type", async () => {
+        test("POST - should not create a student when some body parameters are the wrong type", async () => {
             payload.first_name = true;
             payload.year = 4;
 

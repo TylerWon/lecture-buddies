@@ -101,7 +101,7 @@ describe("conversation routes tests", () => {
             expect(response.body.conversation_members).toEqual(payload.conversation_members);
         });
 
-        test("POST - should not create a conversation when missing some fields", async () => {
+        test("POST - should not create a conversation when missing some body parameters", async () => {
             delete payload.conversation_members;
 
             await verifyPostRequestResponseWithAuth(app, "/conversations", user1.token, payload, 400, [
@@ -114,7 +114,7 @@ describe("conversation routes tests", () => {
             ]);
         });
 
-        test("POST - should not create a conversation when some fields are the wrong type", async () => {
+        test("POST - should not create a conversation when some body parameters are the wrong type", async () => {
             payload.conversation_members = { id1: student1.student_id, id2: student2.student_id };
 
             await verifyPostRequestResponseWithAuth(app, "/conversations", user1.token, payload, 400, [

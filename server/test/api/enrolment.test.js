@@ -63,7 +63,7 @@ describe("enrolment routes tests", () => {
             await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 201, payload);
         });
 
-        test("POST - should not create an enrolment when missing some fields", async () => {
+        test("POST - should not create an enrolment when missing some body parameters", async () => {
             delete payload.student_id;
 
             await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, [
@@ -76,7 +76,7 @@ describe("enrolment routes tests", () => {
             ]);
         });
 
-        test("POST - should not create an enrolment when some fields are the wrong type", async () => {
+        test("POST - should not create an enrolment when some body parameters are the wrong type", async () => {
             payload.section_id = "-1";
 
             await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, [

@@ -73,7 +73,7 @@ describe("friendship routes tests", () => {
             });
         });
 
-        test("POST - should not create a friendship when missing some fields", async () => {
+        test("POST - should not create a friendship when missing some body parameters", async () => {
             delete payload.requestor_id;
 
             await verifyPostRequestResponseWithAuth(app, "/friendships", user1.token, payload, 400, [
@@ -86,7 +86,7 @@ describe("friendship routes tests", () => {
             ]);
         });
 
-        test("POST - should not create a friendship when some fields are the wrong type", async () => {
+        test("POST - should not create a friendship when some body parameters are the wrong type", async () => {
             payload.requestee_id = "-1";
 
             await verifyPostRequestResponseWithAuth(app, "/friendships", user1.token, payload, 400, [
@@ -145,7 +145,7 @@ describe("friendship routes tests", () => {
             );
         });
 
-        test("PUT - should not update a friendship when missing some fields", async () => {
+        test("PUT - should not update a friendship when missing some body parameters", async () => {
             delete payload.friendship_status;
 
             await verifyPutRequestResponse(
@@ -165,7 +165,7 @@ describe("friendship routes tests", () => {
             );
         });
 
-        test("PUT - should not update a friendship when some fields are the wrong type", async () => {
+        test("PUT - should not update a friendship when some body parameters are the wrong type", async () => {
             payload.friendship_status = false;
 
             await verifyPutRequestResponse(

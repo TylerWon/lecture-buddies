@@ -62,7 +62,7 @@ describe("social media routes tests", () => {
             expect(response.body.social_media_url).toEqual(payload.social_media_url);
         });
 
-        test("POST - should not create a social media when missing some fields", async () => {
+        test("POST - should not create a social media when missing some body parameters", async () => {
             delete payload.social_media_platform;
 
             await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, [
@@ -75,7 +75,7 @@ describe("social media routes tests", () => {
             ]);
         });
 
-        test("POST - should not create a social media when some fields are the wrong type", async () => {
+        test("POST - should not create a social media when some body parameters are the wrong type", async () => {
             payload.social_media_url = false;
 
             await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, [

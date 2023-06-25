@@ -42,7 +42,7 @@ describe("auth routes tests", () => {
             });
         });
 
-        test("POST - should not log a user in when missing some fields", async () => {
+        test("POST - should not log a user in when missing some body parameters", async () => {
             delete payload.username;
 
             await verifyPostRequestResponseWithoutAuth(app, "/auth/login", payload, 400, [
@@ -55,7 +55,7 @@ describe("auth routes tests", () => {
             ]);
         });
 
-        test("POST - should not log a user in when some fields are the wrong type", async () => {
+        test("POST - should not log a user in when some body parameters are the wrong type", async () => {
             payload.password = 12345678;
 
             await verifyPostRequestResponseWithoutAuth(app, "/auth/login", payload, 400, [
@@ -115,7 +115,7 @@ describe("auth routes tests", () => {
             expect(response.statusCode).toEqual(200);
         });
 
-        test("POST - should not sign a user up when missing some fields", async () => {
+        test("POST - should not sign a user up when missing some body parameters", async () => {
             delete payload.username;
 
             await verifyPostRequestResponseWithoutAuth(app, "/auth/signup", payload, 400, [
@@ -128,7 +128,7 @@ describe("auth routes tests", () => {
             ]);
         });
 
-        test("POST - should not sign a user up when some fields are the wrong type", async () => {
+        test("POST - should not sign a user up when some body parameters are the wrong type", async () => {
             payload.password = 12345678;
 
             await verifyPostRequestResponseWithoutAuth(app, "/auth/signup", payload, 400, [

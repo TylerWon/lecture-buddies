@@ -58,7 +58,7 @@ describe("interest routes tests", () => {
             expect(response.body.interest_name).toEqual(payload.interest_name);
         });
 
-        test("POST - should not create an interest when missing some fields", async () => {
+        test("POST - should not create an interest when missing some body parameters", async () => {
             delete payload.student_id;
 
             await verifyPostRequestResponseWithAuth(app, "/interests", user1.token, payload, 400, [
@@ -71,7 +71,7 @@ describe("interest routes tests", () => {
             ]);
         });
 
-        test("POST - should not create an interest when some fields are the wrong type", async () => {
+        test("POST - should not create an interest when some body parameters are the wrong type", async () => {
             payload.student_id = "-1";
 
             await verifyPostRequestResponseWithAuth(app, "/interests", user1.token, payload, 400, [
