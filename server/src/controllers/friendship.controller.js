@@ -72,7 +72,6 @@ const updateFriendship = async (req, res, next) => {
     try {
         await db.one(queries.friendships.getFriendship, [requestor_id, requestee_id]);
     } catch (err) {
-        console.log(err);
         return res.status(400).json({
             message: `friendship between students with ids '${requestor_id}' and '${requestee_id}' does not exist`,
         });

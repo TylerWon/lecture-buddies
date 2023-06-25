@@ -9,7 +9,7 @@ const {
     verifyPutRequestResponse,
 } = require("../utils/helpers");
 
-describe("enrolment routes tests", () => {
+describe("friendship routes tests", () => {
     let user1;
     let user2;
     let school1;
@@ -98,6 +98,14 @@ describe("enrolment routes tests", () => {
                     msg: "requestee_id must be a positive integer",
                 },
             ]);
+        });
+
+        test("POST - should not create a friendship when a student does not exist", async () => {
+            payload.requestor_id = payload.requestor_id + 100;
+
+            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.token, payload, 400, {
+                message: `student with id '${payload.requestor_id}' does not exist`,
+            });
         });
 
         test("POST - should not create a friendship when friendship already exists", async () => {
