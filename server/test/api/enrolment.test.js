@@ -60,10 +60,7 @@ describe("enrolment routes tests", () => {
         });
 
         test("POST - should create an enrolment", async () => {
-            const response = await request(app).post("/enrolments").auth(user1.token, { type: "bearer" }).send(payload);
-            expect(response.statusCode).toEqual(201);
-            expect(response.body.student_id).toEqual(payload.student_id);
-            expect(response.body.section_id).toEqual(payload.section_id);
+            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 201, payload);
         });
 
         test("POST - should not create an enrolment when missing some fields", async () => {
