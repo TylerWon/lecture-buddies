@@ -13,6 +13,18 @@ const queries = {
             JOIN students ON conversation_members.student_id = students.student_id
             WHERE conversation_members.conversation_id = $1
         `,
+        createConversation: `
+            INSERT INTO conversations (conversation_name)
+            VALUES ($1)
+            RETURNING *
+        `,
+    },
+    conversationMembers: {
+        createConversationMember: `
+            INSERT INTO conversation_members (conversation_id, student_id)
+            VALUES ($1, $2)
+            RETURNING *
+        `,
     },
     courses: {
         getCourse: `

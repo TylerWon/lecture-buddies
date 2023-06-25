@@ -24,6 +24,36 @@ const authValidationSchema = () =>
         ["body"]
     );
 
+// Conversations
+const createConversationValidationSchema = () =>
+    checkSchema(
+        {
+            conversation_name: {
+                exists: {
+                    errorMessage: "conversation_name is required",
+                },
+                isString: {
+                    errorMessage: "conversation_name must be a string",
+                },
+            },
+            conversation_members: {
+                exists: {
+                    errorMessage: "conversation_members is required",
+                },
+                isArray: {
+                    errorMessage: "conversation_members must be an array",
+                },
+            },
+            "conversation_members.*": {
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "conversation_members items must be positive integers",
+                },
+            },
+        },
+        ["body"]
+    );
+
 // Enrolments
 const createEnrolmentValidationSchema = () =>
     checkSchema({
@@ -290,6 +320,7 @@ const sortingAndPaginationValidationSchema = (orderByOptions, orderByMessage) =>
 
 module.exports = {
     authValidationSchema,
+    createConversationValidationSchema,
     createEnrolmentValidationSchema,
     createFriendshipValidationSchema,
     updateFriendshipValidationSchema,

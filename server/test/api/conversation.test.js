@@ -73,7 +73,7 @@ describe("conversation routes tests", () => {
                 .post("/conversations")
                 .auth(user1.token, { type: "bearer" })
                 .send(payload);
-            expect(response.statusCode).toEqual(200);
+            expect(response.statusCode).toEqual(201);
             expect(response.body.conversation_name).toEqual(payload.conversation_name);
             expect(response.body.conversation_members).toEqual(payload.conversation_members);
         });
@@ -100,7 +100,7 @@ describe("conversation routes tests", () => {
                     location: "body",
                     path: "conversation_members",
                     value: payload.conversation_members,
-                    msg: "conversation_members must be a list of positive integers",
+                    msg: "conversation_members must be an array",
                 },
             ]);
         });
