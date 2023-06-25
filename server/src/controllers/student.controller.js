@@ -69,242 +69,6 @@ const createStudent = async (req, res, next) => {
 };
 
 /**
- * Gets a student
- *
- * @param {number} req.params.student_id - The student's ID
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getStudent = async (req, res, next) => {
-    const studentId = req.params.student_id;
-
-    // Check if student exists
-    if (!(await studentExists(studentId))) {
-        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
-    }
-
-    // Get student
-    try {
-        const student = await db.one(queries.students.getStudent, [studentId]);
-        return res.json(student);
-    } catch (err) {
-        return next(err); // unexpected error
-    }
-};
-
-/**
- * Gets the friends for a student. Information about the friend and their interests and social medias is included. If
- * the friendship status is 'accepted', information about the friends' current/previous mutual courses with the student
- * is included. Otherwise, only information about the friends' current mutual courses with the student is included
- *
- * @param {number} req.params.student_id - the student's ID
- * @param {string} req.query.status - the friendship status of the friends to get (options: pending, accepted, declined)
- * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
- * @param {string} req.query.offset - the position to start returning results from
- * @param {string} req.query.limit - the number of results to return
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getFriendsForStudent = async (req, res, next) => {
-    const studentId = req.params.student_id;
-    const status = req.query.status;
-    const orderBy = req.query.order_by;
-    const offset = req.query.offset;
-    const limit = req.query.limit;
-
-    // Check if student exists
-    if (!(await studentExists(studentId))) {
-        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
-    }
-
-    try {
-        let friends;
-
-        // Get friends based on status
-        switch (status) {
-            case "pending":
-                friends = await db.any(queries.students.getFriendsForStudent, [studentId, status]);
-                break;
-            case "accepted":
-                friends = await db.any(queries.students.getFriendsForStudent, [studentId, status]);
-                break;
-            case "declined":
-                friends = await db.any(queries.students.getFriendsForStudent, [studentId, status]);
-                break;
-        }
-
-        // Sort friends
-        switch (orderBy) {
-            case "name":
-                sortStudentsByNameASC(friends);
-                break;
-            case "-name":
-                sortStudentsByNameDESC(friends);
-                break;
-        }
-
-        // Paginate friends
-        friends = friends.slice(offset, offset + limit);
-
-        // Get interests for each friend
-        await getInterestsForStudents(friends);
-
-        // Get social medias for each friend
-        await getSocialMediasForStudents(friends);
-
-        // Get school
-        const student = await db.one(queries.students.getStudent, [studentId]);
-        const school = await db.one(queries.schools.getSchool, [student.school_id]);
-
-        // Get current mutual courses with the student for each friend
-        await getMutualCoursesForStudentsForTerm(studentId, friends, school.current_term, "current_mutual_courses");
-
-        // Get previous mutual courses with the student for each friend if status is 'accepted'
-        if (status === "accepted") {
-            await getMutualCoursesForStudentsExcludingTerm(
-                studentId,
-                friends,
-                school.current_term,
-                "previous_mutual_courses"
-            );
-        }
-
-        return res.json(friends);
-    } catch (err) {
-        return next(err); // unexpected error
-    }
-};
-
-/**
- * Gets the conversations for a student. Information about the conversation, members of the conversation, and the most
- * recent message in the conversation is included.
- *
- * @param {number} req.params.student_id - The student's ID
- * @param {string} req.query.order_by - the field to order the response by (options: date, -date)
- * @param {string} req.query.offset - the position to start returning results from
- * @param {string} req.query.limit - the number of results to return
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getConversationsForStudent = async (req, res, next) => {
-    const studentId = req.params.student_id;
-    const orderBy = req.query.order_by;
-    const offset = req.query.offset;
-    const limit = req.query.limit;
-
-    // Check if student exists
-    if (!(await studentExists(studentId))) {
-        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
-    }
-
-    try {
-        // Get conversations
-        let conversations = await db.any(queries.students.getConversationsForStudent, [studentId]);
-
-        // Get members of each conversation
-        await getMembersForConversations(conversations);
-
-        // Get most recent message for each conversation
-        await getMostRecentMessageForConversations(conversations);
-
-        // Sort conversations
-        switch (orderBy) {
-            case "date":
-                sortConversationsByDateASC(conversations);
-                break;
-            case "-date":
-                sortConversationsByDateDESC(conversations);
-                break;
-        }
-
-        // Paginate conversations
-        conversations = conversations.slice(offset, offset + limit);
-
-        return res.json(conversations);
-    } catch (err) {
-        console.log(err);
-        return next(err); // unexpected error
-    }
-};
-
-/**
- * Gets the course history for a student. The course history is all the courses a student has taken. Information about
- * the subject, course, and section is included.
- *
- * @param {number} req.params.student_id - The student's ID
- * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getCourseHistoryForStudent = async (req, res, next) => {
-    const studentId = req.params.student_id;
-    const orderBy = req.query.order_by;
-
-    // Check if student exists
-    if (!(await studentExists(studentId))) {
-        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
-    }
-
-    try {
-        // Get course history
-        let courseHistory = await db.any(queries.students.getCourseHistoryForStudent, [studentId]);
-
-        // Sort course history
-        switch (orderBy) {
-            case "name":
-                sortCoursesByNameASC(courseHistory);
-                break;
-            case "-name":
-                sortCoursesByNameDESC(courseHistory);
-                break;
-        }
-
-        return res.json(courseHistory);
-    } catch (err) {
-        return next(err); // unexpected error
-    }
-};
-
-/**
- * Gets the interests for a student
- *
- * @param {number} req.params.student_id - The student's ID
- *
- * @returns
- * - 200 OK if successful
- * - 400 Bad Request if student does not exist
- * - 500 Internal Server Error if unexpected error
- */
-const getInterestsForStudent = async (req, res, next) => {
-    const studentId = req.params.student_id;
-
-    // Check if student exists
-    if (!(await studentExists(studentId))) {
-        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
-    }
-
-    // Get interests
-    try {
-        const interests = await db.any(queries.students.getInterestsForStudent, [studentId]);
-        return res.json(interests);
-    } catch (err) {
-        return next(err); // unexpected error
-    }
-};
-
-/**
  * Gets the classmates for a student in a section. Information about each classmate and their interests, social medias,
  * and mutual courses with the student for the term the section is in is included.
  *
@@ -410,6 +174,215 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
 };
 
 /**
+ * Gets the conversations for a student. Information about the conversation, members of the conversation, and the most
+ * recent message in the conversation is included.
+ *
+ * @param {number} req.params.student_id - The student's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: date, -date)
+ * @param {string} req.query.offset - the position to start returning results from
+ * @param {string} req.query.limit - the number of results to return
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const getConversationsForStudent = async (req, res, next) => {
+    const studentId = req.params.student_id;
+    const orderBy = req.query.order_by;
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    try {
+        // Get conversations
+        let conversations = await db.any(queries.students.getConversationsForStudent, [studentId]);
+
+        // Get members of each conversation
+        await getMembersForConversations(conversations);
+
+        // Get most recent message for each conversation
+        await getMostRecentMessageForConversations(conversations);
+
+        // Sort conversations
+        switch (orderBy) {
+            case "date":
+                sortConversationsByDateASC(conversations);
+                break;
+            case "-date":
+                sortConversationsByDateDESC(conversations);
+                break;
+        }
+
+        // Paginate conversations
+        conversations = conversations.slice(offset, offset + limit);
+
+        return res.json(conversations);
+    } catch (err) {
+        console.log(err);
+        return next(err); // unexpected error
+    }
+};
+
+/**
+ * Gets the course history for a student. The course history is all the courses a student has taken. Information about
+ * the subject, course, and section is included.
+ *
+ * @param {number} req.params.student_id - The student's ID
+ * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const getCourseHistoryForStudent = async (req, res, next) => {
+    const studentId = req.params.student_id;
+    const orderBy = req.query.order_by;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    try {
+        // Get course history
+        let courseHistory = await db.any(queries.students.getCourseHistoryForStudent, [studentId]);
+
+        // Sort course history
+        switch (orderBy) {
+            case "name":
+                sortCoursesByNameASC(courseHistory);
+                break;
+            case "-name":
+                sortCoursesByNameDESC(courseHistory);
+                break;
+        }
+
+        return res.json(courseHistory);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+};
+
+/**
+ * Gets the friends for a student. Information about the friend and their interests and social medias is included. If
+ * the friendship status is 'accepted', information about the friends' current/previous mutual courses with the student
+ * is included. Otherwise, only information about the friends' current mutual courses with the student is included
+ *
+ * @param {number} req.params.student_id - the student's ID
+ * @param {string} req.query.status - the friendship status of the friends to get (options: pending, accepted, declined)
+ * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
+ * @param {string} req.query.offset - the position to start returning results from
+ * @param {string} req.query.limit - the number of results to return
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const getFriendsForStudent = async (req, res, next) => {
+    const studentId = req.params.student_id;
+    const status = req.query.status;
+    const orderBy = req.query.order_by;
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    try {
+        let friends;
+
+        // Get friends based on status
+        switch (status) {
+            case "pending":
+                friends = await db.any(queries.students.getFriendsForStudent, [studentId, status]);
+                break;
+            case "accepted":
+                friends = await db.any(queries.students.getFriendsForStudent, [studentId, status]);
+                break;
+            case "declined":
+                friends = await db.any(queries.students.getFriendsForStudent, [studentId, status]);
+                break;
+        }
+
+        // Sort friends
+        switch (orderBy) {
+            case "name":
+                sortStudentsByNameASC(friends);
+                break;
+            case "-name":
+                sortStudentsByNameDESC(friends);
+                break;
+        }
+
+        // Paginate friends
+        friends = friends.slice(offset, offset + limit);
+
+        // Get interests for each friend
+        await getInterestsForStudents(friends);
+
+        // Get social medias for each friend
+        await getSocialMediasForStudents(friends);
+
+        // Get school
+        const student = await db.one(queries.students.getStudent, [studentId]);
+        const school = await db.one(queries.schools.getSchool, [student.school_id]);
+
+        // Get current mutual courses with the student for each friend
+        await getMutualCoursesForStudentsForTerm(studentId, friends, school.current_term, "current_mutual_courses");
+
+        // Get previous mutual courses with the student for each friend if status is 'accepted'
+        if (status === "accepted") {
+            await getMutualCoursesForStudentsExcludingTerm(
+                studentId,
+                friends,
+                school.current_term,
+                "previous_mutual_courses"
+            );
+        }
+
+        return res.json(friends);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+};
+
+/**
+ * Gets the interests for a student
+ *
+ * @param {number} req.params.student_id - The student's ID
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const getInterestsForStudent = async (req, res, next) => {
+    const studentId = req.params.student_id;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    // Get interests
+    try {
+        const interests = await db.any(queries.students.getInterestsForStudent, [studentId]);
+        return res.json(interests);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+};
+
+/**
  * Gets the social medias for a student
  *
  * @param {number} req.params.student_id - The student's ID
@@ -431,6 +404,33 @@ const getSocialMediasForStudent = async (req, res, next) => {
     try {
         const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [studentId]);
         return res.json(socialMedias);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+};
+
+/**
+ * Gets a student
+ *
+ * @param {number} req.params.student_id - The student's ID
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if student does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const getStudent = async (req, res, next) => {
+    const studentId = req.params.student_id;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    // Get student
+    try {
+        const student = await db.one(queries.students.getStudent, [studentId]);
+        return res.json(student);
     } catch (err) {
         return next(err); // unexpected error
     }
@@ -638,11 +638,11 @@ const studentExists = async (studentId) => {
 
 module.exports = {
     createStudent,
-    getStudent,
+    getClassmatesForStudentInSection,
+    getConversationsForStudent,
+    getCourseHistoryForStudent,
+    getFriendsForStudent,
     getInterestsForStudent,
     getSocialMediasForStudent,
-    getCourseHistoryForStudent,
-    getClassmatesForStudentInSection,
-    getFriendsForStudent,
-    getConversationsForStudent,
+    getStudent,
 };
