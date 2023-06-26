@@ -295,6 +295,78 @@ const getFriendsForStudentValidationSchema = () =>
         ["query"]
     );
 
+const updateStudentValidationSchema = () =>
+    checkSchema(
+        {
+            school_id: {
+                exists: {
+                    errorMessage: "school_id is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "school_id must be a positive integer",
+                },
+            },
+            first_name: {
+                exists: {
+                    errorMessage: "first_name is required",
+                },
+                isString: {
+                    errorMessage: "first_name must be a string",
+                },
+            },
+            last_name: {
+                exists: {
+                    errorMessage: "last_name is required",
+                },
+                isString: {
+                    errorMessage: "last_name must be a string",
+                },
+            },
+            year: {
+                exists: {
+                    errorMessage: "year is required",
+                },
+                isString: {
+                    errorMessage: "year must be a string",
+                },
+            },
+            faculty: {
+                exists: {
+                    errorMessage: "faculty is required",
+                },
+                isString: {
+                    errorMessage: "faculty must be a string",
+                },
+            },
+            major: {
+                exists: {
+                    errorMessage: "major is required",
+                },
+                isString: {
+                    errorMessage: "major must be a string",
+                },
+            },
+            profile_photo_url: {
+                exists: {
+                    errorMessage: "profile_photo_url is required",
+                },
+                isString: {
+                    errorMessage: "profile_photo_url must be a string",
+                },
+            },
+            bio: {
+                exists: {
+                    errorMessage: "bio is required",
+                },
+                isString: {
+                    errorMessage: "bio must be a string",
+                },
+            },
+        },
+        ["body"]
+    );
+
 // Social media
 const createSocialMediaValidationSchema = () =>
     checkSchema(
@@ -376,6 +448,7 @@ module.exports = {
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
     getFriendsForStudentValidationSchema,
+    updateStudentValidationSchema,
     createSocialMediaValidationSchema,
     sortingAndPaginationValidationSchema,
 };

@@ -227,47 +227,6 @@ const updateFriendship = async (db, requestor_id, requestee_id, friendshipStatus
 };
 
 /**
- * Updates a student
- *
- * @param {object} db - the database connection
- * @param {number} studentId - the ID of the student to update
- * @param {number} schoolId - the ID of the new school the student attends
- * @param {string} firstName - the student's new first name
- * @param {string} lastName - the student's new last name
- * @param {string} year - the student's new year of schooling
- * @param {string} faculty - the student's new faculty
- * @param {string} major - the student's new major
- * @param {string} profilePhotoUrl - the new url of the student's profile photo
- * @param {string} bio - the student's new bio
- *
- * @returns {object} the updated student
- */
-const updateStudent = async (
-    db,
-    schoolId,
-    firstName,
-    lastName,
-    year,
-    faculty,
-    major,
-    profilePhotoUrl,
-    bio,
-    studentId
-) => {
-    return await db.one(queries.students.updateStudent, [
-        schoolId,
-        firstName,
-        lastName,
-        year,
-        faculty,
-        major,
-        profilePhotoUrl,
-        bio,
-        studentId,
-    ]);
-};
-
-/**
  * Checks that a GET request to an endpoint returns the expected status code and body
  *
  * @param {object} app - the express app
@@ -357,7 +316,6 @@ module.exports = {
     createStudent,
     createUser,
     updateFriendship,
-    updateStudent,
     verifyGetRequestResponse,
     verifyPostRequestResponseWithAuth,
     verifyPostRequestResponseWithoutAuth,

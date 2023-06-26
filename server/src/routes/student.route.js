@@ -16,8 +16,8 @@ router.post(
 router.get("/:student_id(\\d+)", authMiddleware.authenticateRequest, studentController.getStudent);
 router.put(
     "/:student_id(\\d+)",
-    // validationSchemas.updateStudentValidationSchema(),
-    // validationMiddleware.validateRequest,
+    validationSchemas.updateStudentValidationSchema(),
+    validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     studentController.updateStudent
 );

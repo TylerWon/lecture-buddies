@@ -33,9 +33,7 @@ const createStudent = async (req, res, next) => {
     }
 
     // Check if school exists
-    try {
-        await db.one(queries.schools.getSchool, [payload.school_id]);
-    } catch (err) {
+    if (!(await schoolExists(payload.school_id))) {
         return res.status(400).json({
             message: `school with id '${payload.school_id}' does not exist`,
         });
@@ -456,7 +454,38 @@ const getStudent = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const updateStudent = async (req, res, next) => {
-    res.send("Not implemented");
+    const studentId = req.params.student_id;
+    const payload = req.body;
+
+    // Check if student exists
+    if (!(await studentExists(studentId))) {
+        return res.status(400).json({ message: `student with id '${studentId}' does not exist` });
+    }
+
+    // Check if school exists
+    if (!(await schoolExists(payload.school_id))) {
+        return res.status(400).json({
+            message: `school with id '${payload.school_id}' does not exist`,
+        });
+    }
+
+    // Update student
+    try {
+        const student = await db.one(queries.students.updateStudent, [
+            payload.school_id,
+            payload.first_name,
+            payload.last_name,
+            payload.year,
+            payload.faculty,
+            payload.major,
+            payload.profile_photo_url,
+            payload.bio,
+            studentId,
+        ]);
+        return res.json(student);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 /********** HELPERS **********/
@@ -640,6 +669,24 @@ const sortStudentsByNameDESC = (students) => {
         const bName = `${b.first_name} ${b.last_name}`;
         return bName.localeCompare(aName);
     });
+};
+
+/**
+ * Checks if a school exists
+ *
+ * @param {number} schoolId - the school's ID
+ *
+ * @returns
+ * - true if the school exists
+ * - false if the school does not exist
+ */
+const schoolExists = async (schoolId) => {
+    try {
+        await db.one(queries.schools.getSchool, [schoolId]);
+        return true;
+    } catch (err) {
+        return false;
+    }
 };
 
 /**

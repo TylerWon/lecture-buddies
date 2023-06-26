@@ -210,6 +210,12 @@ const queries = {
             JOIN conversations ON conversation_members.conversation_id = conversations.conversation_id
             WHERE conversation_members.student_id = $1
         `,
+        updateStudent: `
+            UPDATE students
+            SET school_id = $1, first_name = $2, last_name = $3, year = $4, faculty = $5, major = $6, profile_photo_url = $7, bio = $8
+            WHERE student_id = $9
+            RETURNING *
+        `,
     },
     users: {
         getUser: `

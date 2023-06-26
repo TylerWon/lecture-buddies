@@ -26,9 +26,11 @@ describe("student routes tests", () => {
     let user2;
     let user3;
     let user4;
+    let user5;
     let student1;
     let student2;
     let student3;
+    let student5;
     let school1;
     let subject1;
     let subject2;
@@ -62,12 +64,15 @@ describe("student routes tests", () => {
     const user3Password = "password3";
     const user4Username = "won.tyler4@gmail.com";
     const user4Password = "password4";
+    const user5Username = "won.tyler5@gmail.com";
+    const user5Password = "password5";
 
     beforeAll(async () => {
         user1 = await createUser(db, user1Username, user1Password);
         user2 = await createUser(db, user2Username, user2Password);
         user3 = await createUser(db, user3Username, user3Password);
         user4 = await createUser(db, user4Username, user4Password);
+        user5 = await createUser(db, user5Username, user5Password);
         school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
         subject1 = await createSubject(db, school1.school_id, "CPSC");
         subject2 = await createSubject(db, school1.school_id, "ENGL");
@@ -114,6 +119,18 @@ describe("student routes tests", () => {
             "Cellular, Anatomical, and Physiological Sciences",
             "www.brianwu.com/profile_photo.jpg",
             "Hello. I'm Brian. I'm a 4th year cellular, anatomical, and physiological sciences student at UBC."
+        );
+        student5 = await createStudent(
+            db,
+            user5.user_id,
+            school1.school_id,
+            "Lyndon",
+            "Won",
+            "5",
+            "Science",
+            "Computer Science",
+            "www.lyndonwon.com/profile_photo.jpg",
+            "Hello. I'm Lyndon. I'm a 5th year computer science student at UBC"
         );
         interest1 = await createInterest(db, student1.student_id, "reading");
         interest2 = await createInterest(db, student2.student_id, "video games");
@@ -278,32 +295,17 @@ describe("student routes tests", () => {
             let payload;
 
             beforeEach(() => {
-                payload = { ...student1 };
+                payload = { ...student5 };
                 delete payload.student_id;
-            });
-
-            afterAll(async () => {
-                await updateStudent(
-                    db,
-                    student1.school_id,
-                    student1.first_name,
-                    student1.last_name,
-                    student1.year,
-                    student1.faculty,
-                    student1.major,
-                    student1.profile_photo_url,
-                    student1.bio,
-                    student1.student_id
-                );
             });
 
             test("PUT - should update a student", async () => {
                 payload.first_name = "John";
                 payload.major = "Mathematics";
 
-                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, user1.token, payload, 200, {
+                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, user1.token, payload, 200, {
                     ...payload,
-                    student_id: student1.student_id,
+                    student_id: student5.student_id,
                 });
             });
 
@@ -311,7 +313,7 @@ describe("student routes tests", () => {
                 delete payload.school_id;
                 delete payload.bio;
 
-                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, user1.token, payload, 400, [
+                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, user1.token, payload, 400, [
                     {
                         type: "field",
                         location: "body",
@@ -329,9 +331,9 @@ describe("student routes tests", () => {
 
             test("PUT - should not update a student when some body parameters are the wrong type", async () => {
                 payload.faculty = 1;
-                payload.school_id = "4";
+                payload.profile_photo_url = false;
 
-                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, user1.token, payload, 400, [
+                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, user1.token, payload, 400, [
                     {
                         type: "field",
                         location: "body",
@@ -342,9 +344,9 @@ describe("student routes tests", () => {
                     {
                         type: "field",
                         location: "body",
-                        path: "school_id",
-                        value: payload.school_id,
-                        msg: "school_id must be a positive integer",
+                        path: "profile_photo_url",
+                        value: payload.profile_photo_url,
+                        msg: "profile_photo_url must be a string",
                     },
                 ]);
             });
@@ -352,12 +354,12 @@ describe("student routes tests", () => {
             test("PUT - should return error message when the student_id path parameter does not correspond to a student", async () => {
                 await verifyPutRequestResponse(
                     app,
-                    `/students/${student1.student_id + 100}`,
+                    `/students/${student5.student_id + 100}`,
                     user1.token,
                     payload,
                     400,
                     {
-                        message: `student with id '${student1.student_id + 100}' does not exist`,
+                        message: `student with id '${student5.student_id + 100}' does not exist`,
                     }
                 );
             });
@@ -365,13 +367,13 @@ describe("student routes tests", () => {
             test("PUT - should not update a student when school does not exist", async () => {
                 payload.school_id = school1.school_id + 100;
 
-                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, user1.token, payload, 400, {
+                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, user1.token, payload, 400, {
                     message: `school with id '${payload.school_id}' does not exist`,
                 });
             });
 
             test("PUT - should not update a student when request is unauthenticated", async () => {
-                await verifyPutRequestResponse(app, `/students/${student1.student_id}`, undefined, payload, 401, {
+                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, undefined, payload, 401, {
                     message: "unauthorized",
                 });
             });
