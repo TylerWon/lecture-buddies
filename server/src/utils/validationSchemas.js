@@ -368,7 +368,7 @@ const updateStudentValidationSchema = () =>
     );
 
 // Social media
-const createSocialMediaValidationSchema = () =>
+const createUpdateSocialMediaValidationSchema = () =>
     checkSchema(
         {
             student_id: {
@@ -449,6 +449,6 @@ module.exports = {
     getCourseHistoryForStudentValidationSchema,
     getFriendsForStudentValidationSchema,
     updateStudentValidationSchema,
-    createSocialMediaValidationSchema,
+    createUpdateSocialMediaValidationSchema,
     sortingAndPaginationValidationSchema,
 };

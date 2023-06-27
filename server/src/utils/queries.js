@@ -140,6 +140,21 @@ const queries = {
             VALUES ($1, $2, $3)
             RETURNING *
         `,
+        getSocialMedia: `
+            SELECT *
+            FROM social_medias
+            WHERE social_media_id = $1
+        `,
+        deleteSocialMedia: `
+            DELETE FROM social_medias
+            WHERE social_media_id = $1
+        `,
+        updateSocialMedia: `
+            UPDATE social_medias
+            SET student_id = $1, social_media_platform = $2, social_media_url = $3
+            WHERE social_media_id = $4
+            RETURNING *
+        `,
     },
     subjects: {
         getSubject: `

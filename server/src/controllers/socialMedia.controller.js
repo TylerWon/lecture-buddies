@@ -17,9 +17,7 @@ const createSocialMedia = async (req, res, next) => {
     const payload = req.body;
 
     // Check if student exists
-    try {
-        await db.one(queries.students.getStudent, [payload.student_id]);
-    } catch (err) {
+    if (!(await studentExists(payload.student_id))) {
         return res.status(400).json({ message: `student with id '${payload.student_id}' does not exist` });
     }
 
@@ -47,7 +45,20 @@ const createSocialMedia = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const deleteSocialMedia = async (req, res, next) => {
-    res.send("Not implemented");
+    const socialMediaId = req.params.social_media_id;
+
+    // Check if social media exists
+    if (!(await socialMediaExists(socialMediaId))) {
+        return res.status(400).json({ message: `social media with id '${socialMediaId}' does not exist` });
+    }
+
+    // Delete social media
+    try {
+        await db.none(queries.socialMedias.deleteSocialMedia, [socialMediaId]);
+        return res.status(200).json({ message: "social media deleted" });
+    } catch (err) {
+        return next(err); // unexpected error
+    }
 };
 
 /**
@@ -64,7 +75,67 @@ const deleteSocialMedia = async (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const updateSocialMedia = async (req, res, next) => {
-    res.send("Not implemented");
+    const socialMediaId = req.params.social_media_id;
+    const payload = req.body;
+
+    // Check if social media exists
+    if (!(await socialMediaExists(socialMediaId))) {
+        return res.status(400).json({ message: `social media with id '${socialMediaId}' does not exist` });
+    }
+
+    // Check if student exists
+    if (!(await studentExists(payload.student_id))) {
+        return res.status(400).json({ message: `student with id '${payload.student_id}' does not exist` });
+    }
+
+    // Update social media
+    try {
+        const socialMedia = await db.one(queries.socialMedias.updateSocialMedia, [
+            payload.student_id,
+            payload.social_media_platform,
+            payload.social_media_url,
+            socialMediaId,
+        ]);
+        return res.status(200).json(socialMedia);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+};
+
+/**
+ * Checks if a social media exists
+ *
+ * @param {number} socialMediaId - the social media's ID
+ *
+ * @returns
+ * - true if the social media exists
+ * - false if the social media does not exist
+ */
+const socialMediaExists = async (socialMediaId) => {
+    try {
+        await db.one(queries.socialMedias.getSocialMedia, [socialMediaId]);
+        return true;
+    } catch (err) {
+        return false;
+    }
+};
+
+/**
+ * Checks if a student exists
+ *
+ * @param {number} studentId - the student's ID
+ *
+ * @returns
+ * - true if the student exists
+ * - false if the student does not exist
+ */
+const studentExists = async (studentId) => {
+    try {
+        await db.one(queries.students.getStudent, [studentId]);
+        return true;
+    } catch (err) {
+        return false;
+    }
 };
 
 module.exports = {
