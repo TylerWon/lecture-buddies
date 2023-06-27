@@ -227,6 +227,24 @@ const updateFriendship = async (db, requestor_id, requestee_id, friendshipStatus
 };
 
 /**
+ * Checks that a DELETE request to an endpoint returns the expected status code and body
+ *
+ * @param {object} app - the express app
+ * @param {string} endpoint - the endpoint to send the DELETE request to
+ * @param {string} token - the token to send with the DELETE request
+ * @param {number} expectedStatusCode - the expected status code of the response
+ * @param {any} expectedBody - the expected body of the response
+ *
+ * @returns {object} the response
+ */
+const verifyDeleteRequestResponse = async (app, endpoint, token, expectedStatusCode, expectedBody) => {
+    const response = await request(app).delete(endpoint).auth(token, { type: "bearer" });
+    expect(response.statusCode).toEqual(expectedStatusCode);
+    expect(response.body).toEqual(expectedBody);
+    return response;
+};
+
+/**
  * Checks that a GET request to an endpoint returns the expected status code and body
  *
  * @param {object} app - the express app
@@ -316,6 +334,7 @@ module.exports = {
     createStudent,
     createUser,
     updateFriendship,
+    verifyDeleteRequestResponse,
     verifyGetRequestResponse,
     verifyPostRequestResponseWithAuth,
     verifyPostRequestResponseWithoutAuth,

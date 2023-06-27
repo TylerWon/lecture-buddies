@@ -33,6 +33,21 @@ const createEnrolment = async (req, res, next) => {
     }
 };
 
+/**
+ * Deletes an enrolment
+ *
+ * @param {number} req.body.student_id - the ID of the student enrolled in the section
+ * @param {number} req.body.section_id - the ID of the section the student is enrolled in
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if enrolment does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const deleteEnrolment = async (req, res, next) => {
+    res.send("Not implemented");
+};
+
 module.exports = {
     createEnrolment,
 };

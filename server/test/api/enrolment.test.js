@@ -12,14 +12,18 @@ const {
     createUser,
     cleanUpDatabase,
     verifyPostRequestResponseWithAuth,
+    verifyDeleteRequestResponse,
 } = require("../utils/helpers");
 
 describe("enrolment routes tests", () => {
     let user1;
     let school1;
     let course1;
+    let course2;
     let section1;
+    let section2;
     let student1;
+    let enrolment1;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
@@ -29,7 +33,9 @@ describe("enrolment routes tests", () => {
         school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
         subject1 = await createSubject(db, school1.school_id, "CPSC");
         course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");
+        course2 = await createCourse(db, subject1.subject_id, "121", "Models of Computation");
         section1 = await createSection(db, course1.course_id, "001", "2023W1");
+        section2 = await createSection(db, course2.course_id, "001", "2023W1");
         student1 = await createStudent(
             db,
             user1.user_id,
@@ -42,6 +48,7 @@ describe("enrolment routes tests", () => {
             "www.tylerwon.com/profile_photo.jpg",
             "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
         );
+        enrolment1 = await createEnrolment(db, student1.student_id, section2.section_id);
     });
 
     afterAll(async () => {
@@ -97,6 +104,40 @@ describe("enrolment routes tests", () => {
         });
 
         test("POST - should return error message when request is unauthenticated", async () => {
+            await verifyPostRequestResponseWithAuth(app, `/enrolments`, undefined, payload, 401, {
+                message: "unauthorized",
+            });
+        });
+    });
+
+    describe("/enrolments/{student_id}/{section_id}", () => {
+        test("DELETE - should delete an enrolment", async () => {
+            await verifyDeleteRequestResponse(
+                app,
+                `/enrolments/${enrolment1.student_id}/${enrolment1.section_id}`,
+                user1.token,
+                200,
+                {
+                    message: "enrolment deleted",
+                }
+            );
+        });
+
+        test("DELETE - should not delete an enrolment when enrolment does not exist", async () => {
+            await verifyDeleteRequestResponse(
+                app,
+                `/enrolments/${enrolment1.student_id + 100}/${enrolment1.section_id}`,
+                user1.token,
+                400,
+                {
+                    message: `enrolment with student id '${enrolment1.student_id + 100}' and section id '${
+                        enrolment1.section_id
+                    }' does not exist`,
+                }
+            );
+        });
+
+        test("DELETE - should return error message when request is unauthenticated", async () => {
             await verifyPostRequestResponseWithAuth(app, `/enrolments`, undefined, payload, 401, {
                 message: "unauthorized",
             });
