@@ -145,14 +145,14 @@ describe("interest routes tests", () => {
             });
 
             test("PUT - should not update an interest when missing some body parameters", async () => {
-                delete payload.interest_name;
+                delete payload.student_id;
 
                 await verifyPutRequestResponse(app, `/interests/${interest2.interest_id}`, user1.token, payload, 400, [
                     {
                         type: "field",
                         location: "body",
-                        path: "interest_name",
-                        msg: "interest_name is required",
+                        path: "student_id",
+                        msg: "student_id is required",
                     },
                 ]);
             });
@@ -182,6 +182,14 @@ describe("interest routes tests", () => {
                         message: `interest with id '${interest2.interest_id + 100}' does not exist`,
                     }
                 );
+            });
+
+            test("PUT - should return error message when the student does not exist", async () => {
+                payload.student_id = student1.student_id + 100;
+
+                await verifyPutRequestResponse(app, `/interests/${interest2.interest_id}`, user1.token, payload, 400, {
+                    message: `student with id '${payload.student_id}' does not exist`,
+                });
             });
 
             test("PUT - should return error message when request is unauthenticated", async () => {

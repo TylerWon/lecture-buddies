@@ -88,6 +88,21 @@ const queries = {
             VALUES ($1, $2)
             RETURNING *
         `,
+        getInterest: `
+            SELECT *
+            FROM interests
+            WHERE interest_id = $1
+        `,
+        deleteInterest: `
+            DELETE FROM interests
+            WHERE interest_id = $1
+        `,
+        updateInterest: `
+            UPDATE interests
+            SET student_id = $1, interest_name = $2
+            WHERE interest_id = $3
+            RETURNING *
+        `,
     },
     messages: {
         createMessage: `

@@ -123,7 +123,7 @@ const updateFriendshipValidationSchema = () =>
     );
 
 // Interests
-const createInterestValidationSchema = () =>
+const createUpdateInterestValidationSchema = () =>
     checkSchema(
         {
             student_id: {
@@ -443,7 +443,7 @@ module.exports = {
     createEnrolmentValidationSchema,
     createFriendshipValidationSchema,
     updateFriendshipValidationSchema,
-    createInterestValidationSchema,
+    createUpdateInterestValidationSchema,
     createMessageValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
