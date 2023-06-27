@@ -13,5 +13,13 @@ router.post(
     authMiddleware.authenticateRequest,
     interestController.createInterest
 );
+router.delete("/:interest_id(\\d+)", authMiddleware.authenticateRequest, interestController.deleteInterest);
+router.put(
+    "/:interest_id(\\d+)",
+    // validationSchemas.updateInterestValidationSchema(),
+    validationMiddleware.validateRequest,
+    authMiddleware.authenticateRequest,
+    interestController.updateInterest
+);
 
 module.exports = router;

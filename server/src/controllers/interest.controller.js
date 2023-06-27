@@ -32,6 +32,37 @@ const createInterest = async (req, res, next) => {
     }
 };
 
+/**
+ * Deletes an interest
+ *
+ * @param {number} req.params.interest_id - the interest's ID
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if interest does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const deleteInterest = async (req, res, next) => {
+    res.send("Not implemented");
+};
+
+/**
+ * Updates an interest
+ *
+ * @param {number} req.params.interest_id - the interest's ID
+ * @param {string} req.body.interest_name - the interest's new name
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if interest does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const updateInterest = async (req, res, next) => {
+    res.send("Not implemented");
+};
+
 module.exports = {
     createInterest,
+    deleteInterest,
+    updateInterest,
 };
