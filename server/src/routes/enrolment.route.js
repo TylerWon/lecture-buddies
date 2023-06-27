@@ -13,5 +13,10 @@ router.post(
     authMiddleware.authenticateRequest,
     enrolmentController.createEnrolment
 );
+router.delete(
+    "/:student_id(\\d+)/:section_id(\\d+)",
+    authMiddleware.authenticateRequest,
+    enrolmentController.deleteEnrolment
+);
 
 module.exports = router;

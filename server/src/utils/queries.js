@@ -59,6 +59,10 @@ const queries = {
             FROM enrolments
             WHERE student_id = $1 AND section_id = $2
         `,
+        deleteEnrolment: `
+            DELETE FROM enrolments
+            WHERE student_id = $1 AND section_id = $2
+        `,
     },
     friendships: {
         getFriendship: `

@@ -138,9 +138,15 @@ describe("enrolment routes tests", () => {
         });
 
         test("DELETE - should return error message when request is unauthenticated", async () => {
-            await verifyPostRequestResponseWithAuth(app, `/enrolments`, undefined, payload, 401, {
-                message: "unauthorized",
-            });
+            await verifyDeleteRequestResponse(
+                app,
+                `/enrolments/${enrolment1.student_id}/${enrolment1.section_id}`,
+                undefined,
+                401,
+                {
+                    message: "unauthorized",
+                }
+            );
         });
     });
 });
