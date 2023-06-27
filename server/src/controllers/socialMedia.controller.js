@@ -36,6 +36,39 @@ const createSocialMedia = async (req, res, next) => {
     }
 };
 
+/**
+ * Deletes a social media
+ *
+ * @param {number} req.params.social_media_id - the social media's ID
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if social media does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const deleteSocialMedia = async (req, res, next) => {
+    res.send("Not implemented");
+};
+
+/**
+ * Updates a social media
+ *
+ * @param {number} req.params.social_media_id - the social media's ID
+ * @param {number} req.body.student_id - the new ID of the student that the social media belongs to
+ * @param {string} req.body.social_media_platform - the new social media platform
+ * @param {string} req.body.social_media_url - the new URL of the student's profile on the platform
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if social media or student does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const updateSocialMedia = async (req, res, next) => {
+    res.send("Not implemented");
+};
+
 module.exports = {
     createSocialMedia,
+    deleteSocialMedia,
+    updateSocialMedia,
 };

@@ -13,5 +13,13 @@ router.post(
     authMiddleware.authenticateRequest,
     socialMediaController.createSocialMedia
 );
+router.delete("/:social_media_id(\\d+)", authMiddleware.authenticateRequest, socialMediaController.deleteSocialMedia);
+router.put(
+    "/:social_media_id(\\d+)",
+    // validationSchemas.createUpdateSocialMediaValidationSchema(),
+    validationMiddleware.validateRequest,
+    authMiddleware.authenticateRequest,
+    socialMediaController.updateSocialMedia
+);
 
 module.exports = router;
