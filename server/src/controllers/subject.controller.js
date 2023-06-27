@@ -23,7 +23,7 @@ const getCoursesForSubject = async (req, res, next) => {
     // Get courses
     try {
         const courses = await db.any(queries.subjects.getCoursesForSubject, [subjectId]);
-        return res.json(courses);
+        return res.status(200).json(courses);
     } catch (err) {
         return next(err); // unexpected error
     }

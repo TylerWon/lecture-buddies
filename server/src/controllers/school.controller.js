@@ -11,7 +11,7 @@ const queries = require("../utils/queries");
 const getSchools = async (req, res, next) => {
     try {
         const schools = await db.any(queries.schools.getSchools);
-        return res.json(schools);
+        return res.status(200).json(schools);
     } catch (err) {
         return next(err); // unexpected error
     }
@@ -40,7 +40,7 @@ const getSubjectsForSchool = async (req, res, next) => {
     // Get subjects
     try {
         const subjects = await db.any(queries.schools.getSubjectsForSchool, [schoolId]);
-        return res.json(subjects);
+        return res.status(200).json(subjects);
     } catch (err) {
         return next(err); // unexpected error
     }

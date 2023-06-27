@@ -92,7 +92,7 @@ const getMessagesForConversation = async (req, res, next) => {
         // Paginate messages
         messages = messages.slice(offset, offset + limit);
 
-        return res.json(messages);
+        return res.status(200).json(messages);
     } catch (err) {
         return next(err); // unexpected error
     }

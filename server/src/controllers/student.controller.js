@@ -166,7 +166,7 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
         // Get friendship status for each classmate
         await getFriendshipStatusForStudents(studentId, classmates);
 
-        return res.json(classmates);
+        return res.status(200).json(classmates);
     } catch (err) {
         return next(err); // unexpected error
     }
@@ -220,7 +220,7 @@ const getConversationsForStudent = async (req, res, next) => {
         // Paginate conversations
         conversations = conversations.slice(offset, offset + limit);
 
-        return res.json(conversations);
+        return res.status(200).json(conversations);
     } catch (err) {
         console.log(err);
         return next(err); // unexpected error
@@ -262,7 +262,7 @@ const getCourseHistoryForStudent = async (req, res, next) => {
                 break;
         }
 
-        return res.json(courseHistory);
+        return res.status(200).json(courseHistory);
     } catch (err) {
         return next(err); // unexpected error
     }
@@ -348,7 +348,7 @@ const getFriendsForStudent = async (req, res, next) => {
             );
         }
 
-        return res.json(friends);
+        return res.status(200).json(friends);
     } catch (err) {
         return next(err); // unexpected error
     }
@@ -375,7 +375,7 @@ const getInterestsForStudent = async (req, res, next) => {
     // Get interests
     try {
         const interests = await db.any(queries.students.getInterestsForStudent, [studentId]);
-        return res.json(interests);
+        return res.status(200).json(interests);
     } catch (err) {
         return next(err); // unexpected error
     }
@@ -402,7 +402,7 @@ const getSocialMediasForStudent = async (req, res, next) => {
     // Get social medias
     try {
         const socialMedias = await db.any(queries.students.getSocialMediasForStudent, [studentId]);
-        return res.json(socialMedias);
+        return res.status(200).json(socialMedias);
     } catch (err) {
         return next(err); // unexpected error
     }
@@ -429,7 +429,7 @@ const getStudent = async (req, res, next) => {
     // Get student
     try {
         const student = await db.one(queries.students.getStudent, [studentId]);
-        return res.json(student);
+        return res.status(200).json(student);
     } catch (err) {
         return next(err); // unexpected error
     }
@@ -482,7 +482,7 @@ const updateStudent = async (req, res, next) => {
             payload.bio,
             studentId,
         ]);
-        return res.json(student);
+        return res.status(200).json(student);
     } catch (err) {
         return next(err); // unexpected error
     }

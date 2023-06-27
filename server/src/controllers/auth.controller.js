@@ -63,7 +63,7 @@ const login = passport.authenticate("local");
  * @returns 200 OK
  */
 const afterLogin = (req, res, next) => {
-    return res.json({
+    return res.status(200).json({
         token: req.user.token,
     });
 };
@@ -81,7 +81,7 @@ const logout = (req, res, next) => {
             return next(err);
         }
 
-        return res.json({ message: "logout successful" });
+        return res.status(200).json({ message: "logout successful" });
     });
 };
 
@@ -130,7 +130,7 @@ const signup = async (req, res, next) => {
             return next(err);
         }
 
-        return res.json({ token: user.token });
+        return res.status(200).json({ token: user.token });
     });
 };
 
