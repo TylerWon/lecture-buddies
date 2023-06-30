@@ -262,6 +262,11 @@ const queries = {
             FROM users 
             WHERE username = $1
         `,
+        getUserByToken: `
+            SELECT *
+            FROM users
+            WHERE token = $1
+        `,
         createUser: `
             INSERT INTO users (username, password, salt, token) 
             VALUES ($1, $2, $3, $4) 
