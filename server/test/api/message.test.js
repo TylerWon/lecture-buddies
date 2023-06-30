@@ -75,7 +75,10 @@ describe("message routes tests", () => {
         });
 
         test("POST - should create a message", async () => {
-            const response = await request(app).post("/messages").auth(user1.token, { type: "bearer" }).send(payload);
+            const response = await request(app)
+                .post("/messages")
+                .auth(user1.access_token, { type: "bearer" })
+                .send(payload);
             expect(response.statusCode).toEqual(201);
             expect(response.body.conversation_id).toEqual(payload.conversation_id);
             expect(response.body.author_id).toEqual(payload.author_id);
@@ -85,7 +88,7 @@ describe("message routes tests", () => {
         test("POST - should not create a message when missing some body parameters", async () => {
             delete payload.author_id;
 
-            await verifyPostRequestResponseWithAuth(app, "/messages", user1.token, payload, 400, [
+            await verifyPostRequestResponseWithAuth(app, "/messages", user1.access_token, payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -98,7 +101,7 @@ describe("message routes tests", () => {
         test("POST - should not create a message when some body parameters are the wrong type", async () => {
             payload.message_content = 1;
 
-            await verifyPostRequestResponseWithAuth(app, "/messages", user1.token, payload, 400, [
+            await verifyPostRequestResponseWithAuth(app, "/messages", user1.access_token, payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -112,7 +115,7 @@ describe("message routes tests", () => {
         test("POST - should not create a message when conversation does not exist", async () => {
             payload.conversation_id = conversation1.conversation_id + 100;
 
-            await verifyPostRequestResponseWithAuth(app, "/messages", user1.token, payload, 400, {
+            await verifyPostRequestResponseWithAuth(app, "/messages", user1.access_token, payload, 400, {
                 message: `conversation with id '${payload.conversation_id}' does not exist`,
             });
         });
@@ -120,7 +123,7 @@ describe("message routes tests", () => {
         test("POST - should not create a message when student does not exist", async () => {
             payload.author_id = student1.student_id + 100;
 
-            await verifyPostRequestResponseWithAuth(app, "/messages", user1.token, payload, 400, {
+            await verifyPostRequestResponseWithAuth(app, "/messages", user1.access_token, payload, 400, {
                 message: `student with id '${payload.author_id}' does not exist`,
             });
         });

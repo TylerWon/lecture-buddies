@@ -207,9 +207,9 @@ const createStudent = async (db, userId, schoolId, firstName, lastName, year, fa
 const createUser = async (db, username, password) => {
     const salt = crypto.randomBytes(16);
     const hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
-    const token = jwt.sign({ username: username }, process.env.JWT_SECRET);
+    const accessToken = jwt.sign({ username: username }, process.env.JWT_SECRET);
 
-    return await db.one(queries.users.createUser, [username, hashedPassword, salt, token]);
+    return await db.one(queries.users.createUser, [username, hashedPassword, salt, accessToken]);
 };
 
 /**
@@ -231,14 +231,14 @@ const updateFriendship = async (db, requestor_id, requestee_id, friendshipStatus
  *
  * @param {object} app - the express app
  * @param {string} endpoint - the endpoint to send the DELETE request to
- * @param {string} token - the token to send with the DELETE request
+ * @param {string} accessToken - the access token to send with the DELETE request
  * @param {number} expectedStatusCode - the expected status code of the response
  * @param {any} expectedBody - the expected body of the response
  *
  * @returns {object} the response
  */
-const verifyDeleteRequestResponse = async (app, endpoint, token, expectedStatusCode, expectedBody) => {
-    const response = await request(app).delete(endpoint).auth(token, { type: "bearer" });
+const verifyDeleteRequestResponse = async (app, endpoint, accessToken, expectedStatusCode, expectedBody) => {
+    const response = await request(app).delete(endpoint).auth(accessToken, { type: "bearer" });
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
     return response;
@@ -249,14 +249,14 @@ const verifyDeleteRequestResponse = async (app, endpoint, token, expectedStatusC
  *
  * @param {object} app - the express app
  * @param {string} endpoint - the endpoint to send the GET request to
- * @param {string} token - the token to send with the GET request
+ * @param {string} accessToken - the access token to send with the GET request
  * @param {number} expectedStatusCode - the expected status code of the response
  * @param {any} expectedBody - the expected body of the response
  *
  * @returns {object} the response
  */
-const verifyGetRequestResponse = async (app, endpoint, token, expectedStatusCode, expectedBody) => {
-    const response = await request(app).get(endpoint).auth(token, { type: "bearer" });
+const verifyGetRequestResponse = async (app, endpoint, accessToken, expectedStatusCode, expectedBody) => {
+    const response = await request(app).get(endpoint).auth(accessToken, { type: "bearer" });
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
     return response;
@@ -267,15 +267,22 @@ const verifyGetRequestResponse = async (app, endpoint, token, expectedStatusCode
  *
  * @param {object} app - the express app
  * @param {string} endpoint - the endpoint to send the POST request to
- * @param {string} token - the token to send with the POST request
+ * @param {string} accessToken - the access token to send with the POST request
  * @param {any} payload - the payload to send with the POST request
  * @param {number} expectedStatusCode - the expected status code of the response
  * @param {any} expectedBody - the expected body of the response
  *
  * @returns {object} the response
  */
-const verifyPostRequestResponseWithAuth = async (app, endpoint, token, payload, expectedStatusCode, expectedBody) => {
-    const response = await request(app).post(endpoint).auth(token, { type: "bearer" }).send(payload);
+const verifyPostRequestResponseWithAuth = async (
+    app,
+    endpoint,
+    accessToken,
+    payload,
+    expectedStatusCode,
+    expectedBody
+) => {
+    const response = await request(app).post(endpoint).auth(accessToken, { type: "bearer" }).send(payload);
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
     return response;
@@ -304,15 +311,15 @@ const verifyPostRequestResponseWithoutAuth = async (app, endpoint, payload, expe
  *
  * @param {object} app - the express app
  * @param {string} endpoint - the endpoint to send the PUT request to
- * @param {string} token - the token to send with the POST request
+ * @param {string} accessToken - the access token to send with the POST request
  * @param {any} payload - the payload to send with the PUT request
  * @param {number} expectedStatusCode - the expected status code of the response
  * @param {any} expectedBody - the expected body of the response
  *
  * @returns {object} the response
  */
-const verifyPutRequestResponse = async (app, endpoint, token, payload, expectedStatusCode, expectedBody) => {
-    const response = await request(app).put(endpoint).auth(token, { type: "bearer" }).send(payload);
+const verifyPutRequestResponse = async (app, endpoint, accessToken, payload, expectedStatusCode, expectedBody) => {
+    const response = await request(app).put(endpoint).auth(accessToken, { type: "bearer" }).send(payload);
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
     return response;

@@ -61,7 +61,7 @@ describe("social media routes tests", () => {
         test("POST - should create a social media", async () => {
             const response = await request(app)
                 .post("/social-medias")
-                .auth(user1.token, { type: "bearer" })
+                .auth(user1.access_token, { type: "bearer" })
                 .send(payload);
             expect(response.statusCode).toEqual(201);
             expect(response.body.student_id).toEqual(payload.student_id);
@@ -72,7 +72,7 @@ describe("social media routes tests", () => {
         test("POST - should not create a social media when missing some body parameters", async () => {
             delete payload.social_media_platform;
 
-            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, [
+            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.access_token, payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -85,7 +85,7 @@ describe("social media routes tests", () => {
         test("POST - should not create a social media when some body parameters are the wrong type", async () => {
             payload.social_media_url = false;
 
-            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, [
+            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.access_token, payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -99,7 +99,7 @@ describe("social media routes tests", () => {
         test("POST - should not create a social media when student does not exist", async () => {
             payload.student_id = student1.student_id + 100;
 
-            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, {
+            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.access_token, payload, 400, {
                 message: `student with id '${payload.student_id}' does not exist`,
             });
         });
@@ -107,7 +107,7 @@ describe("social media routes tests", () => {
         test("POST - should not create a social media when the social_media_platform body parameter is not a valid option", async () => {
             payload.social_media_platform = "Youtube";
 
-            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.token, payload, 400, [
+            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.access_token, payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -131,7 +131,7 @@ describe("social media routes tests", () => {
                 await verifyDeleteRequestResponse(
                     app,
                     `/social-medias/${socialMedia1.social_media_id}`,
-                    user1.token,
+                    user1.access_token,
                     200,
                     {
                         message: "social media deleted",
@@ -143,7 +143,7 @@ describe("social media routes tests", () => {
                 await verifyDeleteRequestResponse(
                     app,
                     `/social-medias/${socialMedia1.social_media_id + 100}`,
-                    user1.token,
+                    user1.access_token,
                     400,
                     {
                         message: `social media with id '${socialMedia1.social_media_id + 100}' does not exist`,
@@ -179,7 +179,7 @@ describe("social media routes tests", () => {
                 await verifyPutRequestResponse(
                     app,
                     `/social-medias/${socialMedia2.social_media_id}`,
-                    user1.token,
+                    user1.access_token,
                     payload,
                     200,
                     {
@@ -195,7 +195,7 @@ describe("social media routes tests", () => {
                 await verifyPutRequestResponse(
                     app,
                     `/social-medias/${socialMedia2.social_media_id}`,
-                    user1.token,
+                    user1.access_token,
                     payload,
                     400,
                     [
@@ -215,7 +215,7 @@ describe("social media routes tests", () => {
                 await verifyPutRequestResponse(
                     app,
                     `/social-medias/${socialMedia2.social_media_id}`,
-                    user1.token,
+                    user1.access_token,
                     payload,
                     400,
                     [
@@ -234,7 +234,7 @@ describe("social media routes tests", () => {
                 await verifyPutRequestResponse(
                     app,
                     `/social-medias/${socialMedia2.social_media_id + 100}`,
-                    user1.token,
+                    user1.access_token,
                     payload,
                     400,
                     {
@@ -249,7 +249,7 @@ describe("social media routes tests", () => {
                 await verifyPutRequestResponse(
                     app,
                     `/social-medias/${socialMedia2.social_media_id}`,
-                    user1.token,
+                    user1.access_token,
                     payload,
                     400,
                     {

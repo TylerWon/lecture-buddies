@@ -67,7 +67,7 @@ describe("friendship routes tests", () => {
         });
 
         test("POST - should create a friendship", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.token, payload, 201, {
+            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 201, {
                 ...payload,
                 friendship_status: "pending",
             });
@@ -76,7 +76,7 @@ describe("friendship routes tests", () => {
         test("POST - should not create a friendship when missing some body parameters", async () => {
             delete payload.requestor_id;
 
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.token, payload, 400, [
+            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -89,7 +89,7 @@ describe("friendship routes tests", () => {
         test("POST - should not create a friendship when some body parameters are the wrong type", async () => {
             payload.requestee_id = "-1";
 
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.token, payload, 400, [
+            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -103,13 +103,13 @@ describe("friendship routes tests", () => {
         test("POST - should not create a friendship when a student does not exist", async () => {
             payload.requestor_id = payload.requestor_id + 100;
 
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.token, payload, 400, {
+            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 400, {
                 message: `student with id '${payload.requestor_id}' does not exist`,
             });
         });
 
         test("POST - should not create a friendship when friendship already exists", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.token, payload, 400, {
+            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 400, {
                 message: `friendship already exists between students with ids '${payload.requestor_id}' and '${payload.requestee_id}'`,
             });
         });
@@ -134,7 +134,7 @@ describe("friendship routes tests", () => {
             await verifyPutRequestResponse(
                 app,
                 `/friendships/${student1.student_id}/${student2.student_id}`,
-                user1.token,
+                user1.access_token,
                 payload,
                 200,
                 {
@@ -151,7 +151,7 @@ describe("friendship routes tests", () => {
             await verifyPutRequestResponse(
                 app,
                 `/friendships/${student1.student_id}/${student2.student_id}`,
-                user1.token,
+                user1.access_token,
                 payload,
                 400,
                 [
@@ -171,7 +171,7 @@ describe("friendship routes tests", () => {
             await verifyPutRequestResponse(
                 app,
                 `/friendships/${student1.student_id}/${student2.student_id}`,
-                user1.token,
+                user1.access_token,
                 payload,
                 400,
                 [
@@ -190,7 +190,7 @@ describe("friendship routes tests", () => {
             await verifyPutRequestResponse(
                 app,
                 `/friendships/${student1.student_id + 100}/${student2.student_id}`,
-                user1.token,
+                user1.access_token,
                 payload,
                 400,
                 {

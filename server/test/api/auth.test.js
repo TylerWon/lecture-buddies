@@ -38,7 +38,7 @@ describe("auth routes tests", () => {
 
         test("POST - should log a user in", async () => {
             await verifyPostRequestResponseWithoutAuth(app, "/auth/login", payload, 200, {
-                token: user1.token,
+                access_token: user1.access_token,
             });
         });
 
@@ -88,7 +88,7 @@ describe("auth routes tests", () => {
 
     describe("/auth/logout", () => {
         test("POST - should log a user out", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/auth/logout", user1.token, undefined, 200, {
+            await verifyPostRequestResponseWithAuth(app, "/auth/logout", user1.access_token, undefined, 200, {
                 message: "logout successful",
             });
         });

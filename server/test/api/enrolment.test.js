@@ -67,13 +67,13 @@ describe("enrolment routes tests", () => {
         });
 
         test("POST - should create an enrolment", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 201, payload);
+            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.access_token, payload, 201, payload);
         });
 
         test("POST - should not create an enrolment when missing some body parameters", async () => {
             delete payload.student_id;
 
-            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, [
+            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.access_token, payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -86,7 +86,7 @@ describe("enrolment routes tests", () => {
         test("POST - should not create an enrolment when some body parameters are the wrong type", async () => {
             payload.section_id = "-1";
 
-            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, [
+            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.access_token, payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -98,7 +98,7 @@ describe("enrolment routes tests", () => {
         });
 
         test("POST - should not create an enrolment when the student is already enrolled in the section", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.token, payload, 400, {
+            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.access_token, payload, 400, {
                 message: `student with id '${payload.student_id}' is already enrolled in section with id '${payload.section_id}'`,
             });
         });
@@ -115,7 +115,7 @@ describe("enrolment routes tests", () => {
             await verifyDeleteRequestResponse(
                 app,
                 `/enrolments/${enrolment1.student_id}/${enrolment1.section_id}`,
-                user1.token,
+                user1.access_token,
                 200,
                 {
                     message: "enrolment deleted",
@@ -127,7 +127,7 @@ describe("enrolment routes tests", () => {
             await verifyDeleteRequestResponse(
                 app,
                 `/enrolments/${enrolment1.student_id + 100}/${enrolment1.section_id}`,
-                user1.token,
+                user1.access_token,
                 400,
                 {
                     message: `enrolment with student id '${enrolment1.student_id + 100}' and section id '${

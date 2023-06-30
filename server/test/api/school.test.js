@@ -29,7 +29,7 @@ describe("school routes tests", () => {
 
     describe("/schools", () => {
         test("GET - should return all schools", async () => {
-            await verifyGetRequestResponse(app, "/schools", user1.token, 200, [school1]);
+            await verifyGetRequestResponse(app, "/schools", user1.access_token, 200, [school1]);
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {
@@ -41,13 +41,21 @@ describe("school routes tests", () => {
 
     describe("/schools/{school_id}/subjects", () => {
         test("GET - should return the subjects for a school", async () => {
-            await verifyGetRequestResponse(app, `/schools/${school1.school_id}/subjects`, user1.token, 200, [subject1]);
+            await verifyGetRequestResponse(app, `/schools/${school1.school_id}/subjects`, user1.access_token, 200, [
+                subject1,
+            ]);
         });
 
         test("GET - should return error message when the school_id path parameter does not correspond to a school", async () => {
-            await verifyGetRequestResponse(app, `/schools/${school1.school_id + 100}/subjects`, user1.token, 400, {
-                message: `school with id '${school1.school_id + 100}' does not exist`,
-            });
+            await verifyGetRequestResponse(
+                app,
+                `/schools/${school1.school_id + 100}/subjects`,
+                user1.access_token,
+                400,
+                {
+                    message: `school with id '${school1.school_id + 100}' does not exist`,
+                }
+            );
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {

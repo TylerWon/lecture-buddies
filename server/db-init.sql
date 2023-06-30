@@ -51,7 +51,7 @@ CREATE TABLE users (
 	username VARCHAR(254) UNIQUE,
 	password BYTEA,
 	salt BYTEA,
-	token VARCHAR(250)
+	access_token VARCHAR(250)
 );
 
 CREATE TABLE students (

@@ -37,7 +37,7 @@ passport.use(
 // Passport user serializer and deserializer for sessions
 passport.serializeUser((user, cb) => {
     process.nextTick(() => {
-        return cb(null, { token: user.token });
+        return cb(null, user);
     });
 });
 
@@ -64,7 +64,7 @@ const login = passport.authenticate("local");
  */
 const afterLogin = (req, res, next) => {
     return res.status(200).json({
-        token: req.user.token,
+        access_token: req.user.access_token,
     });
 };
 
@@ -97,7 +97,7 @@ const logout = (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const signup = async (req, res, next) => {
-    let token, hashedPassword, user;
+    let accessToken, hashedPassword, user;
     const username = req.body.username;
     const password = req.body.password;
     const salt = crypto.randomBytes(16);
@@ -109,17 +109,17 @@ const signup = async (req, res, next) => {
         return res.status(400).json({ message: "an account with that username already exists" });
     }
 
-    // Create hashed password and token
+    // Create hashed password and access token
     try {
         hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
-        token = jwt.sign({ user_id: user.user_id, username: user.username }, process.env.JWT_SECRET);
+        accessToken = jwt.sign({ user_id: user.user_id, username: user.username }, process.env.JWT_SECRET);
     } catch (err) {
-        return next(err); // error when computing hashed password or token
+        return next(err); // error when computing hashed password or access token
     }
 
-    // Update user with hashed password, salt, and token
+    // Update user with hashed password, salt, and access token
     try {
-        user = await db.one(queries.users.updateUser, [user.username, hashedPassword, salt, token, user.user_id]);
+        user = await db.one(queries.users.updateUser, [user.username, hashedPassword, salt, accessToken, user.user_id]);
     } catch (err) {
         return next(err); // error when updating user
     }
@@ -130,7 +130,7 @@ const signup = async (req, res, next) => {
             return next(err);
         }
 
-        return res.status(200).json({ token: user.token });
+        return res.status(200).json({ access_token: user.access_token });
     });
 };
 

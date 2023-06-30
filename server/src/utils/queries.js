@@ -262,19 +262,19 @@ const queries = {
             FROM users 
             WHERE username = $1
         `,
-        getUserByToken: `
+        getUserByAccessToken: `
             SELECT *
             FROM users
-            WHERE token = $1
+            WHERE access_token = $1
         `,
         createUser: `
-            INSERT INTO users (username, password, salt, token) 
+            INSERT INTO users (username, password, salt, access_token) 
             VALUES ($1, $2, $3, $4) 
             RETURNING *
         `,
         updateUser: `
             UPDATE users
-            SET username = $1, password = $2, salt = $3, token = $4
+            SET username = $1, password = $2, salt = $3, access_token = $4
             WHERE user_id = $5
             RETURNING *
         `,
