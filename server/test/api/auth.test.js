@@ -37,9 +37,12 @@ describe("auth routes tests", () => {
         });
 
         test("POST - should log a user in", async () => {
-            await verifyPostRequestResponseWithoutAuth(app, "/auth/login", payload, 200, {
+            const response = await request(app).post("/auth/login").send(payload);
+            expect(response.statusCode).toEqual(200);
+            expect(response.body).toEqual({
                 access_token: user1.access_token,
             });
+            expect(response.headers["set-cookie"]).toHaveLength(1);
         });
 
         test("POST - should not log a user in when missing some body parameters", async () => {
@@ -88,9 +91,15 @@ describe("auth routes tests", () => {
 
     describe("/auth/logout", () => {
         test("POST - should log a user out", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/auth/logout", user1.access_token, undefined, 200, {
+            const response = await request(app)
+                .post("/auth/logout")
+                .auth(user1.access_token, { type: "bearer" })
+                .send(undefined);
+            expect(response.statusCode).toEqual(200);
+            expect(response.body).toEqual({
                 message: "logout successful",
             });
+            expect(response.headers["set-cookie"]).toHaveLength(1);
         });
 
         test("POST - should not log a user out when request is unauthenticated", async () => {
@@ -110,9 +119,13 @@ describe("auth routes tests", () => {
         test("POST - should sign a user up", async () => {
             let response = await request(app).post("/auth/signup").send(payload);
             expect(response.statusCode).toEqual(200);
+            expect(response.body.access_token).toBeDefined();
+            expect(response.headers["set-cookie"]).toHaveLength(1);
 
             response = await request(app).post("/auth/login").send(payload);
             expect(response.statusCode).toEqual(200);
+            expect(response.body.access_token).toBeDefined();
+            expect(response.headers["set-cookie"]).toHaveLength(1);
         });
 
         test("POST - should not sign a user up when missing some body parameters", async () => {
