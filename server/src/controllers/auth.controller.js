@@ -34,13 +34,14 @@ passport.use(
     })
 );
 
-// Passport user serializer and deserializer for sessions
+// Passport serializer - serializes user data in req.user into session store
 passport.serializeUser((user, cb) => {
     process.nextTick(() => {
-        return cb(null, user);
+        return cb(null, { user_id: user.user_id, username: user.username, access_token: user.access_token });
     });
 });
 
+// Passport deserializer - deserializes user data from session store into req.user
 passport.deserializeUser((user, cb) => {
     process.nextTick(() => {
         return cb(null, user);
@@ -49,6 +50,9 @@ passport.deserializeUser((user, cb) => {
 
 /**
  * Logs a user in
+ *
+ * @param {string} req.body.username - The user's email
+ * @param {string} req.body.password - The user's password
  *
  * @returns
  * - 401 Unauthorized if login unsuccessful
@@ -78,7 +82,7 @@ const afterLogin = (req, res, next) => {
 const logout = (req, res, next) => {
     req.logout((err) => {
         if (err) {
-            return next(err);
+            return next(err); // unexpected error
         }
 
         return res.status(200).json({ message: "logout successful" });
@@ -114,20 +118,20 @@ const signup = async (req, res, next) => {
         hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
         accessToken = jwt.sign({ user_id: user.user_id, username: user.username }, process.env.JWT_SECRET);
     } catch (err) {
-        return next(err); // error when computing hashed password or access token
+        return next(err); // unexpected error
     }
 
     // Update user with hashed password, salt, and access token
     try {
         user = await db.one(queries.users.updateUser, [user.username, hashedPassword, salt, accessToken, user.user_id]);
     } catch (err) {
-        return next(err); // error when updating user
+        return next(err); // unexpected error
     }
 
     // Login user
     req.login(user, (err) => {
         if (err) {
-            return next(err);
+            return next(err); // unexpected error
         }
 
         return res.status(200).json({ access_token: user.access_token });
