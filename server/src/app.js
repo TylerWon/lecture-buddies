@@ -20,6 +20,7 @@ const subjectRouter = require("./routes/subject.route");
 const studentRouter = require("./routes/student.route");
 
 const app = express();
+const PROD = process.env.NODE_ENV === "production";
 
 // Middleware
 // logs requests
@@ -39,6 +40,11 @@ app.use(
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
+        cookie: {
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            httpOnly: true,
+            secure: PROD,
+        },
     })
 );
 app.use(passport.session());
