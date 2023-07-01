@@ -6,7 +6,13 @@ const jwt = require("jsonwebtoken");
 const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
-// Passport strategy for authentication with username and password
+/**
+ * Passport strategy for authentication with username and password. Verifies that the provided username and password
+ * are correct
+ *
+ * If authentication successful, creates a session for the user and calls the next middleware function in the stack
+ * If authentication unsuccessful, returns a 401 Unauthorized response
+ */
 passport.use(
     new LocalStrategy(async (username, password, cb) => {
         let hashedPassword;
@@ -49,7 +55,7 @@ passport.deserializeUser((user, cb) => {
 });
 
 /**
- * Logs a user in
+ * Logs a user in. Uses the local Passport strategy
  *
  * @param {string} req.body.username - The user's email
  * @param {string} req.body.password - The user's password
@@ -62,7 +68,7 @@ passport.deserializeUser((user, cb) => {
 const login = passport.authenticate("local");
 
 /**
- * Runs after a successful login. Sends information about the user who just logged in
+ * Runs after a successful login. Sends the access token of user who just logged in
  *
  * @returns 200 OK
  */
@@ -73,13 +79,14 @@ const afterLogin = (req, res, next) => {
 };
 
 /**
- * Logs a user out
+ * Logs a user out. Removes the session for the user
  *
  * @returns
  * - 200 OK if logout successful
  * - 500 Internal Server Error if unexpected error
  */
 const logout = (req, res, next) => {
+    // Remove session for the user
     req.logout((err) => {
         if (err) {
             return next(err); // unexpected error
@@ -90,7 +97,7 @@ const logout = (req, res, next) => {
 };
 
 /**
- * Registers a user
+ * Registers a user. Creates a user and a session for the user
  *
  * @param {string} req.body.username - The user's email
  * @param {string} req.body.password - The user's password
@@ -128,7 +135,7 @@ const signup = async (req, res, next) => {
         return next(err); // unexpected error
     }
 
-    // Login user
+    // Create session for the user
     req.login(user, (err) => {
         if (err) {
             return next(err); // unexpected error
