@@ -1,3 +1,6 @@
+const request = require("supertest");
+const session = require("supertest-session");
+
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
@@ -5,11 +8,14 @@ const {
     createStudent,
     createUser,
     cleanUpDatabase,
-    verifyPostRequestResponseWithAuth,
+    loginUser,
+    verifyPostRequestResponse,
     verifyPutRequestResponse,
 } = require("../utils/helpers");
 
 describe("friendship routes tests", () => {
+    const testSession = session(app);
+
     let user1;
     let user2;
     let school1;
@@ -49,6 +55,8 @@ describe("friendship routes tests", () => {
             "www.connorwon.com/profile_photo.jpg",
             "Hello. I'm Connor. I'm a 3rd year computer science student at UBC."
         );
+
+        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
@@ -67,7 +75,7 @@ describe("friendship routes tests", () => {
         });
 
         test("POST - should create a friendship", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 201, {
+            await verifyPostRequestResponse(testSession, "/friendships", payload, 201, {
                 ...payload,
                 friendship_status: "pending",
             });
@@ -76,7 +84,7 @@ describe("friendship routes tests", () => {
         test("POST - should not create a friendship when missing some body parameters", async () => {
             delete payload.requestor_id;
 
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 400, [
+            await verifyPostRequestResponse(testSession, "/friendships", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -89,7 +97,7 @@ describe("friendship routes tests", () => {
         test("POST - should not create a friendship when some body parameters are the wrong type", async () => {
             payload.requestee_id = "-1";
 
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 400, [
+            await verifyPostRequestResponse(testSession, "/friendships", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -103,20 +111,20 @@ describe("friendship routes tests", () => {
         test("POST - should not create a friendship when a student does not exist", async () => {
             payload.requestor_id = payload.requestor_id + 100;
 
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 400, {
+            await verifyPostRequestResponse(testSession, "/friendships", payload, 400, {
                 message: `student with id '${payload.requestor_id}' does not exist`,
             });
         });
 
         test("POST - should not create a friendship when friendship already exists", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/friendships", user1.access_token, payload, 400, {
+            await verifyPostRequestResponse(testSession, "/friendships", payload, 400, {
                 message: `friendship already exists between students with ids '${payload.requestor_id}' and '${payload.requestee_id}'`,
             });
         });
 
         test("POST - should return error message when request is unauthenticated", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/friendships", undefined, payload, 401, {
-                message: "unauthorized",
+            await verifyPostRequestResponse(request(app), "/friendships", payload, 401, {
+                message: "unauthenticated",
             });
         });
     });
@@ -132,9 +140,8 @@ describe("friendship routes tests", () => {
 
         test("PUT - should update a friendship", async () => {
             await verifyPutRequestResponse(
-                app,
+                testSession,
                 `/friendships/${student1.student_id}/${student2.student_id}`,
-                user1.access_token,
                 payload,
                 200,
                 {
@@ -149,9 +156,8 @@ describe("friendship routes tests", () => {
             delete payload.friendship_status;
 
             await verifyPutRequestResponse(
-                app,
+                testSession,
                 `/friendships/${student1.student_id}/${student2.student_id}`,
-                user1.access_token,
                 payload,
                 400,
                 [
@@ -169,9 +175,8 @@ describe("friendship routes tests", () => {
             payload.friendship_status = false;
 
             await verifyPutRequestResponse(
-                app,
+                testSession,
                 `/friendships/${student1.student_id}/${student2.student_id}`,
-                user1.access_token,
                 payload,
                 400,
                 [
@@ -188,9 +193,8 @@ describe("friendship routes tests", () => {
 
         test("PUT - should not update a friendship when friendship does not exist", async () => {
             await verifyPutRequestResponse(
-                app,
+                testSession,
                 `/friendships/${student1.student_id + 100}/${student2.student_id}`,
-                user1.access_token,
                 payload,
                 400,
                 {
@@ -203,13 +207,12 @@ describe("friendship routes tests", () => {
 
         test("PUT - should return error message when request is unauthenticated", async () => {
             await verifyPutRequestResponse(
-                app,
+                request(app),
                 `/friendships/${student1.student_id}/${student2.student_id}`,
-                undefined,
                 payload,
                 401,
                 {
-                    message: "unauthorized",
+                    message: "unauthenticated",
                 }
             );
         });

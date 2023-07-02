@@ -43,7 +43,7 @@ passport.use(
 // Passport serializer - serializes user data in req.user into session store
 passport.serializeUser((user, cb) => {
     process.nextTick(() => {
-        return cb(null, { user_id: user.user_id, username: user.username, access_token: user.access_token });
+        return cb(null, { user_id: user.user_id, username: user.username });
     });
 });
 
@@ -110,31 +110,23 @@ const logout = (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const signup = async (req, res, next) => {
-    let accessToken, hashedPassword, user;
+    let hashedPassword, user;
     const username = req.body.username;
     const password = req.body.password;
     const salt = crypto.randomBytes(16);
 
-    // Create user with just username
-    try {
-        user = await db.one(queries.users.createUser, [username, null, null, null]);
-    } catch (err) {
-        return res.status(400).json({ message: "an account with that username already exists" });
-    }
-
-    // Create hashed password and access token
+    // Create hashed password
     try {
         hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
-        accessToken = jwt.sign({ user_id: user.user_id, username: user.username }, process.env.JWT_SECRET);
     } catch (err) {
         return next(err); // unexpected error
     }
 
-    // Update user with hashed password, salt, and access token
+    // Create user
     try {
-        user = await db.one(queries.users.updateUser, [user.username, hashedPassword, salt, accessToken, user.user_id]);
+        user = await db.one(queries.users.createUser, [username, hashedPassword, salt]);
     } catch (err) {
-        return next(err); // unexpected error
+        return res.status(400).json({ message: "an account with that username already exists" });
     }
 
     // Create session for the user

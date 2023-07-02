@@ -1,16 +1,22 @@
+const request = require("supertest");
+const session = require("supertest-session");
+
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
+    cleanUpDatabase,
     createCourse,
     createSchool,
     createSection,
     createSubject,
     createUser,
-    cleanUpDatabase,
+    loginUser,
     verifyGetRequestResponse,
 } = require("../utils/helpers");
 
 describe("course routes tests", () => {
+    const testSession = session(app);
+
     let user1;
     let school1;
     let course1;
@@ -25,6 +31,8 @@ describe("course routes tests", () => {
         subject1 = await createSubject(db, school1.school_id, "CPSC");
         course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");
         section1 = await createSection(db, course1.course_id, "001", "2023W1");
+
+        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
@@ -34,26 +42,18 @@ describe("course routes tests", () => {
 
     describe("/courses/{course_id}/sections", () => {
         test("GET - should return the sections for a course", async () => {
-            await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, user1.access_token, 200, [
-                section1,
-            ]);
+            await verifyGetRequestResponse(testSession, `/courses/${course1.course_id}/sections`, 200, [section1]);
         });
 
         test("GET - should return error message when the course_id path parameter does not correspond to a course", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/courses/${course1.course_id + 100}/sections`,
-                user1.access_token,
-                400,
-                {
-                    message: `course with id ${course1.course_id + 100} does not exist`,
-                }
-            );
+            await verifyGetRequestResponse(testSession, `/courses/${course1.course_id + 100}/sections`, 400, {
+                message: `course with id ${course1.course_id + 100} does not exist`,
+            });
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {
-            await verifyGetRequestResponse(app, `/courses/${course1.course_id}/sections`, undefined, 401, {
-                message: "unauthorized",
+            await verifyGetRequestResponse(request(app), `/courses/${course1.course_id}/sections`, 401, {
+                message: "unauthenticated",
             });
         });
     });

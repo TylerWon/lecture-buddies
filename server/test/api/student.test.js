@@ -1,3 +1,6 @@
+const request = require("supertest");
+const session = require("supertest-session");
+
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
@@ -15,13 +18,16 @@ const {
     createStudent,
     createUser,
     cleanUpDatabase,
+    loginUser,
     verifyGetRequestResponse,
-    verifyPostRequestResponseWithAuth,
+    verifyPostRequestResponse,
     updateFriendship,
     verifyPutRequestResponse,
 } = require("../utils/helpers");
 
 describe("student routes tests", () => {
+    const testSession = session(app);
+
     let user1;
     let user2;
     let user3;
@@ -171,6 +177,8 @@ describe("student routes tests", () => {
             student1.student_id,
             "This is message 1 in conversation 2"
         );
+
+        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
@@ -196,14 +204,14 @@ describe("student routes tests", () => {
         });
 
         test("POST - should create a student", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/students", user1.access_token, payload, 201, payload);
+            await verifyPostRequestResponse(testSession, "/students", payload, 201, payload);
         });
 
         test("POST - should not create a student when missing some body parameters", async () => {
             delete payload.last_name;
             delete payload.profile_photo_url;
 
-            await verifyPostRequestResponseWithAuth(app, "/students", user1.access_token, payload, 400, [
+            await verifyPostRequestResponse(testSession, "/students", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -223,7 +231,7 @@ describe("student routes tests", () => {
             payload.first_name = true;
             payload.year = 4;
 
-            await verifyPostRequestResponseWithAuth(app, "/students", user1.access_token, payload, 400, [
+            await verifyPostRequestResponse(testSession, "/students", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -244,7 +252,7 @@ describe("student routes tests", () => {
         test("POST - should not create a student when user does not exist", async () => {
             payload.student_id = user4.user_id + 100;
 
-            await verifyPostRequestResponseWithAuth(app, "/students", user1.access_token, payload, 400, {
+            await verifyPostRequestResponse(testSession, "/students", payload, 400, {
                 message: `user with id '${payload.student_id}' does not exist`,
             });
         });
@@ -252,7 +260,7 @@ describe("student routes tests", () => {
         test("POST - should not create a student when school does not exist", async () => {
             payload.school_id = school1.school_id + 100;
 
-            await verifyPostRequestResponseWithAuth(app, "/students", user1.access_token, payload, 400, {
+            await verifyPostRequestResponse(testSession, "/students", payload, 400, {
                 message: `school with id '${payload.school_id}' does not exist`,
             });
         });
@@ -260,14 +268,14 @@ describe("student routes tests", () => {
         test("POST - should not create a student when user is already associated with another student", async () => {
             payload.user_id = user1.user_id;
 
-            await verifyPostRequestResponseWithAuth(app, "/students", user1.access_token, payload, 400, {
+            await verifyPostRequestResponse(testSession, "/students", payload, 400, {
                 message: `user with id '${payload.user_id}' is already associated with another student`,
             });
         });
 
         test("POST - should not create a student when request is unauthenticated", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/students", undefined, payload, 401, {
-                message: "unauthorized",
+            await verifyPostRequestResponse(request(app), "/students", payload, 401, {
+                message: "unauthenticated",
             });
         });
     });
@@ -275,18 +283,18 @@ describe("student routes tests", () => {
     describe("/students/{student_id}", () => {
         describe("GET", () => {
             test("GET - should return a student", async () => {
-                await verifyGetRequestResponse(app, `/students/${student1.student_id}`, user1.access_token, 200, student1);
+                await verifyGetRequestResponse(testSession, `/students/${student1.student_id}`, 200, student1);
             });
 
             test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
-                await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}`, user1.access_token, 400, {
+                await verifyGetRequestResponse(testSession, `/students/${student1.student_id + 100}`, 400, {
                     message: `student with id '${student1.student_id + 100}' does not exist`,
                 });
             });
 
             test("GET - should return error message when request is unauthenticated", async () => {
-                await verifyGetRequestResponse(app, `/students/${student1.student_id}`, undefined, 401, {
-                    message: "unauthorized",
+                await verifyGetRequestResponse(request(app), `/students/${student1.student_id}`, 401, {
+                    message: "unauthenticated",
                 });
             });
         });
@@ -303,7 +311,7 @@ describe("student routes tests", () => {
                 payload.first_name = "John";
                 payload.major = "Mathematics";
 
-                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, user1.access_token, payload, 200, {
+                await verifyPutRequestResponse(testSession, `/students/${student5.student_id}`, payload, 200, {
                     ...payload,
                     student_id: student5.student_id,
                 });
@@ -313,7 +321,7 @@ describe("student routes tests", () => {
                 delete payload.school_id;
                 delete payload.bio;
 
-                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, user1.access_token, payload, 400, [
+                await verifyPutRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, [
                     {
                         type: "field",
                         location: "body",
@@ -333,7 +341,7 @@ describe("student routes tests", () => {
                 payload.faculty = 1;
                 payload.profile_photo_url = false;
 
-                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, user1.access_token, payload, 400, [
+                await verifyPutRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, [
                     {
                         type: "field",
                         location: "body",
@@ -352,29 +360,22 @@ describe("student routes tests", () => {
             });
 
             test("PUT - should return error message when the student_id path parameter does not correspond to a student", async () => {
-                await verifyPutRequestResponse(
-                    app,
-                    `/students/${student5.student_id + 100}`,
-                    user1.access_token,
-                    payload,
-                    400,
-                    {
-                        message: `student with id '${student5.student_id + 100}' does not exist`,
-                    }
-                );
+                await verifyPutRequestResponse(testSession, `/students/${student5.student_id + 100}`, payload, 400, {
+                    message: `student with id '${student5.student_id + 100}' does not exist`,
+                });
             });
 
             test("PUT - should not update a student when school does not exist", async () => {
                 payload.school_id = school1.school_id + 100;
 
-                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, user1.access_token, payload, 400, {
+                await verifyPutRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, {
                     message: `school with id '${payload.school_id}' does not exist`,
                 });
             });
 
             test("PUT - should not update a student when request is unauthenticated", async () => {
-                await verifyPutRequestResponse(app, `/students/${student5.student_id}`, undefined, payload, 401, {
-                    message: "unauthorized",
+                await verifyPutRequestResponse(request(app), `/students/${student5.student_id}`, payload, 401, {
+                    message: "unauthenticated",
                 });
             });
         });
@@ -432,9 +433,8 @@ describe("student routes tests", () => {
                 classmateDetails2.friendship_status = friendship2.friendship_status;
 
                 await verifyGetRequestResponse(
-                    app,
+                    testSession,
                     `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=2`,
-                    user1.access_token,
                     200,
                     [classmateDetails2, classmateDetails1]
                 );
@@ -475,9 +475,8 @@ describe("student routes tests", () => {
                 classmateDetails2.previous_mutual_courses = [courseDetails1];
 
                 await verifyGetRequestResponse(
-                    app,
+                    testSession,
                     `/students/${student1.student_id}/friends?status=accepted&order_by=name&offset=0&limit=2`,
-                    user1.access_token,
                     200,
                     [classmateDetails2, classmateDetails1]
                 );
@@ -494,9 +493,8 @@ describe("student routes tests", () => {
                 classmateDetails2.friendship_status = friendship2.friendship_status;
 
                 await verifyGetRequestResponse(
-                    app,
+                    testSession,
                     `/students/${student1.student_id}/friends?status=declined&order_by=name&offset=0&limit=2`,
-                    user1.access_token,
                     200,
                     [classmateDetails2, classmateDetails1]
                 );
@@ -505,9 +503,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the friends for a student (order by name)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails2, classmateDetails1]
             );
@@ -515,9 +512,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the friends for a student (order by -name)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=-name&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails1, classmateDetails2]
             );
@@ -525,9 +521,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the friends for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=1&limit=1`,
-                user1.access_token,
                 200,
                 [classmateDetails1]
             );
@@ -535,9 +530,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the friends for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=10`,
-                user1.access_token,
                 200,
                 [classmateDetails2, classmateDetails1]
             );
@@ -545,9 +539,8 @@ describe("student routes tests", () => {
 
         test("GET - should return nothing when offset >= total number of results", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=2&limit=2`,
-                user1.access_token,
                 200,
                 []
             );
@@ -555,9 +548,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id + 100}/friends?status=pending&order_by=name&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 { message: `student with id '${student1.student_id + 100}' does not exist` }
             );
@@ -565,9 +557,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the status query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?order_by=name&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -582,9 +573,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the order_by query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -599,9 +589,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the offset query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=name&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -616,9 +605,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the limit query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -635,9 +623,8 @@ describe("student routes tests", () => {
             const status = "invalid";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=${status}&order_by=name&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -655,9 +642,8 @@ describe("student routes tests", () => {
             const orderBy = "num_mutual_courses";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=${orderBy}&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -675,9 +661,8 @@ describe("student routes tests", () => {
             const offset = "-1";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=${offset}&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -695,9 +680,8 @@ describe("student routes tests", () => {
             const limit = "-1";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=${limit}`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -713,12 +697,11 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when request is unauthenticated", async () => {
             await verifyGetRequestResponse(
-                app,
+                request(app),
                 `/students/${student1.student_id}/friends?status=pending&order_by=name&offset=0&limit=2`,
-                undefined,
                 401,
                 {
-                    message: "unauthorized",
+                    message: "unauthenticated",
                 }
             );
         });
@@ -749,9 +732,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the conversation history for a student (order by date)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [conversationDetails1, conversationDetails2]
             );
@@ -759,9 +741,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the conversation history for a student (order by -date)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=-date&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [conversationDetails2, conversationDetails1]
             );
@@ -769,9 +750,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the conversation history for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=1&limit=1`,
-                user1.access_token,
                 200,
                 [conversationDetails2]
             );
@@ -779,9 +759,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the conversation history for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=10`,
-                user1.access_token,
                 200,
                 [conversationDetails1, conversationDetails2]
             );
@@ -789,9 +768,8 @@ describe("student routes tests", () => {
 
         test("GET - should return nothing when offset >= total number of results", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=2&limit=2`,
-                user1.access_token,
                 200,
                 []
             );
@@ -799,9 +777,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id + 100}/conversations?order_by=date&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 {
                     message: `student with id '${student1.student_id + 100}' does not exist`,
@@ -811,9 +788,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the order_by query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?offset=0&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -828,9 +804,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the offset query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -845,9 +820,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the limit query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=0`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -864,9 +838,8 @@ describe("student routes tests", () => {
             const orderBy = "conversation_name";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=${orderBy}&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -884,9 +857,8 @@ describe("student routes tests", () => {
             const offset = "-1";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=${offset}&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -904,9 +876,8 @@ describe("student routes tests", () => {
             const limit = "-1";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=${limit}`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -922,12 +893,11 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when request is unauthenticated", async () => {
             await verifyGetRequestResponse(
-                app,
+                request(app),
                 `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=2`,
-                undefined,
                 401,
                 {
-                    message: "unauthorized",
+                    message: "unauthenticated",
                 }
             );
         });
@@ -978,9 +948,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the course history for a student (order by name)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/course-history?order_by=name`,
-                user1.access_token,
                 200,
                 [courseDetails1, courseDetails2, courseDetails3]
             );
@@ -988,9 +957,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the course history for a student (order by -name)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/course-history?order_by=-name`,
-                user1.access_token,
                 200,
                 [courseDetails3, courseDetails2, courseDetails1]
             );
@@ -998,9 +966,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id + 100}/course-history?order_by=-name`,
-                user1.access_token,
                 400,
                 {
                     message: `student with id '${student1.student_id + 100}' does not exist`,
@@ -1009,7 +976,7 @@ describe("student routes tests", () => {
         });
 
         test("GET - should return error message when missing the order_by query parameter", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id}/course-history`, user1.access_token, 400, [
+            await verifyGetRequestResponse(testSession, `/students/${student1.student_id}/course-history`, 400, [
                 {
                     type: "field",
                     location: "query",
@@ -1023,9 +990,8 @@ describe("student routes tests", () => {
             const orderBy = "-term";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/course-history?order_by=${orderBy}`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -1041,12 +1007,11 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when request is unauthenticated", async () => {
             await verifyGetRequestResponse(
-                app,
+                request(app),
                 `/students/${student1.student_id}/course-history?order_by=-name`,
-                undefined,
                 401,
                 {
-                    message: "unauthorized",
+                    message: "unauthenticated",
                 }
             );
         });
@@ -1054,20 +1019,18 @@ describe("student routes tests", () => {
 
     describe("/students/{student_id}/interests", () => {
         test("GET - should return the interests for a student", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id}/interests`, user1.access_token, 200, [
-                interest1,
-            ]);
+            await verifyGetRequestResponse(testSession, `/students/${student1.student_id}/interests`, 200, [interest1]);
         });
 
         test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id + 100}/interests`, user1.access_token, 400, {
+            await verifyGetRequestResponse(testSession, `/students/${student1.student_id + 100}/interests`, 400, {
                 message: `student with id '${student1.student_id + 100}' does not exist`,
             });
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id}/interests`, undefined, 401, {
-                message: "unauthorized",
+            await verifyGetRequestResponse(request(app), `/students/${student1.student_id}/interests`, 401, {
+                message: "unauthenticated",
             });
         });
     });
@@ -1122,9 +1085,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (order by num_mutual_courses)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails2, classmateDetails1]
             );
@@ -1132,9 +1094,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (order by -num_mutual_courses)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=-num_mutual_courses&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails1, classmateDetails2]
             );
@@ -1142,9 +1103,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (order by name)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=name&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails2, classmateDetails1]
             );
@@ -1152,9 +1112,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (order by -name)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=-name&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails1, classmateDetails2]
             );
@@ -1162,9 +1121,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (order by year)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=year&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails1, classmateDetails2]
             );
@@ -1172,9 +1130,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (order by -year)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=-year&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails2, classmateDetails1]
             );
@@ -1182,9 +1139,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (order by major)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=major&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails2, classmateDetails1]
             );
@@ -1192,9 +1148,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (order by -major)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=-major&offset=0&limit=2`,
-                user1.access_token,
                 200,
                 [classmateDetails1, classmateDetails2]
             );
@@ -1202,9 +1157,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=1&limit=1`,
-                user1.access_token,
                 200,
                 [classmateDetails1]
             );
@@ -1212,9 +1166,8 @@ describe("student routes tests", () => {
 
         test("GET - should return the classmates for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=10`,
-                user1.access_token,
                 200,
                 [classmateDetails2, classmateDetails1]
             );
@@ -1222,9 +1175,8 @@ describe("student routes tests", () => {
 
         test("GET - should return nothing when offset >= total number of results", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=2&limit=2`,
-                user1.access_token,
                 200,
                 []
             );
@@ -1232,11 +1184,10 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id + 100}/sections/${
                     section1.section_id
                 }/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 {
                     message: `student with id '${student1.student_id + 100}' does not exist`,
@@ -1246,11 +1197,10 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when the section_id path parameter does not correspond to a section", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${
                     section1.section_id + 100
                 }/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 {
                     message: `section with id '${section1.section_id + 100}' does not exist`,
@@ -1260,9 +1210,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when the student is not enrolled in the section", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section4.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 {
                     message: `student with id '${student1.student_id}' is not enrolled in section with id '${section4.section_id}'`,
@@ -1272,9 +1221,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the order_by query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -1289,9 +1237,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the offset query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -1306,9 +1253,8 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when missing the limit query parameter", async () => {
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -1325,9 +1271,8 @@ describe("student routes tests", () => {
             const orderBy = "faculty";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=${orderBy}&offset=0&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -1345,9 +1290,8 @@ describe("student routes tests", () => {
             const offset = "-1";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=${offset}&limit=2`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -1365,9 +1309,8 @@ describe("student routes tests", () => {
             const limit = "-1";
 
             await verifyGetRequestResponse(
-                app,
+                testSession,
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=${limit}`,
-                user1.access_token,
                 400,
                 [
                     {
@@ -1383,12 +1326,11 @@ describe("student routes tests", () => {
 
         test("GET - should return error message when request is unauthenticated", async () => {
             await verifyGetRequestResponse(
-                app,
+                request(app),
                 `/students/${student1.student_id}/sections/${section1.section_id}/classmates?order_by=num_mutual_courses&offset=0&limit=2`,
-                undefined,
                 401,
                 {
-                    message: "unauthorized",
+                    message: "unauthenticated",
                 }
             );
         });
@@ -1396,26 +1338,20 @@ describe("student routes tests", () => {
 
     describe("/students/{student_id}/social-medias", () => {
         test("GET - should return the social medias for a student", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id}/social-medias`, user1.access_token, 200, [
+            await verifyGetRequestResponse(testSession, `/students/${student1.student_id}/social-medias`, 200, [
                 socialMedia1,
             ]);
         });
 
         test("GET - should return error message when the student_id path parameter does not correspond to a student", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/students/${student1.student_id + 100}/social-medias`,
-                user1.access_token,
-                400,
-                {
-                    message: `student with id '${student1.student_id + 100}' does not exist`,
-                }
-            );
+            await verifyGetRequestResponse(testSession, `/students/${student1.student_id + 100}/social-medias`, 400, {
+                message: `student with id '${student1.student_id + 100}' does not exist`,
+            });
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {
-            await verifyGetRequestResponse(app, `/students/${student1.student_id}/social-medias`, undefined, 401, {
-                message: "unauthorized",
+            await verifyGetRequestResponse(request(app), `/students/${student1.student_id}/social-medias`, 401, {
+                message: "unauthenticated",
             });
         });
     });

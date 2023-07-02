@@ -97,8 +97,8 @@ const queries = {
     },
     users: {
         createUser: `
-            INSERT INTO users (username, password, salt, access_token) 
-            VALUES ($1, $2, $3, $4) 
+            INSERT INTO users (username, password, salt) 
+            VALUES ($1, $2, $3) 
             RETURNING *
         `,
     },

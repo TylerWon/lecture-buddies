@@ -1,4 +1,5 @@
 const request = require("supertest");
+const session = require("supertest-session");
 
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
@@ -8,12 +9,15 @@ const {
     createSocialMedia,
     createStudent,
     createUser,
+    loginUser,
     verifyDeleteRequestResponse,
-    verifyPostRequestResponseWithAuth,
+    verifyPostRequestResponse,
     verifyPutRequestResponse,
 } = require("../utils/helpers");
 
 describe("social media routes tests", () => {
+    const testSession = session(app);
+
     let user1;
     let school1;
     let student1;
@@ -40,6 +44,8 @@ describe("social media routes tests", () => {
         );
         socialMedia1 = await createSocialMedia(db, student1.student_id, "LinkedIn", "www.linkedin.com/tylerwon");
         socialMedia2 = await createSocialMedia(db, student1.student_id, "Instagram", "www.instagram.com/connorwon");
+
+        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
@@ -59,10 +65,7 @@ describe("social media routes tests", () => {
         });
 
         test("POST - should create a social media", async () => {
-            const response = await request(app)
-                .post("/social-medias")
-                .auth(user1.access_token, { type: "bearer" })
-                .send(payload);
+            const response = await testSession.post("/social-medias").send(payload);
             expect(response.statusCode).toEqual(201);
             expect(response.body.student_id).toEqual(payload.student_id);
             expect(response.body.social_media_platform).toEqual(payload.social_media_platform);
@@ -72,7 +75,7 @@ describe("social media routes tests", () => {
         test("POST - should not create a social media when missing some body parameters", async () => {
             delete payload.social_media_platform;
 
-            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.access_token, payload, 400, [
+            await verifyPostRequestResponse(testSession, "/social-medias", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -85,7 +88,7 @@ describe("social media routes tests", () => {
         test("POST - should not create a social media when some body parameters are the wrong type", async () => {
             payload.social_media_url = false;
 
-            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.access_token, payload, 400, [
+            await verifyPostRequestResponse(testSession, "/social-medias", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -99,7 +102,7 @@ describe("social media routes tests", () => {
         test("POST - should not create a social media when student does not exist", async () => {
             payload.student_id = student1.student_id + 100;
 
-            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.access_token, payload, 400, {
+            await verifyPostRequestResponse(testSession, "/social-medias", payload, 400, {
                 message: `student with id '${payload.student_id}' does not exist`,
             });
         });
@@ -107,7 +110,7 @@ describe("social media routes tests", () => {
         test("POST - should not create a social media when the social_media_platform body parameter is not a valid option", async () => {
             payload.social_media_platform = "Youtube";
 
-            await verifyPostRequestResponseWithAuth(app, "/social-medias", user1.access_token, payload, 400, [
+            await verifyPostRequestResponse(testSession, "/social-medias", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -119,8 +122,8 @@ describe("social media routes tests", () => {
         });
 
         test("POST - should return error message when request is unauthenticated", async () => {
-            await verifyPostRequestResponseWithAuth(app, `/social-medias`, undefined, payload, 401, {
-                message: "unauthorized",
+            await verifyPostRequestResponse(request(app), "/social-medias", payload, 401, {
+                message: "unauthenticated",
             });
         });
     });
@@ -128,22 +131,15 @@ describe("social media routes tests", () => {
     describe("/social-medias/{social_media_id}", () => {
         describe("DELETE", () => {
             test("DELETE - should delete a social media", async () => {
-                await verifyDeleteRequestResponse(
-                    app,
-                    `/social-medias/${socialMedia1.social_media_id}`,
-                    user1.access_token,
-                    200,
-                    {
-                        message: "social media deleted",
-                    }
-                );
+                await verifyDeleteRequestResponse(testSession, `/social-medias/${socialMedia1.social_media_id}`, 200, {
+                    message: "social media deleted",
+                });
             });
 
             test("DELETE - should not delete a social media when social media does not exist", async () => {
                 await verifyDeleteRequestResponse(
-                    app,
+                    testSession,
                     `/social-medias/${socialMedia1.social_media_id + 100}`,
-                    user1.access_token,
                     400,
                     {
                         message: `social media with id '${socialMedia1.social_media_id + 100}' does not exist`,
@@ -152,15 +148,9 @@ describe("social media routes tests", () => {
             });
 
             test("DELETE - should return error message when request is unauthenticated", async () => {
-                await verifyDeleteRequestResponse(
-                    app,
-                    `/social-medias/${socialMedia1.social_media_id}`,
-                    undefined,
-                    401,
-                    {
-                        message: "unauthorized",
-                    }
-                );
+                await verifyDeleteRequestResponse(request(app), `/social-medias/${socialMedia1.social_media_id}`, 401, {
+                    message: "unauthenticated",
+                });
             });
         });
 
@@ -177,9 +167,8 @@ describe("social media routes tests", () => {
                 payload.social_media_url = "www.twitter.com/connorwon";
 
                 await verifyPutRequestResponse(
-                    app,
+                    testSession,
                     `/social-medias/${socialMedia2.social_media_id}`,
-                    user1.access_token,
                     payload,
                     200,
                     {
@@ -193,9 +182,8 @@ describe("social media routes tests", () => {
                 delete payload.social_media_url;
 
                 await verifyPutRequestResponse(
-                    app,
+                    testSession,
                     `/social-medias/${socialMedia2.social_media_id}`,
-                    user1.access_token,
                     payload,
                     400,
                     [
@@ -213,9 +201,8 @@ describe("social media routes tests", () => {
                 payload.social_media_platform = "Youtube";
 
                 await verifyPutRequestResponse(
-                    app,
+                    testSession,
                     `/social-medias/${socialMedia2.social_media_id}`,
-                    user1.access_token,
                     payload,
                     400,
                     [
@@ -232,9 +219,8 @@ describe("social media routes tests", () => {
 
             test("PUT - should return error message when the social_media_id path parameter does not correspond to a social media", async () => {
                 await verifyPutRequestResponse(
-                    app,
+                    testSession,
                     `/social-medias/${socialMedia2.social_media_id + 100}`,
-                    user1.access_token,
                     payload,
                     400,
                     {
@@ -247,9 +233,8 @@ describe("social media routes tests", () => {
                 payload.student_id = student1.student_id + 100;
 
                 await verifyPutRequestResponse(
-                    app,
+                    testSession,
                     `/social-medias/${socialMedia2.social_media_id}`,
-                    user1.access_token,
                     payload,
                     400,
                     {
@@ -260,13 +245,12 @@ describe("social media routes tests", () => {
 
             test("PUT - should return error message when request is unauthenticated", async () => {
                 await verifyPutRequestResponse(
-                    app,
+                    request(app),
                     `/social-medias/${socialMedia2.social_media_id}`,
-                    undefined,
                     payload,
                     401,
                     {
-                        message: "unauthorized",
+                        message: "unauthenticated",
                     }
                 );
             });

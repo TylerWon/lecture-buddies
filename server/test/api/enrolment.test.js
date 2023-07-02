@@ -1,4 +1,5 @@
 const request = require("supertest");
+const session = require("supertest-session");
 
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
@@ -11,11 +12,14 @@ const {
     createStudent,
     createUser,
     cleanUpDatabase,
-    verifyPostRequestResponseWithAuth,
+    loginUser,
+    verifyPostRequestResponse,
     verifyDeleteRequestResponse,
 } = require("../utils/helpers");
 
 describe("enrolment routes tests", () => {
+    const testSession = session(app);
+
     let user1;
     let school1;
     let course1;
@@ -49,6 +53,8 @@ describe("enrolment routes tests", () => {
             "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
         );
         enrolment1 = await createEnrolment(db, student1.student_id, section2.section_id);
+
+        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
@@ -67,13 +73,13 @@ describe("enrolment routes tests", () => {
         });
 
         test("POST - should create an enrolment", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.access_token, payload, 201, payload);
+            await verifyPostRequestResponse(testSession, "/enrolments", payload, 201, payload);
         });
 
         test("POST - should not create an enrolment when missing some body parameters", async () => {
             delete payload.student_id;
 
-            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.access_token, payload, 400, [
+            await verifyPostRequestResponse(testSession, "/enrolments", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -86,7 +92,7 @@ describe("enrolment routes tests", () => {
         test("POST - should not create an enrolment when some body parameters are the wrong type", async () => {
             payload.section_id = "-1";
 
-            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.access_token, payload, 400, [
+            await verifyPostRequestResponse(testSession, "/enrolments", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -98,14 +104,14 @@ describe("enrolment routes tests", () => {
         });
 
         test("POST - should not create an enrolment when the student is already enrolled in the section", async () => {
-            await verifyPostRequestResponseWithAuth(app, "/enrolments", user1.access_token, payload, 400, {
+            await verifyPostRequestResponse(testSession, "/enrolments", payload, 400, {
                 message: `student with id '${payload.student_id}' is already enrolled in section with id '${payload.section_id}'`,
             });
         });
 
         test("POST - should return error message when request is unauthenticated", async () => {
-            await verifyPostRequestResponseWithAuth(app, `/enrolments`, undefined, payload, 401, {
-                message: "unauthorized",
+            await verifyPostRequestResponse(request(app), "/enrolments", payload, 401, {
+                message: "unauthenticated",
             });
         });
     });
@@ -113,9 +119,8 @@ describe("enrolment routes tests", () => {
     describe("/enrolments/{student_id}/{section_id}", () => {
         test("DELETE - should delete an enrolment", async () => {
             await verifyDeleteRequestResponse(
-                app,
+                testSession,
                 `/enrolments/${enrolment1.student_id}/${enrolment1.section_id}`,
-                user1.access_token,
                 200,
                 {
                     message: "enrolment deleted",
@@ -125,9 +130,8 @@ describe("enrolment routes tests", () => {
 
         test("DELETE - should not delete an enrolment when enrolment does not exist", async () => {
             await verifyDeleteRequestResponse(
-                app,
+                testSession,
                 `/enrolments/${enrolment1.student_id + 100}/${enrolment1.section_id}`,
-                user1.access_token,
                 400,
                 {
                     message: `enrolment with student id '${enrolment1.student_id + 100}' and section id '${
@@ -139,12 +143,11 @@ describe("enrolment routes tests", () => {
 
         test("DELETE - should return error message when request is unauthenticated", async () => {
             await verifyDeleteRequestResponse(
-                app,
+                request(app),
                 `/enrolments/${enrolment1.student_id}/${enrolment1.section_id}`,
-                undefined,
                 401,
                 {
-                    message: "unauthorized",
+                    message: "unauthenticated",
                 }
             );
         });

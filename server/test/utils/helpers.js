@@ -207,9 +207,19 @@ const createStudent = async (db, userId, schoolId, firstName, lastName, year, fa
 const createUser = async (db, username, password) => {
     const salt = crypto.randomBytes(16);
     const hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
-    const accessToken = jwt.sign({ username: username }, process.env.JWT_SECRET);
 
-    return await db.one(queries.users.createUser, [username, hashedPassword, salt, accessToken]);
+    return await db.one(queries.users.createUser, [username, hashedPassword, salt]);
+};
+
+/**
+ * Logs a user in
+ *
+ * @param {object} app - a supertest request
+ * @param {string} username - the user's username
+ * @param {string} password - the user's password
+ */
+const loginUser = async (request, username, password) => {
+    await request.post("/auth/login").send({ username: username, password: password });
 };
 
 /**
@@ -229,7 +239,7 @@ const updateFriendship = async (db, requestor_id, requestee_id, friendshipStatus
 /**
  * Checks that a DELETE request to an endpoint returns the expected status code and body
  *
- * @param {object} app - the express app
+ * @param {object} request - a supertest request
  * @param {string} endpoint - the endpoint to send the DELETE request to
  * @param {string} accessToken - the access token to send with the DELETE request
  * @param {number} expectedStatusCode - the expected status code of the response
@@ -237,61 +247,32 @@ const updateFriendship = async (db, requestor_id, requestee_id, friendshipStatus
  *
  * @returns {object} the response
  */
-const verifyDeleteRequestResponse = async (app, endpoint, accessToken, expectedStatusCode, expectedBody) => {
-    const response = await request(app).delete(endpoint).auth(accessToken, { type: "bearer" });
+const verifyDeleteRequestResponse = async (request, endpoint, expectedStatusCode, expectedBody) => {
+    const response = await request.delete(endpoint);
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
-    return response;
 };
 
 /**
  * Checks that a GET request to an endpoint returns the expected status code and body
  *
- * @param {object} app - the express app
+ * @param {object} request - a supertest request
  * @param {string} endpoint - the endpoint to send the GET request to
- * @param {string} accessToken - the access token to send with the GET request
  * @param {number} expectedStatusCode - the expected status code of the response
  * @param {any} expectedBody - the expected body of the response
  *
  * @returns {object} the response
  */
-const verifyGetRequestResponse = async (app, endpoint, accessToken, expectedStatusCode, expectedBody) => {
-    const response = await request(app).get(endpoint).auth(accessToken, { type: "bearer" });
+const verifyGetRequestResponse = async (request, endpoint, expectedStatusCode, expectedBody) => {
+    const response = await request.get(endpoint);
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
-    return response;
-};
-
-/**
- * Checks that a POST request to an endpoint that requires authentiation returns the expected status code and body
- *
- * @param {object} app - the express app
- * @param {string} endpoint - the endpoint to send the POST request to
- * @param {string} accessToken - the access token to send with the POST request
- * @param {any} payload - the payload to send with the POST request
- * @param {number} expectedStatusCode - the expected status code of the response
- * @param {any} expectedBody - the expected body of the response
- *
- * @returns {object} the response
- */
-const verifyPostRequestResponseWithAuth = async (
-    app,
-    endpoint,
-    accessToken,
-    payload,
-    expectedStatusCode,
-    expectedBody
-) => {
-    const response = await request(app).post(endpoint).auth(accessToken, { type: "bearer" }).send(payload);
-    expect(response.statusCode).toEqual(expectedStatusCode);
-    expect(response.body).toEqual(expectedBody);
-    return response;
 };
 
 /**
  * Checks that a POST request to an endpoint returns the expected status code and body
  *
- * @param {object} app - the express app
+ * @param {object} request - a supertest request
  * @param {string} endpoint - the endpoint to send the POST request to
  * @param {any} payload - the payload to send with the POST request
  * @param {number} expectedStatusCode - the expected status code of the response
@@ -299,30 +280,27 @@ const verifyPostRequestResponseWithAuth = async (
  *
  * @returns {object} the response
  */
-const verifyPostRequestResponseWithoutAuth = async (app, endpoint, payload, expectedStatusCode, expectedBody) => {
-    const response = await request(app).post(endpoint).send(payload);
+const verifyPostRequestResponse = async (request, endpoint, payload, expectedStatusCode, expectedBody) => {
+    const response = await request.post(endpoint).send(payload);
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
-    return response;
 };
 
 /**
  * Checks that a PUT request to an endpoint returns the expected status code and body
  *
- * @param {object} app - the express app
+ * @param {object} request - a supertest request
  * @param {string} endpoint - the endpoint to send the PUT request to
- * @param {string} accessToken - the access token to send with the POST request
  * @param {any} payload - the payload to send with the PUT request
  * @param {number} expectedStatusCode - the expected status code of the response
  * @param {any} expectedBody - the expected body of the response
  *
  * @returns {object} the response
  */
-const verifyPutRequestResponse = async (app, endpoint, accessToken, payload, expectedStatusCode, expectedBody) => {
-    const response = await request(app).put(endpoint).auth(accessToken, { type: "bearer" }).send(payload);
+const verifyPutRequestResponse = async (request, endpoint, payload, expectedStatusCode, expectedBody) => {
+    const response = await request.put(endpoint).send(payload);
     expect(response.statusCode).toEqual(expectedStatusCode);
     expect(response.body).toEqual(expectedBody);
-    return response;
 };
 
 module.exports = {
@@ -340,10 +318,10 @@ module.exports = {
     createSubject,
     createStudent,
     createUser,
+    loginUser,
     updateFriendship,
     verifyDeleteRequestResponse,
     verifyGetRequestResponse,
-    verifyPostRequestResponseWithAuth,
-    verifyPostRequestResponseWithoutAuth,
+    verifyPostRequestResponse,
     verifyPutRequestResponse,
 };

@@ -50,8 +50,7 @@ CREATE TABLE users (
 	user_id SERIAL PRIMARY KEY,
 	username VARCHAR(254) UNIQUE,
 	password BYTEA,
-	salt BYTEA,
-	access_token VARCHAR(250)
+	salt BYTEA
 );
 
 CREATE TABLE students (

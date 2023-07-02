@@ -1,3 +1,6 @@
+const request = require("supertest");
+const session = require("supertest-session");
+
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
@@ -5,10 +8,13 @@ const {
     createSubject,
     createUser,
     cleanUpDatabase,
+    loginUser,
     verifyGetRequestResponse,
 } = require("../utils/helpers");
 
 describe("school routes tests", () => {
+    const testSession = session(app);
+
     let user1;
     let school1;
     let subject1;
@@ -20,6 +26,8 @@ describe("school routes tests", () => {
         user1 = await createUser(db, user1Username, user1Password);
         school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
         subject1 = await createSubject(db, school1.school_id, "CPSC");
+
+        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
@@ -29,38 +37,30 @@ describe("school routes tests", () => {
 
     describe("/schools", () => {
         test("GET - should return all schools", async () => {
-            await verifyGetRequestResponse(app, "/schools", user1.access_token, 200, [school1]);
+            await verifyGetRequestResponse(testSession, "/schools", 200, [school1]);
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {
-            await verifyGetRequestResponse(app, "/schools", undefined, 401, {
-                message: "unauthorized",
+            await verifyGetRequestResponse(request(app), "/schools", 401, {
+                message: "unauthenticated",
             });
         });
     });
 
     describe("/schools/{school_id}/subjects", () => {
         test("GET - should return the subjects for a school", async () => {
-            await verifyGetRequestResponse(app, `/schools/${school1.school_id}/subjects`, user1.access_token, 200, [
-                subject1,
-            ]);
+            await verifyGetRequestResponse(testSession, `/schools/${school1.school_id}/subjects`, 200, [subject1]);
         });
 
         test("GET - should return error message when the school_id path parameter does not correspond to a school", async () => {
-            await verifyGetRequestResponse(
-                app,
-                `/schools/${school1.school_id + 100}/subjects`,
-                user1.access_token,
-                400,
-                {
-                    message: `school with id '${school1.school_id + 100}' does not exist`,
-                }
-            );
+            await verifyGetRequestResponse(testSession, `/schools/${school1.school_id + 100}/subjects`, 400, {
+                message: `school with id '${school1.school_id + 100}' does not exist`,
+            });
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {
-            await verifyGetRequestResponse(app, `/schools/${school1.school_id}/subjects`, undefined, 401, {
-                message: "unauthorized",
+            await verifyGetRequestResponse(request(app), `/schools/${school1.school_id}/subjects`, 401, {
+                message: "unauthenticated",
             });
         });
     });
