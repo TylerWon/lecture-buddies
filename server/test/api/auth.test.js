@@ -6,6 +6,8 @@ const db = require("../../src/configs/db.config");
 const { cleanUpDatabase, createUser, loginUser, verifyPostRequestResponse } = require("../utils/helpers");
 
 describe("auth routes tests", () => {
+    const testSession = session(app);
+
     let user1;
 
     const user1Username = "won.tyler1@gmail.com";
@@ -15,11 +17,27 @@ describe("auth routes tests", () => {
 
     beforeAll(async () => {
         user1 = await createUser(db, user1Username, user1Password);
+
+        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
         await cleanUpDatabase(db);
         await db.$pool.end();
+    });
+
+    describe("/auth/autologin", () => {
+        test("POST - should log a user in when the user's session is valid", async () => {
+            await verifyPostRequestResponse(testSession, "/auth/autologin", undefined, 200, {
+                user_id: user1.user_id,
+            });
+        });
+
+        test("POST - should not log a user in when the user's session is invalid", async () => {
+            await verifyPostRequestResponse(request(app), "/auth/autologin", undefined, 401, {
+                message: "unauthenticated",
+            });
+        });
     });
 
     describe("/auth/login", () => {
@@ -84,10 +102,6 @@ describe("auth routes tests", () => {
 
     describe("/auth/logout", () => {
         test("POST - should log a user out", async () => {
-            const testSession = session(app);
-
-            await loginUser(testSession, user1Username, user1Password);
-
             await verifyPostRequestResponse(testSession, "/auth/logout", undefined, 200, {
                 message: "logout successful",
             });

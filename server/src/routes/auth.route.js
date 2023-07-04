@@ -6,6 +6,7 @@ const authMiddleware = require("../middlewares/auth.middleware");
 const validationMiddleware = require("../middlewares/validation.middleware");
 const validationSchemas = require("../utils/validationSchemas");
 
+router.post("/autologin", authController.autoLogin);
 router.post(
     "/login",
     validationSchemas.authValidationSchema(),

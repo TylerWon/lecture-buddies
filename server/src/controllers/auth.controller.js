@@ -55,12 +55,29 @@ passport.deserializeUser((user, cb) => {
 });
 
 /**
- * Logs a user in. Uses the local Passport strategy
+ * Logs a user in using the user's session
+ *
+ * @returns
+ * - 200 OK if login successful
+ * - 401 Unauthorized if login unsuccessful
+ * - 500 Internal Server Error if unexpected error
+ */
+const autoLogin = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ message: "unauthenticated" });
+    }
+
+    return res.status(200).json({ user_id: req.user.user_id });
+};
+
+/**
+ * Logs a user in using the local Passport strategy
  *
  * @param {string} req.body.username - The user's email
  * @param {string} req.body.password - The user's password
  *
  * @returns
+ * - 200 OK if login successful
  * - 401 Unauthorized if login unsuccessful
  * - 500 Internal Server Error if unexpected error
  * - Otherwise, calls the next middleware function in the stack
@@ -68,7 +85,7 @@ passport.deserializeUser((user, cb) => {
 const login = passport.authenticate("local");
 
 /**
- * Runs after a successful login. Sends the access token of user who just logged in
+ * Runs after a successful login. Sends the user id of the user who just logged in
  *
  * @returns 200 OK
  */
@@ -81,7 +98,7 @@ const afterLogin = (req, res, next) => {
 };
 
 /**
- * Logs a user out. Removes the session for the user
+ * Logs a user out by destroying the user's session
  *
  * @returns
  * - 200 OK if logout successful
@@ -99,7 +116,7 @@ const logout = (req, res, next) => {
 };
 
 /**
- * Registers a user. Creates a user and a session for the user
+ * Registers a user by creating a user and a session for the user
  *
  * @param {string} req.body.username - The user's email
  * @param {string} req.body.password - The user's password
@@ -140,6 +157,7 @@ const signup = async (req, res, next) => {
 };
 
 module.exports = {
+    autoLogin,
     login,
     afterLogin,
     logout,
