@@ -6,6 +6,7 @@ const logger = require("morgan");
 const passport = require("passport");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
+const cors = require("cors");
 
 const authRouter = require("./routes/auth.route");
 const conversationRouter = require("./routes/conversation.route");
@@ -19,8 +20,11 @@ const socialMediaRouter = require("./routes/socialMedia.route");
 const subjectRouter = require("./routes/subject.route");
 const studentRouter = require("./routes/student.route");
 
-const app = express();
+const CLIENT_URL = process.env.CLIENT_URL;
+const SESSION_SECRET = process.env.SESSION_SECRET;
 const PROD = process.env.NODE_ENV === "production";
+
+const app = express();
 
 // Middleware
 // logs requests
@@ -37,7 +41,7 @@ app.use(
             pgPromise: db,
             createTableIfMissing: true,
         }),
-        secret: process.env.SESSION_SECRET,
+        secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: {
@@ -48,6 +52,9 @@ app.use(
     })
 );
 app.use(passport.session());
+
+// configure cors
+app.use(cors({ origin: CLIENT_URL, credentials: true }));
 
 // Routes
 app.use("/auth", authRouter);
