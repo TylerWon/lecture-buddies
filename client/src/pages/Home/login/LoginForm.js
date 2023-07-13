@@ -1,7 +1,9 @@
-import { Box, Button, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, Paper, Stack, TextField, Typography } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import * as yup from "yup";
 
 import { UserContext } from "../../../contexts/UserContext";
@@ -16,6 +18,8 @@ const validationSchema = yup.object({
 function LoginForm() {
     const { setLoggedIn, setUserId } = useContext(UserContext);
     const navigate = useNavigate();
+
+    const [showPassword, setShowPassword] = useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -73,7 +77,7 @@ function LoginForm() {
                 </Stack>
                 <Paper elevation={2} sx={{ width: { xs: "250px", sm: "300px", md: "400px" }, padding: "16px" }}>
                     <form onSubmit={formik.handleSubmit}>
-                        <Stack direction="column" spacing={1}>
+                        <Stack direction="column" spacing={2}>
                             <TextField
                                 fullWidth
                                 id="email"
@@ -89,11 +93,20 @@ function LoginForm() {
                                 id="password"
                                 name="password"
                                 label="Password"
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 value={formik.values.password}
                                 onChange={formik.handleChange}
                                 error={formik.touched.password && Boolean(formik.errors.password)}
                                 helperText={formik.touched.password && formik.errors.password}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                             <Button color="primary" variant="contained" fullWidth type="submit">
                                 Login
