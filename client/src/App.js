@@ -2,11 +2,14 @@ import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } 
 
 import Home from "./pages/Home";
 import Courses from "./pages/Courses";
+import NoAuth from "./components/NoAuth";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <>
-            <Route path="/" element={<Home />} />
+            <Route element={<NoAuth />}>
+                <Route path="/" element={<Home />} />
+            </Route>
             <Route path="/courses" element={<Courses />} />
         </>
     )
