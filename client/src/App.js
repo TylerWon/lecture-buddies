@@ -1,7 +1,8 @@
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom";
 
-import Home from "./pages/Home";
+import Auth from "./components/Auth";
 import Courses from "./pages/Courses";
+import Home from "./pages/Home";
 import NoAuth from "./components/NoAuth";
 
 const router = createBrowserRouter(
@@ -10,7 +11,9 @@ const router = createBrowserRouter(
             <Route element={<NoAuth />}>
                 <Route path="/" element={<Home />} />
             </Route>
-            <Route path="/courses" element={<Courses />} />
+            <Route element={<Auth />}>
+                <Route path="/courses" element={<Courses />} />
+            </Route>
         </>
     )
 );
