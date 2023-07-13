@@ -16,7 +16,7 @@ const validationSchema = yup.object({
 });
 
 function LoginForm() {
-    const { setLoggedIn, setUserId } = useContext(UserContext);
+    const { setIsLoggedIn, setUserId } = useContext(UserContext);
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
@@ -54,7 +54,7 @@ function LoginForm() {
                 return;
             }
 
-            setLoggedIn(true);
+            setIsLoggedIn(true);
             setUserId(response.userId);
 
             navigate("/courses");
