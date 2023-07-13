@@ -47,6 +47,7 @@ app.use(
         cookie: {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             httpOnly: true,
+            sameSite: "Lax",
             secure: PROD,
         },
     })
@@ -54,7 +55,12 @@ app.use(
 app.use(passport.session());
 
 // configure cors
-app.use(cors({ origin: CLIENT_URL, credentials: true }));
+app.use(
+    cors({
+        origin: CLIENT_URL,
+        credentials: true,
+    })
+);
 
 // Routes
 app.use("/auth", authRouter);
