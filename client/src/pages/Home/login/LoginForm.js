@@ -1,6 +1,10 @@
 import { Box, Button, Paper, Stack, TextField, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
+import { useContext } from "react";
 import * as yup from "yup";
+
+import { UserContext } from "../../../contexts/UserContext";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -10,8 +14,8 @@ const validationSchema = yup.object({
 });
 
 function LoginForm() {
-    // Handler for when the login form is submitted
-    const handleSubmit = async (values) => {};
+    const { setLoggedIn, setUserId } = useContext(UserContext);
+    const navigate = useNavigate();
 
     const formik = useFormik({
         initialValues: {
@@ -24,6 +28,37 @@ function LoginForm() {
         },
     });
 
+    // Handler for when the login form is submitted
+    const handleSubmit = async (values) => {
+        let response;
+
+        try {
+            response = await fetch(`${API_BASE_URL}/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: values.email,
+                    password: values.password,
+                }),
+                credentials: "include",
+            });
+
+            if (response.status !== 200) {
+                formik.setErrors({ email: "Invalid email or password", password: "Invalid email or password" });
+                return;
+            }
+
+            setLoggedIn(true);
+            setUserId(response.userId);
+
+            navigate("/courses");
+        } catch (err) {
+            console.log(err); // unexpected error
+        }
+    };
+
     return (
         <Box minHeight="400px" marginTop="200px" marginBottom="92px">
             <Stack
@@ -32,13 +67,13 @@ function LoginForm() {
                 alignItems="center"
                 spacing={{ xs: 5, md: 15, lg: 40 }}
             >
-                <Stack justifyContent="center" alignItems={{ xs: "center", md: "start" }}>
+                <Stack direction="column" justifyContent="center" alignItems={{ xs: "center", md: "start" }}>
                     <Typography variant="h1">Lecture Buddies</Typography>
                     <Typography variant="h6">Make new friends in your classes</Typography>
                 </Stack>
                 <Paper elevation={2} sx={{ width: { xs: "250px", sm: "300px", md: "400px" }, padding: "16px" }}>
                     <form onSubmit={formik.handleSubmit}>
-                        <Stack spacing={1}>
+                        <Stack direction="column" spacing={1}>
                             <TextField
                                 fullWidth
                                 id="email"
