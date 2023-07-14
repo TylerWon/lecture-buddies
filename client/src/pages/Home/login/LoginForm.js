@@ -34,10 +34,8 @@ function LoginForm() {
 
     // Handler for when the login form is submitted
     const handleSubmit = async (values) => {
-        let response;
-
         try {
-            response = await fetch(`${API_BASE_URL}/auth/login`, {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -54,8 +52,10 @@ function LoginForm() {
                 return;
             }
 
+            const data = await response.json();
+
             setIsLoggedIn(true);
-            setUserId(response.userId);
+            setUserId(data.userId);
 
             navigate("/courses");
         } catch (err) {
