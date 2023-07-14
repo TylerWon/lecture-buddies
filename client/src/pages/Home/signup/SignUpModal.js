@@ -1,6 +1,17 @@
-import { Box, Container, Dialog, Typography, useTheme } from "@mui/material";
+import {
+    Box,
+    Container,
+    Dialog,
+    Stack,
+    Step,
+    StepLabel,
+    Stepper,
+    Typography,
+    useTheme,
+    useMediaQuery,
+} from "@mui/material";
 import { useFormik } from "formik";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import * as yup from "yup";
 import YupPassword from "yup-password";
 
@@ -11,6 +22,7 @@ import AuthForm from "../../../components/forms/AuthForm";
 YupPassword(yup);
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const STEPS = ["General", "Education", "Personal"];
 
 const validationSchema = yup.object({
     email: yup.string().email("Invalid email address").required("Email is required"),
@@ -30,6 +42,8 @@ function SignUpModal(props) {
 
     const { setUserId } = useContext(UserContext);
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const [activeStep, setActiveStep] = useState(0);
 
     const formik = useFormik({
         initialValues: {
@@ -70,17 +84,27 @@ function SignUpModal(props) {
             const data = await response.json();
 
             setUserId(data.userId);
+            setActiveStep((prevActiveStep) => prevActiveStep + 1);
         } catch (err) {
             console.log(err); // unexpected error
         }
     };
 
     return (
-        <Dialog open={showSignUpModal} onClose={handleSignUpModalClose} fullWidth maxWidth="sm">
+        <Dialog open={showSignUpModal} onClose={handleSignUpModalClose} fullScreen={isMobile} fullWidth maxWidth="sm">
             <Box padding="20px" bgcolor={theme.palette.common.white}>
                 <Typography variant="h3">Sign up</Typography>
-                <Container maxWidth="xs" sx={{ marginTop: "35px" }}>
-                    <AuthForm formik={formik} submitButtonText="Sign up" />
+                <Container sx={{ marginTop: "35px" }}>
+                    <Stack direction="column" alignItems="center" spacing={2}>
+                        <Stepper activeStep={activeStep} alternativeLabel={isMobile} sx={{ width: "80%" }}>
+                            {STEPS.map((label) => (
+                                <Step key={label}>
+                                    <StepLabel>{label}</StepLabel>
+                                </Step>
+                            ))}
+                        </Stepper>
+                        <AuthForm formik={formik} submitButtonText="Sign up" />
+                    </Stack>
                 </Container>
             </Box>
         </Dialog>
