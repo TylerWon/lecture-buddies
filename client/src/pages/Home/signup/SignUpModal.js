@@ -17,6 +17,8 @@ import * as yup from "yup";
 import YupPassword from "yup-password";
 
 import SignUpStep1 from "./SignUpStep1";
+import SignUpStep2 from "./SignUpStep2";
+import SignUpStep3 from "./SignUpStep3";
 
 YupPassword(yup);
 
@@ -52,7 +54,9 @@ function SignUpModal(props) {
                                 </Step>
                             ))}
                         </Stepper>
-                        <SignUpStep1 setActiveStep={setActiveStep} />
+                        {activeStep === 0 && <SignUpStep1 setActiveStep={setActiveStep} />}
+                        {activeStep === 1 && <SignUpStep2 setActiveStep={setActiveStep} />}
+                        {activeStep === 2 && <SignUpStep3 setActiveStep={setActiveStep} />}
                     </Stack>
                 </Container>
             </Box>
