@@ -32,34 +32,39 @@ function LoginForm(props) {
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
-            handleLoginFormSubmit(values);
+            handleAuthFormSubmit(values);
         },
     });
 
-    // Handler for when the login form is submitted
-    const handleLoginFormSubmit = async (values) => {
+    // Logs a user in
+    const login = async (values) => {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: values.email,
+                password: values.password,
+            }),
+            credentials: "include",
+        });
+
+        if (response.status !== 200) {
+            formik.setErrors({ email: "Invalid email or password", password: "Invalid email or password" });
+            return;
+        }
+
+        return await response.json();
+    };
+
+    // Handler for when the AuthForm is submitted
+    const handleAuthFormSubmit = async (values) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: values.email,
-                    password: values.password,
-                }),
-                credentials: "include",
-            });
-
-            if (response.status !== 200) {
-                formik.setErrors({ email: "Invalid email or password", password: "Invalid email or password" });
-                return;
-            }
-
-            const data = await response.json();
+            const user = await login(values);
 
             setIsLoggedIn(true);
-            setUserId(data.userId);
+            setUserId(user.user_id);
 
             navigate("/courses");
         } catch (err) {
