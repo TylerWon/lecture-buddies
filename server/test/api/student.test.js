@@ -192,59 +192,46 @@ describe("student routes tests", () => {
         beforeEach(() => {
             payload = {
                 student_id: user4.user_id,
-                school_id: school1.school_id,
-                first_name: "Tyler",
-                last_name: "Won",
-                year: "4",
-                faculty: "Science",
-                major: "Computer Science",
-                profile_photo_url: "www.tylerwon.com/profile_photo.jpg",
-                bio: "Hello. I'm Tyler. I'm a 4th year computer science student at UBC.",
             };
         });
 
         test("POST - should create a student", async () => {
-            await verifyPostRequestResponse(testSession, "/students", payload, 201, payload);
+            await verifyPostRequestResponse(testSession, "/students", payload, 201, {
+                student_id: payload.student_id,
+                school_id: null,
+                first_name: null,
+                last_name: null,
+                year: null,
+                faculty: null,
+                major: null,
+                profile_photo_url: null,
+                bio: null,
+            });
         });
 
         test("POST - should not create a student when missing some body parameters", async () => {
-            delete payload.last_name;
-            delete payload.profile_photo_url;
+            delete payload.student_id;
 
             await verifyPostRequestResponse(testSession, "/students", payload, 400, [
                 {
                     type: "field",
                     location: "body",
-                    path: "last_name",
-                    msg: "last_name is required",
-                },
-                {
-                    type: "field",
-                    location: "body",
-                    path: "profile_photo_url",
-                    msg: "profile_photo_url is required",
+                    path: "student_id",
+                    msg: "student_id is required",
                 },
             ]);
         });
 
         test("POST - should not create a student when some body parameters are the wrong type", async () => {
-            payload.first_name = true;
-            payload.year = 4;
+            payload.student_id = false;
 
             await verifyPostRequestResponse(testSession, "/students", payload, 400, [
                 {
                     type: "field",
                     location: "body",
-                    path: "first_name",
-                    value: payload.first_name,
-                    msg: "first_name must be a string",
-                },
-                {
-                    type: "field",
-                    location: "body",
-                    path: "year",
-                    value: payload.year,
-                    msg: "year must be a string",
+                    path: "student_id",
+                    value: payload.student_id,
+                    msg: "student_id must be a positive integer",
                 },
             ]);
         });
@@ -254,14 +241,6 @@ describe("student routes tests", () => {
 
             await verifyPostRequestResponse(testSession, "/students", payload, 400, {
                 message: `user with id '${payload.student_id}' does not exist`,
-            });
-        });
-
-        test("POST - should not create a student when school does not exist", async () => {
-            payload.school_id = school1.school_id + 100;
-
-            await verifyPostRequestResponse(testSession, "/students", payload, 400, {
-                message: `school with id '${payload.school_id}' does not exist`,
             });
         });
 

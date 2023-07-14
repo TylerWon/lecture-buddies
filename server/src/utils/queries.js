@@ -170,8 +170,8 @@ const queries = {
     },
     students: {
         createStudent: `
-            INSERT INTO students (student_id, school_id, first_name, last_name, year, faculty, major, profile_photo_url, bio) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+            INSERT INTO students (student_id) 
+            VALUES ($1) 
             RETURNING *
         `,
         getStudent: `
