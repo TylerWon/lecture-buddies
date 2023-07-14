@@ -40,29 +40,51 @@ function SignUpStep1(props) {
         },
     });
 
+    // Creates a new user
+    const createUser = async (values) => {
+        const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: values.email,
+                password: values.password,
+            }),
+            credentials: "include",
+        });
+
+        if (response.status === 400) {
+            formik.setErrors({ email: "An account with this email already exists" });
+            return;
+        }
+
+        return await response.json();
+    };
+
+    // Creates a new student
+    const createStudent = async (userId) => {
+        const response = await fetch(`${API_BASE_URL}/students`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                student_id: userId,
+            }),
+            credentials: "include",
+        });
+
+        return await response.json();
+    };
+
     // Handler for when AuthForm is submitted
     const handleAuthFormSubmit = async (values) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/signup`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: values.email,
-                    password: values.password,
-                }),
-                credentials: "include",
-            });
+            const user = await createUser(values);
+            await createStudent(user.user_id);
 
-            if (response.status === 400) {
-                formik.setErrors({ email: "An account with this email already exists" });
-                return;
-            }
-
-            const data = await response.json();
-
-            setUserId(data.userId);
+            setUserId(user.user_id);
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
         } catch (err) {
             console.log(err); // unexpected error
