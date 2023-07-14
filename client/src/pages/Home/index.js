@@ -5,7 +5,9 @@ import LoginForm from "./login/LoginForm";
 import LoginFooter from "./login/LoginFooter";
 import SignUpModal from "./signup/SignUpModal";
 
+// Home component
 function Home() {
+    // Hooks
     const [showSignUpModal, setShowSignUpModal] = useState(false);
 
     return (

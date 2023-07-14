@@ -8,19 +8,23 @@ import { UserContext } from "../../../contexts/UserContext";
 
 import AuthForm from "../../../components/forms/AuthForm";
 
+// Constants
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+// Yup validation schema for form
 const validationSchema = yup.object({
     email: yup.string().email("Enter a valid email").required("Email is required"),
     password: yup.string().required("Password is required"),
 });
 
+// LoginForm component
 function LoginForm(props) {
+    // Props
     const { setShowSignUpModal } = props;
 
+    // Hooks
     const { setIsLoggedIn, setUserId } = useContext(UserContext);
     const navigate = useNavigate();
-
     const formik = useFormik({
         initialValues: {
             email: "",

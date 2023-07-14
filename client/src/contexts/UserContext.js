@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
 
+// UserContext
 export const UserContext = createContext({
     isLoggedIn: false,
     setIsLoggedIn: () => {},
@@ -7,7 +8,9 @@ export const UserContext = createContext({
     setUserId: () => {},
 });
 
+// UserContextProvider component
 export function UserContextProvider(props) {
+    // Hooks
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userId, setUserId] = useState(null);
 

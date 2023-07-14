@@ -6,6 +6,7 @@ import Courses from "./pages/Courses";
 import Home from "./pages/Home";
 import NoAuth from "./components/auth/NoAuth";
 
+// React Router setup
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route element={<AutoLogin />}>
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
     )
 );
 
+// App component
 function App() {
     return <RouterProvider router={router} />;
 }

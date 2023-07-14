@@ -1,3 +1,4 @@
+// Courses component
 function Courses() {
     return;
 }

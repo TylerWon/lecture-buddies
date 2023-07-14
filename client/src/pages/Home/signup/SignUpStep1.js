@@ -9,8 +9,10 @@ import AuthForm from "../../../components/forms/AuthForm";
 
 YupPassword(yup);
 
+// Constants
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+// Yup validation schema for form
 const validationSchema = yup.object({
     email: yup.string().email("Invalid email address").required("Email is required"),
     password: yup
@@ -24,11 +26,13 @@ const validationSchema = yup.object({
         .required("Password is required"),
 });
 
+// SignUpStep1 component
 function SignUpStep1(props) {
+    // Props
     const { setActiveStep } = props;
 
+    // Hooks
     const { setUserId } = useContext(UserContext);
-
     const formik = useFormik({
         initialValues: {
             email: "",

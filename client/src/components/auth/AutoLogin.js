@@ -3,13 +3,16 @@ import { useContext, useEffect, useState } from "react";
 
 import { UserContext } from "../../contexts/UserContext";
 
+// Constants
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+// AutoLogin component
 function AutoLogin() {
+    // Hooks
     const { setIsLoggedIn, setUserId } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Automatically logs a user in if they have a valid session cookie
+    // Logs a user in if they have a valid session cookie
     const autoLogin = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/autologin`, {
@@ -30,6 +33,7 @@ function AutoLogin() {
         }
     };
 
+    // Tries to automatically log a user in
     useEffect(() => {
         autoLogin();
     }, []);

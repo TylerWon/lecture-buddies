@@ -22,11 +22,15 @@ import SignUpStep3 from "./SignUpStep3";
 
 YupPassword(yup);
 
+// Constants
 const STEPS = ["General", "Education", "Personal"];
 
+// SignUpModal component
 function SignUpModal(props) {
+    // Props
     const { showSignUpModal, setShowSignUpModal } = props;
 
+    // Hooks
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const [activeStep, setActiveStep] = useState(0);

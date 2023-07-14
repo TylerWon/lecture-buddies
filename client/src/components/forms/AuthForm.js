@@ -3,9 +3,12 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
 
+// AuthForm component
 function AuthForm(props) {
+    //Props
     const { formik, submitButtonText } = props;
 
+    // Hooks
     const [showPassword, setShowPassword] = useState(false);
 
     // Handler for when show password button is clicked
