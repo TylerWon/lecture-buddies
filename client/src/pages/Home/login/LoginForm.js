@@ -1,7 +1,17 @@
-import { Box, Button, IconButton, InputAdornment, Paper, Stack, TextField, Typography } from "@mui/material";
+import {
+    Box,
+    Button,
+    IconButton,
+    InputAdornment,
+    Link as MuiLink,
+    Paper,
+    Stack,
+    TextField,
+    Typography,
+} from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as ReactRouterLink } from "react-router-dom";
 import { useFormik } from "formik";
 import { useContext, useState } from "react";
 import * as yup from "yup";
@@ -15,7 +25,8 @@ const validationSchema = yup.object({
     password: yup.string().required("Password is required"),
 });
 
-function LoginForm() {
+function LoginForm(props) {
+    const { setShowSignUpModal } = props;
     const { setIsLoggedIn, setUserId } = useContext(UserContext);
     const navigate = useNavigate();
 
@@ -28,12 +39,12 @@ function LoginForm() {
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
-            handleSubmit(values);
+            handleLoginFormSubmit(values);
         },
     });
 
     // Handler for when the login form is submitted
-    const handleSubmit = async (values) => {
+    const handleLoginFormSubmit = async (values) => {
         try {
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
@@ -63,6 +74,16 @@ function LoginForm() {
         }
     };
 
+    // Handler for when show password button is clicked
+    const handleShowPasswordClick = () => {
+        setShowPassword(!showPassword);
+    };
+
+    // Handler for when the sign up link is clicked
+    const handleSignUpClick = () => {
+        setShowSignUpModal(true);
+    };
+
     return (
         <Box minHeight="400px" marginTop="200px" marginBottom="92px">
             <Stack
@@ -76,8 +97,8 @@ function LoginForm() {
                     <Typography variant="h6">Make new friends in your classes</Typography>
                 </Stack>
                 <Paper elevation={2} sx={{ width: { xs: "250px", sm: "300px", md: "400px" }, padding: "16px" }}>
-                    <form onSubmit={formik.handleSubmit}>
-                        <Stack direction="column" spacing={2}>
+                    <form onSubmit={formik.handleLoginFormSubmit}>
+                        <Stack direction="column" alignItems="center" spacing={2}>
                             <TextField
                                 fullWidth
                                 id="email"
@@ -101,7 +122,7 @@ function LoginForm() {
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                            <IconButton onClick={handleShowPasswordClick} edge="end">
                                                 {showPassword ? <VisibilityOff /> : <Visibility />}
                                             </IconButton>
                                         </InputAdornment>
@@ -111,6 +132,12 @@ function LoginForm() {
                             <Button color="primary" variant="contained" fullWidth type="submit">
                                 Login
                             </Button>
+                            <Typography variant="body1">
+                                Don't have an account yet?{" "}
+                                <MuiLink component={ReactRouterLink} variant="body1" onClick={handleSignUpClick}>
+                                    Sign up
+                                </MuiLink>
+                            </Typography>
                         </Stack>
                     </form>
                 </Paper>
