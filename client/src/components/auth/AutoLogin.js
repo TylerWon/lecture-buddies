@@ -7,7 +7,6 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function AutoLogin() {
     const { setIsLoggedIn, setUserId } = useContext(UserContext);
-
     const [isLoading, setIsLoading] = useState(true);
 
     // Automatically logs a user in if they have a valid session cookie

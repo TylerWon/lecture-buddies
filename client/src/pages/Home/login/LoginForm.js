@@ -27,9 +27,9 @@ const validationSchema = yup.object({
 
 function LoginForm(props) {
     const { setShowSignUpModal } = props;
+
     const { setIsLoggedIn, setUserId } = useContext(UserContext);
     const navigate = useNavigate();
-
     const [showPassword, setShowPassword] = useState(false);
 
     const formik = useFormik({
