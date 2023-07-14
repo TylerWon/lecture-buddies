@@ -1,19 +1,19 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useContext, useEffect } from "react";
 
-import { UserContext } from "../contexts/UserContext";
+import { UserContext } from "../../contexts/UserContext";
 
-function Auth() {
+function NoAuth() {
     const { isLoggedIn } = useContext(UserContext);
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!isLoggedIn) {
-            navigate("/");
+        if (isLoggedIn) {
+            navigate("/courses");
         }
     }, [isLoggedIn]);
 
-    return <Outlet />;
+    return <>{isLoggedIn ? null : <Outlet />}</>;
 }
 
-export default Auth;
+export default NoAuth;
