@@ -1,22 +1,12 @@
-import {
-    Box,
-    Button,
-    IconButton,
-    InputAdornment,
-    Link as MuiLink,
-    Paper,
-    Stack,
-    TextField,
-    Typography,
-} from "@mui/material";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Box, Link as MuiLink, Paper, Stack, Typography } from "@mui/material";
 import { useNavigate, Link as ReactRouterLink } from "react-router-dom";
 import { useFormik } from "formik";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import * as yup from "yup";
 
 import { UserContext } from "../../../contexts/UserContext";
+
+import AuthForm from "../../../components/forms/AuthForm";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -30,7 +20,6 @@ function LoginForm(props) {
 
     const { setIsLoggedIn, setUserId } = useContext(UserContext);
     const navigate = useNavigate();
-    const [showPassword, setShowPassword] = useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -74,11 +63,6 @@ function LoginForm(props) {
         }
     };
 
-    // Handler for when show password button is clicked
-    const handleShowPasswordClick = () => {
-        setShowPassword(!showPassword);
-    };
-
     // Handler for when the sign up link is clicked
     const handleSignUpClick = () => {
         setShowSignUpModal(true);
@@ -96,50 +80,16 @@ function LoginForm(props) {
                     <Typography variant="h1">Lecture Buddies</Typography>
                     <Typography variant="h6">Make new friends in your classes</Typography>
                 </Stack>
-                <Paper elevation={2} sx={{ width: { xs: "250px", sm: "300px", md: "400px" }, padding: "16px" }}>
-                    <form onSubmit={formik.handleSubmit}>
-                        <Stack direction="column" alignItems="center" spacing={2}>
-                            <TextField
-                                fullWidth
-                                id="email"
-                                name="email"
-                                label="Email"
-                                value={formik.values.email}
-                                onChange={formik.handleChange}
-                                error={formik.touched.email && Boolean(formik.errors.email)}
-                                helperText={formik.touched.email && formik.errors.email}
-                            />
-                            <TextField
-                                fullWidth
-                                id="password"
-                                name="password"
-                                label="Password"
-                                type={showPassword ? "text" : "password"}
-                                value={formik.values.password}
-                                onChange={formik.handleChange}
-                                error={formik.touched.password && Boolean(formik.errors.password)}
-                                helperText={formik.touched.password && formik.errors.password}
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton onClick={handleShowPasswordClick} edge="end">
-                                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                            <Button color="primary" variant="contained" fullWidth type="submit">
-                                Login
-                            </Button>
-                            <Typography variant="body1">
-                                Don't have an account yet?{" "}
-                                <MuiLink component={ReactRouterLink} variant="body1" onClick={handleSignUpClick}>
-                                    Sign up
-                                </MuiLink>
-                            </Typography>
-                        </Stack>
-                    </form>
+                <Paper elevation={2} sx={{ width: { xs: "250px", sm: "400px" }, padding: "16px" }}>
+                    <Stack direction="column" alignItems="center" spacing={2}>
+                        <AuthForm formik={formik} submitButtonText="Login" />
+                        <Typography variant="body1">
+                            Don't have an account yet?{" "}
+                            <MuiLink component={ReactRouterLink} variant="body1" onClick={handleSignUpClick}>
+                                Sign up
+                            </MuiLink>
+                        </Typography>
+                    </Stack>
                 </Paper>
             </Stack>
         </Box>
