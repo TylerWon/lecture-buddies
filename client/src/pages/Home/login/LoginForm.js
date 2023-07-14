@@ -97,7 +97,7 @@ function LoginForm(props) {
                     <Typography variant="h6">Make new friends in your classes</Typography>
                 </Stack>
                 <Paper elevation={2} sx={{ width: { xs: "250px", sm: "300px", md: "400px" }, padding: "16px" }}>
-                    <form onSubmit={formik.handleLoginFormSubmit}>
+                    <form onSubmit={formik.handleSubmit}>
                         <Stack direction="column" alignItems="center" spacing={2}>
                             <TextField
                                 fullWidth

@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { UserContext } from "../../contexts/UserContext";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-function Auth() {
+function AutoLogin() {
     const { setIsLoggedIn, setUserId } = useContext(UserContext);
 
     const [isLoading, setIsLoading] = useState(true);
@@ -38,4 +38,4 @@ function Auth() {
     return <>{isLoading ? null : <Outlet />}</>;
 }
 
-export default Auth;
+export default AutoLogin;
