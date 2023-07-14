@@ -2,6 +2,7 @@ import {
     Box,
     Container,
     Dialog,
+    IconButton,
     Stack,
     Step,
     StepLabel,
@@ -10,6 +11,7 @@ import {
     useTheme,
     useMediaQuery,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { useFormik } from "formik";
 import { useContext, useState } from "react";
 import * as yup from "yup";
@@ -59,6 +61,8 @@ function SignUpModal(props) {
     // Handler for when sign up modal is closed
     const handleSignUpModalClose = () => {
         setShowSignUpModal(false);
+        formik.setFieldValue("email", "");
+        formik.setFieldValue("password", "");
     };
 
     // Handler for when AuthForm is submitted
@@ -93,7 +97,12 @@ function SignUpModal(props) {
     return (
         <Dialog open={showSignUpModal} onClose={handleSignUpModalClose} fullScreen={isMobile} fullWidth maxWidth="sm">
             <Box padding="20px" bgcolor={theme.palette.common.white}>
-                <Typography variant="h3">Sign up</Typography>
+                <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="h3">Sign up</Typography>
+                    <IconButton onClick={handleSignUpModalClose}>
+                        <CloseIcon />
+                    </IconButton>
+                </Stack>
                 <Container sx={{ marginTop: "35px" }}>
                     <Stack direction="column" alignItems="center" spacing={2}>
                         <Stepper activeStep={activeStep} alternativeLabel={isMobile} sx={{ width: "80%" }}>
