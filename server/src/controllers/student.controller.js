@@ -1,3 +1,5 @@
+const pgp = require("pg-promise")();
+
 const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
@@ -35,9 +37,7 @@ const createStudent = async (req, res, next) => {
 
     // Create student
     try {
-        const student = await db.one(queries.students.createStudent, [
-            payload.student_id,
-        ]);
+        const student = await db.one(queries.students.createStudent, [payload.student_id]);
         return res.status(201).json(student);
     } catch (err) {
         return next(err); // unexpected error
@@ -440,7 +440,7 @@ const updateStudent = async (req, res, next) => {
     }
 
     // Check if school exists
-    if (!(await schoolExists(payload.school_id))) {
+    if (payload.school_id && !(await schoolExists(payload.school_id))) {
         return res.status(400).json({
             message: `school with id '${payload.school_id}' does not exist`,
         });
@@ -448,17 +448,11 @@ const updateStudent = async (req, res, next) => {
 
     // Update student
     try {
-        const student = await db.one(queries.students.updateStudent, [
-            payload.school_id,
-            payload.first_name,
-            payload.last_name,
-            payload.year,
-            payload.faculty,
-            payload.major,
-            payload.profile_photo_url,
-            payload.bio,
-            studentId,
-        ]);
+        // Dynamically construct query based on fields in payload
+        const condition = pgp.as.format("WHERE student_id = $1", studentId);
+        const query = `${pgp.helpers.update(payload, null, "students")} ${condition} RETURNING *`;
+
+        const student = await db.one(query);
         return res.status(200).json(student);
     } catch (err) {
         return next(err); // unexpected error

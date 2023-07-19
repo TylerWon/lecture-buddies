@@ -270,6 +270,23 @@ const verifyGetRequestResponse = async (request, endpoint, expectedStatusCode, e
 };
 
 /**
+ * Checks that a PATCH request to an endpoint returns the expected status code and body
+ *
+ * @param {object} request - a supertest request
+ * @param {string} endpoint - the endpoint to send the PATCH request to
+ * @param {any} payload - the payload to send with the PATCH request
+ * @param {number} expectedStatusCode - the expected status code of the response
+ * @param {any} expectedBody - the expected body of the response
+ *
+ * @returns {object} the response
+ */
+const verifyPatchRequestResponse = async (request, endpoint, payload, expectedStatusCode, expectedBody) => {
+    const response = await request.patch(endpoint).send(payload);
+    expect(response.statusCode).toEqual(expectedStatusCode);
+    expect(response.body).toEqual(expectedBody);
+};
+
+/**
  * Checks that a POST request to an endpoint returns the expected status code and body
  *
  * @param {object} request - a supertest request
@@ -322,6 +339,7 @@ module.exports = {
     updateFriendship,
     verifyDeleteRequestResponse,
     verifyGetRequestResponse,
+    verifyPatchRequestResponse,
     verifyPostRequestResponse,
     verifyPutRequestResponse,
 };

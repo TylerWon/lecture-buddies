@@ -19,10 +19,10 @@ const {
     createUser,
     cleanUpDatabase,
     loginUser,
+    verifyPatchRequestResponse,
     verifyGetRequestResponse,
     verifyPostRequestResponse,
     updateFriendship,
-    verifyPutRequestResponse,
 } = require("../utils/helpers");
 
 describe("student routes tests", () => {
@@ -278,49 +278,34 @@ describe("student routes tests", () => {
             });
         });
 
-        describe("PUT", () => {
+        describe("PATCH", () => {
             let payload;
 
             beforeEach(() => {
-                payload = { ...student5 };
-                delete payload.student_id;
+                payload = {
+                    first_name: "John",
+                    last_name: "Doe",
+                };
             });
 
-            test("PUT - should update a student", async () => {
-                payload.first_name = "John";
-                payload.major = "Mathematics";
-
-                await verifyPutRequestResponse(testSession, `/students/${student5.student_id}`, payload, 200, {
-                    ...payload,
+            test("PATCH - should update a student", async () => {
+                await verifyPatchRequestResponse(testSession, `/students/${student5.student_id}`, payload, 200, {
                     student_id: student5.student_id,
+                    school_id: student5.school_id,
+                    ...payload,
+                    year: student5.year,
+                    faculty: student5.faculty,
+                    major: student5.major,
+                    profile_photo_url: student5.profile_photo_url,
+                    bio: student5.bio,
                 });
             });
 
-            test("PUT - should not update a student when missing some body parameters", async () => {
-                delete payload.school_id;
-                delete payload.bio;
-
-                await verifyPutRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, [
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "school_id",
-                        msg: "school_id is required",
-                    },
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "bio",
-                        msg: "bio is required",
-                    },
-                ]);
-            });
-
-            test("PUT - should not update a student when some body parameters are the wrong type", async () => {
+            test("PATCH - should not update a student when some body parameters are the wrong type", async () => {
                 payload.faculty = 1;
                 payload.profile_photo_url = false;
 
-                await verifyPutRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, [
+                await verifyPatchRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, [
                     {
                         type: "field",
                         location: "body",
@@ -338,22 +323,22 @@ describe("student routes tests", () => {
                 ]);
             });
 
-            test("PUT - should return error message when the student_id path parameter does not correspond to a student", async () => {
-                await verifyPutRequestResponse(testSession, `/students/${student5.student_id + 100}`, payload, 400, {
+            test("PATCH - should return error message when the student_id path parameter does not correspond to a student", async () => {
+                await verifyPatchRequestResponse(testSession, `/students/${student5.student_id + 100}`, payload, 400, {
                     message: `student with id '${student5.student_id + 100}' does not exist`,
                 });
             });
 
-            test("PUT - should not update a student when school does not exist", async () => {
+            test("PATCH - should not update a student when school does not exist", async () => {
                 payload.school_id = school1.school_id + 100;
 
-                await verifyPutRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, {
+                await verifyPatchRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, {
                     message: `school with id '${payload.school_id}' does not exist`,
                 });
             });
 
-            test("PUT - should not update a student when request is unauthenticated", async () => {
-                await verifyPutRequestResponse(request(app), `/students/${student5.student_id}`, payload, 401, {
+            test("PATCH - should not update a student when request is unauthenticated", async () => {
+                await verifyPatchRequestResponse(request(app), `/students/${student5.student_id}`, payload, 401, {
                     message: "unauthenticated",
                 });
             });
