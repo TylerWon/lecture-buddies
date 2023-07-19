@@ -91,12 +91,6 @@ const queries = {
             DELETE FROM interests
             WHERE interest_id = $1
         `,
-        updateInterest: `
-            UPDATE interests
-            SET student_id = $1, interest_name = $2
-            WHERE interest_id = $3
-            RETURNING *
-        `,
     },
     messages: {
         createMessage: `

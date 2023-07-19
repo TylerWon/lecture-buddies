@@ -8,15 +8,15 @@ const validationSchemas = require("../utils/validationSchemas");
 
 router.post(
     "/",
-    validationSchemas.createUpdateInterestValidationSchema(),
+    validationSchemas.createInterestValidationSchema(),
     validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     interestController.createInterest
 );
 router.delete("/:interest_id(\\d+)", authMiddleware.authenticateRequest, interestController.deleteInterest);
-router.put(
+router.patch(
     "/:interest_id(\\d+)",
-    validationSchemas.createUpdateInterestValidationSchema(),
+    validationSchemas.updateInterestValidationSchema(),
     validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     interestController.updateInterest

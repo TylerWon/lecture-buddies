@@ -12,7 +12,7 @@ const {
     loginUser,
     verifyDeleteRequestResponse,
     verifyPostRequestResponse,
-    verifyPutRequestResponse,
+    verifyPatchRequestResponse,
 } = require("../utils/helpers");
 
 describe("interest routes tests", () => {
@@ -133,40 +133,27 @@ describe("interest routes tests", () => {
             });
         });
 
-        describe("PUT", () => {
+        describe("PATCH", () => {
             let payload;
 
             beforeEach(() => {
-                payload = { ...interest2 };
-                delete payload.interest_id;
+                payload = {
+                    interest_name: "sports",
+                };
             });
 
-            test("PUT - should update an interest", async () => {
-                payload.interest_name = "sports";
-
-                await verifyPutRequestResponse(testSession, `/interests/${interest2.interest_id}`, payload, 200, {
-                    ...payload,
+            test("PATCH - should update an interest", async () => {
+                await verifyPatchRequestResponse(testSession, `/interests/${interest2.interest_id}`, payload, 200, {
                     interest_id: interest2.interest_id,
+                    student_id: interest2.student_id,
+                    ...payload,
                 });
             });
 
-            test("PUT - should not update an interest when missing some body parameters", async () => {
-                delete payload.student_id;
-
-                await verifyPutRequestResponse(testSession, `/interests/${interest2.interest_id}`, payload, 400, [
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "student_id",
-                        msg: "student_id is required",
-                    },
-                ]);
-            });
-
-            test("PUT - should not update an interest when some body parameters are the wrong type", async () => {
+            test("PATCH - should not update an interest when some body parameters are the wrong type", async () => {
                 payload.interest_name = ["sports"];
 
-                await verifyPutRequestResponse(testSession, `/interests/${interest2.interest_id}`, payload, 400, [
+                await verifyPatchRequestResponse(testSession, `/interests/${interest2.interest_id}`, payload, 400, [
                     {
                         type: "field",
                         location: "body",
@@ -177,22 +164,28 @@ describe("interest routes tests", () => {
                 ]);
             });
 
-            test("PUT - should return error message when the interest_id path parameter does not correspond to an interest", async () => {
-                await verifyPutRequestResponse(testSession, `/interests/${interest2.interest_id + 100}`, payload, 400, {
-                    message: `interest with id '${interest2.interest_id + 100}' does not exist`,
-                });
+            test("PATCH - should return error message when the interest_id path parameter does not correspond to an interest", async () => {
+                await verifyPatchRequestResponse(
+                    testSession,
+                    `/interests/${interest2.interest_id + 100}`,
+                    payload,
+                    400,
+                    {
+                        message: `interest with id '${interest2.interest_id + 100}' does not exist`,
+                    }
+                );
             });
 
-            test("PUT - should return error message when the student does not exist", async () => {
+            test("PATCH - should return error message when the student does not exist", async () => {
                 payload.student_id = student1.student_id + 100;
 
-                await verifyPutRequestResponse(testSession, `/interests/${interest2.interest_id}`, payload, 400, {
+                await verifyPatchRequestResponse(testSession, `/interests/${interest2.interest_id}`, payload, 400, {
                     message: `student with id '${payload.student_id}' does not exist`,
                 });
             });
 
-            test("PUT - should return error message when request is unauthenticated", async () => {
-                await verifyPutRequestResponse(request(app), `/interests/${interest2.interest_id}`, payload, 401, {
+            test("PATCH - should return error message when request is unauthenticated", async () => {
+                await verifyPatchRequestResponse(request(app), `/interests/${interest2.interest_id}`, payload, 401, {
                     message: "unauthenticated",
                 });
             });

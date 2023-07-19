@@ -1,3 +1,5 @@
+const pgp = require("pg-promise")();
+
 const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
@@ -16,9 +18,7 @@ const createInterest = async (req, res, next) => {
     const payload = req.body;
 
     // Check if student exists
-    try {
-        await db.one(queries.students.getStudent, [payload.student_id]);
-    } catch (err) {
+    if (!(await studentExists(payload.student_id))) {
         return res.status(400).json({ message: `student with id '${payload.student_id}' does not exist` });
     }
 
@@ -81,19 +81,17 @@ const updateInterest = async (req, res, next) => {
     }
 
     // Check if student exists
-    try {
-        await db.one(queries.students.getStudent, [payload.student_id]);
-    } catch (err) {
+    if (payload.student_id && !(await studentExists(payload.student_id))) {
         return res.status(400).json({ message: `student with id '${payload.student_id}' does not exist` });
     }
 
     // Update interest
     try {
-        const interest = await db.one(queries.interests.updateInterest, [
-            payload.student_id,
-            payload.interest_name,
-            interestId,
-        ]);
+        // Dynamically construct query based on fields in payload
+        const condition = pgp.as.format("WHERE interest_id = $1", interestId);
+        const query = `${pgp.helpers.update(payload, null, "interests")} ${condition} RETURNING *`;
+
+        const interest = await db.one(query);
         return res.status(200).json(interest);
     } catch (err) {
         return next(err); // unexpected error
@@ -112,6 +110,24 @@ const updateInterest = async (req, res, next) => {
 const interestExists = async (interestId) => {
     try {
         await db.one(queries.interests.getInterest, [interestId]);
+        return true;
+    } catch (err) {
+        return false;
+    }
+};
+
+/**
+ * Checks if a student exists
+ *
+ * @param {number} studentId - the student's ID
+ *
+ * @returns
+ * - true if the student exists
+ * - false if the student does not exist
+ */
+const studentExists = async (studentId) => {
+    try {
+        await db.one(queries.students.getStudent, [studentId]);
         return true;
     } catch (err) {
         return false;

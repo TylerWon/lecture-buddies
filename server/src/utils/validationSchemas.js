@@ -121,7 +121,7 @@ const updateFriendshipValidationSchema = () =>
     );
 
 // Interests
-const createUpdateInterestValidationSchema = () =>
+const createInterestValidationSchema = () =>
     checkSchema(
         {
             student_id: {
@@ -137,6 +137,26 @@ const createUpdateInterestValidationSchema = () =>
                 exists: {
                     errorMessage: "interest_name is required",
                 },
+                isString: {
+                    errorMessage: "interest_name must be a string",
+                },
+            },
+        },
+        ["body"]
+    );
+
+const updateInterestValidationSchema = () =>
+    checkSchema(
+        {
+            student_id: {
+                optional: true,
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "student_id must be a positive integer",
+                },
+            },
+            interest_name: {
+                optional: true,
                 isString: {
                     errorMessage: "interest_name must be a string",
                 },
@@ -360,7 +380,8 @@ module.exports = {
     createEnrolmentValidationSchema,
     createFriendshipValidationSchema,
     updateFriendshipValidationSchema,
-    createUpdateInterestValidationSchema,
+    createInterestValidationSchema,
+    updateInterestValidationSchema,
     createMessageValidationSchema,
     createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
