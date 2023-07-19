@@ -1,3 +1,5 @@
+const pgp = require("pg-promise")();
+
 const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
@@ -79,11 +81,14 @@ const updateFriendship = async (req, res, next) => {
 
     // Update friendship
     try {
-        const friendship = await db.one(queries.friendships.updateFriendship, [
-            payload.friendship_status,
-            requestor_id,
-            requestee_id,
-        ]);
+        // Dynamically construct query based on fields in payload
+        const condition = pgp.as.format(
+            "WHERE requestor_id = $1 AND requestee_id = $2 OR requestor_id = $2 AND requestee_id = $1",
+            [requestor_id, requestee_id]
+        );
+        const query = `${pgp.helpers.update(payload, null, "friendships")} ${condition} RETURNING *`;
+
+        const friendship = await db.one(query);
         return res.status(200).json(friendship);
     } catch (err) {
         return next(err); // unexpected error

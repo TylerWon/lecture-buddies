@@ -10,7 +10,7 @@ const {
     cleanUpDatabase,
     loginUser,
     verifyPostRequestResponse,
-    verifyPutRequestResponse,
+    verifyPatchRequestResponse,
 } = require("../utils/helpers");
 
 describe("friendship routes tests", () => {
@@ -138,8 +138,8 @@ describe("friendship routes tests", () => {
             };
         });
 
-        test("PUT - should update a friendship", async () => {
-            await verifyPutRequestResponse(
+        test("PATCH - should update a friendship", async () => {
+            await verifyPatchRequestResponse(
                 testSession,
                 `/friendships/${student1.student_id}/${student2.student_id}`,
                 payload,
@@ -152,29 +152,10 @@ describe("friendship routes tests", () => {
             );
         });
 
-        test("PUT - should not update a friendship when missing some body parameters", async () => {
-            delete payload.friendship_status;
-
-            await verifyPutRequestResponse(
-                testSession,
-                `/friendships/${student1.student_id}/${student2.student_id}`,
-                payload,
-                400,
-                [
-                    {
-                        type: "field",
-                        location: "body",
-                        path: "friendship_status",
-                        msg: "friendship_status is required",
-                    },
-                ]
-            );
-        });
-
-        test("PUT - should not update a friendship when some body parameters are the wrong type", async () => {
+        test("PATCH - should not update a friendship when some body parameters are the wrong type", async () => {
             payload.friendship_status = false;
 
-            await verifyPutRequestResponse(
+            await verifyPatchRequestResponse(
                 testSession,
                 `/friendships/${student1.student_id}/${student2.student_id}`,
                 payload,
@@ -191,8 +172,8 @@ describe("friendship routes tests", () => {
             );
         });
 
-        test("PUT - should not update a friendship when friendship does not exist", async () => {
-            await verifyPutRequestResponse(
+        test("PATCH - should not update a friendship when friendship does not exist", async () => {
+            await verifyPatchRequestResponse(
                 testSession,
                 `/friendships/${student1.student_id + 100}/${student2.student_id}`,
                 payload,
@@ -205,8 +186,8 @@ describe("friendship routes tests", () => {
             );
         });
 
-        test("PUT - should return error message when request is unauthenticated", async () => {
-            await verifyPutRequestResponse(
+        test("PATCH - should return error message when request is unauthenticated", async () => {
+            await verifyPatchRequestResponse(
                 request(app),
                 `/friendships/${student1.student_id}/${student2.student_id}`,
                 payload,

@@ -13,7 +13,7 @@ router.post(
     authMiddleware.authenticateRequest,
     friendshipController.createFriendship
 );
-router.put(
+router.patch(
     "/:requestor_id(\\d+)/:requestee_id(\\d+)",
     validationSchemas.updateFriendshipValidationSchema(),
     validationMiddleware.validateRequest,

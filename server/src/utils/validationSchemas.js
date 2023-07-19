@@ -110,9 +110,7 @@ const updateFriendshipValidationSchema = () =>
     checkSchema(
         {
             friendship_status: {
-                exists: {
-                    errorMessage: "friendship_status is required",
-                },
+                optional: true,
                 matches: {
                     options: [/^(pending|accepted|declined)$/],
                     errorMessage: "friendship_status must be one of 'pending', 'accepted', or 'declined'",
