@@ -1,8 +1,11 @@
 import { Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useFormik } from "formik";
+import { useContext } from "react";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
+
+import { UserContext } from "../../../contexts/UserContext";
 
 // Constants
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -27,6 +30,25 @@ const validationSchema = yup.object({
 const getSchools = async () => {
     const response = await fetch(`${API_BASE_URL}/schools`, {
         method: "GET",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+// Updates a student
+const updateStudent = async (userId, values) => {
+    const response = await fetch(`${API_BASE_URL}/students/${userId}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            school_id: values.school,
+            year: values.year,
+            faculty: values.faculty,
+            major: values.major,
+        }),
         credentials: "include",
     });
 
@@ -87,6 +109,7 @@ function SignUpStep2(props) {
     const { setActiveStep } = props;
 
     // Hooks
+    const { userId } = useContext(UserContext);
     const formik = useFormik({
         initialValues: {
             school: "",
@@ -101,11 +124,21 @@ function SignUpStep2(props) {
     });
     const [schools, setSchools] = useState([]);
 
-    // TODO
     // Handler for when form is submitted
     const handleEducationFormSubmit = async (values) => {
-        // Get student
-        // Update student
+        try {
+            // Update student
+            const updateStudentResponse = await updateStudent(userId, values);
+            const updateStudentData = await updateStudentResponse.json();
+            if (updateStudentResponse.status === 400) {
+                throw new Error(updateStudentData.message);
+            }
+
+            // Move to next step in the sign up process
+            setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        } catch (err) {
+            console.log(err); // unexpected error
+        }
     };
 
     // Initializes values
