@@ -7,21 +7,31 @@ import * as yup from "yup";
 // Constants
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const YEARS = [
-    { id: "1st", year_name: "1st" },
-    { id: "2nd", year_name: "2nd" },
-    { id: "3rd", year_name: "3rd" },
-    { id: "4th", year_name: "4th" },
-    { id: "5th", year_name: "5th" },
-    { id: "5th+", year_name: "5th+" },
+    { year_id: "1st", year_name: "1st" },
+    { year_id: "2nd", year_name: "2nd" },
+    { year_id: "3rd", year_name: "3rd" },
+    { year_id: "4th", year_name: "4th" },
+    { year_id: "5th", year_name: "5th" },
+    { year_id: "5th+", year_name: "5th+" },
 ];
 
 // Yup validation schema for form
 const validationSchema = yup.object({
-    school: yup.string().required("School is required"),
+    school: yup.number().required("School is required"),
     year: yup.string().required("Year is required"),
     faculty: yup.string().required("Faculty is required"),
     major: yup.string().required("Major is required"),
 });
+
+// Gets schools
+const getSchools = async () => {
+    const response = await fetch(`${API_BASE_URL}/schools`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    return response;
+};
 
 // CustomTextField component
 function CustomTextField(props) {
@@ -59,7 +69,7 @@ function CustomSelectField(props) {
                 error={formik.touched[id] && Boolean(formik.errors[id])}
             >
                 {options.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
+                    <MenuItem key={option[`${id}_id`]} value={option[`${id}_id`]}>
                         {option[`${id}_name`]}
                     </MenuItem>
                 ))}
@@ -98,13 +108,23 @@ function SignUpStep2(props) {
         // Update student
     };
 
-    // TODO
-    // Gets schools
-    const getSchools = async () => {};
+    // Initializes values
+    const init = async () => {
+        try {
+            // Get schools
+            const getSchoolsResponse = await getSchools();
+            const schools = await getSchoolsResponse.json();
 
-    // Gets schools on initial load
+            // Set schools state
+            setSchools(schools);
+        } catch (err) {
+            console.log(err); // unexpected error
+        }
+    };
+
+    // useEffect for initializing values
     useEffect(() => {
-        getSchools();
+        init();
     }, []);
 
     return (
