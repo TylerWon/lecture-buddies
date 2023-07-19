@@ -58,7 +58,7 @@ CREATE TABLE students (
 	school_id INTEGER,
 	first_name VARCHAR(50),
 	last_name VARCHAR(50),
-	year VARCHAR(2),
+	year VARCHAR(10),
 	faculty VARCHAR(150),
 	major VARCHAR(150),
 	profile_photo_url VARCHAR(2048),
