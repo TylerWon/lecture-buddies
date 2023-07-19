@@ -26,6 +26,39 @@ const validationSchema = yup.object({
         .required("Password is required"),
 });
 
+// Creates a new user
+const createUser = async (values) => {
+    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            username: values.email,
+            password: values.password,
+        }),
+        credentials: "include",
+    });
+
+    return response;
+};
+
+// Creates a new student
+const createStudent = async (userId) => {
+    const response = await fetch(`${API_BASE_URL}/students`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            student_id: userId,
+        }),
+        credentials: "include",
+    });
+
+    return response;
+};
+
 // SignUpStep1 component
 function SignUpStep1(props) {
     // Props
@@ -44,50 +77,21 @@ function SignUpStep1(props) {
         },
     });
 
-    // Creates a new user
-    const createUser = async (values) => {
-        const response = await fetch(`${API_BASE_URL}/auth/signup`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: values.email,
-                password: values.password,
-            }),
-            credentials: "include",
-        });
-
-        if (response.status === 400) {
-            formik.setErrors({ email: "An account with this email already exists" });
-            return;
-        }
-
-        return await response.json();
-    };
-
-    // Creates a new student
-    const createStudent = async (userId) => {
-        const response = await fetch(`${API_BASE_URL}/students`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                student_id: userId,
-            }),
-            credentials: "include",
-        });
-
-        return await response.json();
-    };
-
     // Handler for when AuthForm is submitted
     const handleAuthFormSubmit = async (values) => {
         try {
-            const user = await createUser(values);
+            // Create user
+            const createUserResponse = await createUser(values);
+            if (createUserResponse.status === 400) {
+                formik.setErrors({ email: "An account with this email already exists" });
+                return;
+            }
+            const user = await createUserResponse.json();
+
+            // Create student
             await createStudent(user.user_id);
 
+            // Set user id for the user context and move to next step
             setUserId(user.user_id);
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
         } catch (err) {

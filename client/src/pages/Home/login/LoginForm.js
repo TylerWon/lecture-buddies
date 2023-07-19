@@ -17,6 +17,23 @@ const validationSchema = yup.object({
     password: yup.string().required("Password is required"),
 });
 
+// Logs a user in
+const login = async (values) => {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            username: values.email,
+            password: values.password,
+        }),
+        credentials: "include",
+    });
+
+    return response;
+};
+
 // LoginForm component
 function LoginForm(props) {
     // Props
@@ -36,36 +53,22 @@ function LoginForm(props) {
         },
     });
 
-    // Logs a user in
-    const login = async (values) => {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: values.email,
-                password: values.password,
-            }),
-            credentials: "include",
-        });
-
-        if (response.status !== 200) {
-            formik.setErrors({ email: "Invalid email or password", password: "Invalid email or password" });
-            return;
-        }
-
-        return await response.json();
-    };
-
     // Handler for when the AuthForm is submitted
     const handleAuthFormSubmit = async (values) => {
         try {
-            const user = await login(values);
+            // Log the user in
+            const loginResponse = await login(values);
+            if (loginResponse.status !== 200) {
+                formik.setErrors({ email: "Invalid email or password", password: "Invalid email or password" });
+                return;
+            }
+            const user = await loginResponse.json();
 
+            // Set the user context
             setIsLoggedIn(true);
             setUserId(user.user_id);
 
+            // Navigate to the courses page
             navigate("/courses");
         } catch (err) {
             console.log(err); // unexpected error
