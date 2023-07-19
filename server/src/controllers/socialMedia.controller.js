@@ -1,3 +1,5 @@
+const pgp = require("pg-promise")();
+
 const db = require("../configs/db.config");
 const queries = require("../utils/queries");
 
@@ -84,18 +86,17 @@ const updateSocialMedia = async (req, res, next) => {
     }
 
     // Check if student exists
-    if (!(await studentExists(payload.student_id))) {
+    if (payload.student_id && !(await studentExists(payload.student_id))) {
         return res.status(400).json({ message: `student with id '${payload.student_id}' does not exist` });
     }
 
     // Update social media
     try {
-        const socialMedia = await db.one(queries.socialMedias.updateSocialMedia, [
-            payload.student_id,
-            payload.social_media_platform,
-            payload.social_media_url,
-            socialMediaId,
-        ]);
+        // Dynamically construct query based on fields in payload
+        const condition = pgp.as.format("WHERE social_media_id = $1", socialMediaId);
+        const query = `${pgp.helpers.update(payload, null, "social_medias")} ${condition} RETURNING *`;
+
+        const socialMedia = await db.one(query);
         return res.status(200).json(socialMedia);
     } catch (err) {
         return next(err); // unexpected error

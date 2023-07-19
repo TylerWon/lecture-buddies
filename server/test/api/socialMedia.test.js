@@ -12,7 +12,7 @@ const {
     loginUser,
     verifyDeleteRequestResponse,
     verifyPostRequestResponse,
-    verifyPutRequestResponse,
+    verifyPatchRequestResponse,
 } = require("../utils/helpers");
 
 describe("social media routes tests", () => {
@@ -154,53 +154,34 @@ describe("social media routes tests", () => {
             });
         });
 
-        describe("PUT", () => {
+        describe("PATCH", () => {
             let payload;
 
             beforeEach(() => {
-                payload = { ...socialMedia2 };
-                delete payload.social_media_id;
+                payload = {
+                    social_media_platform: "Twitter",
+                    social_media_url: "www.twitter.com/connorwon",
+                };
             });
 
-            test("PUT - should update a social media", async () => {
-                payload.social_media_platform = "Twitter";
-                payload.social_media_url = "www.twitter.com/connorwon";
-
-                await verifyPutRequestResponse(
+            test("PATCH - should update a social media", async () => {
+                await verifyPatchRequestResponse(
                     testSession,
                     `/social-medias/${socialMedia2.social_media_id}`,
                     payload,
                     200,
                     {
-                        ...payload,
                         social_media_id: socialMedia2.social_media_id,
+                        student_id: socialMedia2.student_id,
+                        ...payload,
                     }
                 );
             });
 
-            test("PUT - should not update a social media when missing some body parameters", async () => {
-                delete payload.social_media_url;
-
-                await verifyPutRequestResponse(
-                    testSession,
-                    `/social-medias/${socialMedia2.social_media_id}`,
-                    payload,
-                    400,
-                    [
-                        {
-                            type: "field",
-                            location: "body",
-                            path: "social_media_url",
-                            msg: "social_media_url is required",
-                        },
-                    ]
-                );
-            });
-
-            test("PUT - should not update a social media when some body parameters are the wrong type", async () => {
+            test("PATCH - should not update a social media when some body parameters are the wrong type", async () => {
                 payload.social_media_platform = "Youtube";
 
-                await verifyPutRequestResponse(
+                await verifyPatchRequestResponse(
                     testSession,
                     `/social-medias/${socialMedia2.social_media_id}`,
                     payload,
@@ -217,8 +198,8 @@ describe("social media routes tests", () => {
                 );
             });
 
-            test("PUT - should return error message when the social_media_id path parameter does not correspond to a social media", async () => {
-                await verifyPutRequestResponse(
+            test("PATCH - should return error message when the social_media_id path parameter does not correspond to a social media", async () => {
+                await verifyPatchRequestResponse(
                     testSession,
                     `/social-medias/${socialMedia2.social_media_id + 100}`,
                     payload,
@@ -229,10 +210,10 @@ describe("social media routes tests", () => {
                 );
             });
 
-            test("PUT - should return error message when the student does not exist", async () => {
+            test("PATCH - should return error message when the student does not exist", async () => {
                 payload.student_id = student1.student_id + 100;
 
-                await verifyPutRequestResponse(
+                await verifyPatchRequestResponse(
                     testSession,
                     `/social-medias/${socialMedia2.social_media_id}`,
                     payload,
@@ -243,8 +224,8 @@ describe("social media routes tests", () => {
                 );
             });
 
-            test("PUT - should return error message when request is unauthenticated", async () => {
-                await verifyPutRequestResponse(
+            test("PATCH - should return error message when request is unauthenticated", async () => {
+                await verifyPatchRequestResponse(
                     request(app),
                     `/social-medias/${socialMedia2.social_media_id}`,
                     payload,

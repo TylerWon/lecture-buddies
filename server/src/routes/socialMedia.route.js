@@ -8,15 +8,15 @@ const validationSchemas = require("../utils/validationSchemas");
 
 router.post(
     "/",
-    validationSchemas.createUpdateSocialMediaValidationSchema(),
+    validationSchemas.createSocialMediaValidationSchema(),
     validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     socialMediaController.createSocialMedia
 );
 router.delete("/:social_media_id(\\d+)", authMiddleware.authenticateRequest, socialMediaController.deleteSocialMedia);
-router.put(
+router.patch(
     "/:social_media_id(\\d+)",
-    validationSchemas.createUpdateSocialMediaValidationSchema(),
+    validationSchemas.updateSocialMediaValidationSchema(),
     validationMiddleware.validateRequest,
     authMiddleware.authenticateRequest,
     socialMediaController.updateSocialMedia

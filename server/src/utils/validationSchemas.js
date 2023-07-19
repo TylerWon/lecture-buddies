@@ -305,7 +305,7 @@ const updateStudentValidationSchema = () =>
     );
 
 // Social media
-const createUpdateSocialMediaValidationSchema = () =>
+const createSocialMediaValidationSchema = () =>
     checkSchema(
         {
             student_id: {
@@ -331,6 +331,34 @@ const createUpdateSocialMediaValidationSchema = () =>
                 exists: {
                     errorMessage: "social_media_url is required",
                 },
+                isString: {
+                    errorMessage: "social_media_url must be a string",
+                },
+            },
+        },
+        ["body"]
+    );
+
+const updateSocialMediaValidationSchema = () =>
+    checkSchema(
+        {
+            student_id: {
+                optional: true,
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "student_id must be a positive integer",
+                },
+            },
+            social_media_platform: {
+                optional: true,
+                matches: {
+                    options: [/^(Facebook|Instagram|LinkedIn|Twitter)$/],
+                    errorMessage:
+                        "social_media_platform must be one of 'Facebook', 'Instagram', 'LinkedIn', or 'Twitter'",
+                },
+            },
+            social_media_url: {
+                optional: true,
                 isString: {
                     errorMessage: "social_media_url must be a string",
                 },
@@ -387,6 +415,7 @@ module.exports = {
     getCourseHistoryForStudentValidationSchema,
     getFriendsForStudentValidationSchema,
     updateStudentValidationSchema,
-    createUpdateSocialMediaValidationSchema,
+    createSocialMediaValidationSchema,
+    updateSocialMediaValidationSchema,
     sortingAndPaginationValidationSchema,
 };
