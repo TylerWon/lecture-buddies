@@ -58,15 +58,15 @@ function LoginForm(props) {
         try {
             // Log the user in
             const loginResponse = await login(values);
+            const loginData = await loginResponse.json();
             if (loginResponse.status !== 200) {
                 formik.setErrors({ email: "Invalid email or password", password: "Invalid email or password" });
                 return;
             }
-            const user = await loginResponse.json();
 
             // Set the user context
             setIsLoggedIn(true);
-            setUserId(user.user_id);
+            setUserId(loginData.user_id);
 
             // Navigate to the courses page
             navigate("/courses");

@@ -82,17 +82,19 @@ function SignUpStep1(props) {
         try {
             // Create user
             const createUserResponse = await createUser(values);
+            const createUserData = await createUserResponse.json();
             if (createUserResponse.status === 400) {
                 formik.setErrors({ email: "An account with this email already exists" });
                 return;
             }
-            const user = await createUserResponse.json();
 
             // Create student
-            await createStudent(user.user_id);
+            await createStudent(createUserData.user_id);
 
-            // Set user id for the user context and move to next step
-            setUserId(user.user_id);
+            // Set user id for the user context
+            setUserId(createUserData.user_id);
+
+            // Move to next step in the sign up process
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
         } catch (err) {
             console.log(err); // unexpected error
