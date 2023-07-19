@@ -87,7 +87,7 @@ function LoginForm(props) {
             >
                 <Stack direction="column" justifyContent="center" alignItems={{ xs: "center", md: "start" }}>
                     <Typography variant="h1">Lecture Buddies</Typography>
-                    <Typography variant="h6">Make new friends in your classes</Typography>
+                    <Typography variant="h6">Meet new people in your classes</Typography>
                 </Stack>
                 <Paper elevation={2} sx={{ width: { xs: "250px", sm: "400px" }, padding: "16px" }}>
                     <Stack direction="column" alignItems="center" spacing={2}>
