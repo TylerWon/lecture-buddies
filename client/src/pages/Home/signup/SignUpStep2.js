@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import * as yup from "yup";
 
 import { UserContext } from "../../../contexts/UserContext";
+import { getSchools, updateStudent } from "../../../utils/requests";
 
 // Constants
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const YEARS = [
     { year_id: "1st", year_name: "1st" },
     { year_id: "2nd", year_name: "2nd" },
@@ -25,35 +25,6 @@ const validationSchema = yup.object({
     faculty: yup.string().required("Faculty is required"),
     major: yup.string().required("Major is required"),
 });
-
-// Gets schools
-const getSchools = async () => {
-    const response = await fetch(`${API_BASE_URL}/schools`, {
-        method: "GET",
-        credentials: "include",
-    });
-
-    return response;
-};
-
-// Updates a student
-const updateStudent = async (userId, values) => {
-    const response = await fetch(`${API_BASE_URL}/students/${userId}`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            school_id: values.school,
-            year: values.year,
-            faculty: values.faculty,
-            major: values.major,
-        }),
-        credentials: "include",
-    });
-
-    return response;
-};
 
 // CustomTextField component
 function CustomTextField(props) {

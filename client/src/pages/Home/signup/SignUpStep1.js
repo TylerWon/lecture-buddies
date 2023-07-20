@@ -4,13 +4,11 @@ import * as yup from "yup";
 import YupPassword from "yup-password";
 
 import { UserContext } from "../../../contexts/UserContext";
+import { createUser, createStudent } from "../../../utils/requests";
 
 import AuthForm from "../../../components/forms/AuthForm";
 
 YupPassword(yup);
-
-// Constants
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Yup validation schema for form
 const validationSchema = yup.object({
@@ -25,39 +23,6 @@ const validationSchema = yup.object({
         .minSymbols(1, "Password must contain at least 1 symbol")
         .required("Password is required"),
 });
-
-// Creates a new user
-const createUser = async (values) => {
-    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            username: values.email,
-            password: values.password,
-        }),
-        credentials: "include",
-    });
-
-    return response;
-};
-
-// Creates a new student
-const createStudent = async (userId) => {
-    const response = await fetch(`${API_BASE_URL}/students`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            student_id: userId,
-        }),
-        credentials: "include",
-    });
-
-    return response;
-};
 
 // SignUpStep1 component
 function SignUpStep1(props) {
@@ -89,7 +54,7 @@ function SignUpStep1(props) {
             }
 
             // Create student
-            await createStudent(createUserData.user_id);
+            await createStudent(createUserData);
 
             // Set user id for the user context
             setUserId(createUserData.user_id);

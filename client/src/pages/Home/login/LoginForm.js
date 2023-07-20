@@ -5,34 +5,15 @@ import { useContext } from "react";
 import * as yup from "yup";
 
 import { UserContext } from "../../../contexts/UserContext";
+import { login } from "../../../utils/requests";
 
 import AuthForm from "../../../components/forms/AuthForm";
-
-// Constants
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Yup validation schema for form
 const validationSchema = yup.object({
     email: yup.string().email("Enter a valid email").required("Email is required"),
     password: yup.string().required("Password is required"),
 });
-
-// Logs a user in
-const login = async (values) => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            username: values.email,
-            password: values.password,
-        }),
-        credentials: "include",
-    });
-
-    return response;
-};
 
 // LoginForm component
 function LoginForm(props) {
