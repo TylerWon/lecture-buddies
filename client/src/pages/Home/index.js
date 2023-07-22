@@ -1,24 +1,17 @@
-import { Box, Stack } from "@mui/material";
 import { useState } from "react";
 
-import LoginForm from "./login/LoginForm";
-import LoginFooter from "./login/LoginFooter";
-import SignUpModal from "./signup/SignUpModal";
+import Login from "./Login";
+import SignUp from "./SignUp";
 
 // Home component
 function Home() {
     // Hooks
-    const [showSignUpModal, setShowSignUpModal] = useState(false);
+    const [showSignUp, setShowSignUp] = useState(false);
 
     return (
         <>
-            <Box minHeight="inherit">
-                <Stack justifyContent="space-between" minHeight="inherit">
-                    <LoginForm setShowSignUpModal={setShowSignUpModal} />
-                    <LoginFooter />
-                </Stack>
-            </Box>
-            <SignUpModal showSignUpModal={showSignUpModal} setShowSignUpModal={setShowSignUpModal} />
+            <Login setShowSignUp={setShowSignUp} />
+            <SignUp showSignUp={showSignUp} setShowSignUp={setShowSignUp} />
         </>
     );
 }

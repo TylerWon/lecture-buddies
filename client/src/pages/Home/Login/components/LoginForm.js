@@ -4,10 +4,10 @@ import { useFormik } from "formik";
 import { useContext } from "react";
 import * as yup from "yup";
 
-import { UserContext } from "../../../contexts/UserContext";
-import { login } from "../../../utils/requests";
+import { UserContext } from "../../../../contexts/UserContext";
+import { login } from "../../../../utils/requests";
 
-import AuthForm from "../../../components/forms/AuthForm";
+import AuthForm from "../../../../components/forms/AuthForm";
 
 // Yup validation schema for form
 const validationSchema = yup.object({
@@ -18,7 +18,7 @@ const validationSchema = yup.object({
 // LoginForm component
 function LoginForm(props) {
     // Props
-    const { setShowSignUpModal } = props;
+    const { setShowSignUp } = props;
 
     // Hooks
     const { setIsLoggedIn, setUserId } = useContext(UserContext);
@@ -58,7 +58,7 @@ function LoginForm(props) {
 
     // Handler for when the sign up link is clicked
     const handleSignUpClick = () => {
-        setShowSignUpModal(true);
+        setShowSignUp(true);
     };
 
     return (

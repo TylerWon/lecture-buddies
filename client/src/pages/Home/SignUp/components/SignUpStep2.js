@@ -5,8 +5,8 @@ import { useContext } from "react";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
 
-import { UserContext } from "../../../contexts/UserContext";
-import { getSchools, updateStudent } from "../../../utils/requests";
+import { UserContext } from "../../../../contexts/UserContext";
+import { getSchools, updateStudent } from "../../../../utils/requests";
 
 // Constants
 const YEARS = [

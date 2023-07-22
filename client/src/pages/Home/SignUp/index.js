@@ -16,36 +16,36 @@ import { useState } from "react";
 import * as yup from "yup";
 import YupPassword from "yup-password";
 
-import SignUpStep1 from "./SignUpStep1";
-import SignUpStep2 from "./SignUpStep2";
-import SignUpStep3 from "./SignUpStep3";
+import SignUpStep1 from "./components/SignUpStep1";
+import SignUpStep2 from "./components/SignUpStep2";
+import SignUpStep3 from "./components/SignUpStep3";
 
 YupPassword(yup);
 
 // Constants
 const STEPS = ["General", "Education", "Personal"];
 
-// SignUpModal component
-function SignUpModal(props) {
+// SignUp component
+function SignUp(props) {
     // Props
-    const { showSignUpModal, setShowSignUpModal } = props;
+    const { showSignUp, setShowSignUp } = props;
 
     // Hooks
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const [activeStep, setActiveStep] = useState(0);
 
-    // Handler for when sign up modal is closed
-    const handleSignUpModalClose = () => {
-        setShowSignUpModal(false);
+    // Handler for when sign up is closed
+    const handleSignUpClose = () => {
+        setShowSignUp(false);
     };
 
     return (
-        <Dialog open={showSignUpModal} onClose={handleSignUpModalClose} fullScreen={isMobile} fullWidth maxWidth="sm">
+        <Dialog open={showSignUp} onClose={handleSignUpClose} fullScreen={isMobile} fullWidth maxWidth="sm">
             <Box padding="20px" bgcolor={theme.palette.common.white}>
                 <Stack direction="row" justifyContent="space-between">
                     <Typography variant="h3">Sign up</Typography>
-                    <IconButton onClick={handleSignUpModalClose}>
+                    <IconButton onClick={handleSignUpClose}>
                         <CloseIcon />
                     </IconButton>
                 </Stack>
@@ -68,4 +68,4 @@ function SignUpModal(props) {
     );
 }
 
-export default SignUpModal;
+export default SignUp;

@@ -3,10 +3,10 @@ import { useContext } from "react";
 import * as yup from "yup";
 import YupPassword from "yup-password";
 
-import { UserContext } from "../../../contexts/UserContext";
-import { createUser, createStudent } from "../../../utils/requests";
+import { UserContext } from "../../../../contexts/UserContext";
+import { createUser, createStudent } from "../../../../utils/requests";
 
-import AuthForm from "../../../components/forms/AuthForm";
+import AuthForm from "../../../../components/forms/AuthForm";
 
 YupPassword(yup);
 
