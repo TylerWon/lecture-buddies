@@ -12,18 +12,46 @@ import {
     useMediaQuery,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { styled } from "@mui/material/styles";
 import { useState } from "react";
-import * as yup from "yup";
-import YupPassword from "yup-password";
 
 import SignUpStep1 from "./components/SignUpStep1";
 import SignUpStep2 from "./components/SignUpStep2";
 import SignUpStep3 from "./components/SignUpStep3";
 
-YupPassword(yup);
-
 // Constants
 const STEPS = ["General", "Education", "Personal"];
+
+// Container for the content
+const ContentContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: theme.spacing(4),
+    backgroundColor: theme.palette.common.white,
+    padding: theme.spacing(4),
+    // width: "100%",
+}));
+
+// Container for the header
+const HeaderContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+}));
+
+// Container for the form
+const FormContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: theme.spacing(2),
+    width: "100%",
+}));
 
 // SignUp component
 function SignUp(props) {
@@ -41,29 +69,27 @@ function SignUp(props) {
     };
 
     return (
-        <Dialog open={showSignUp} onClose={handleSignUpClose} fullScreen={isMobile} fullWidth maxWidth="sm">
-            <Box padding="20px" bgcolor={theme.palette.common.white}>
-                <Stack direction="row" justifyContent="space-between">
+        <Dialog fullWidth maxWidth="sm" open={showSignUp} onClose={handleSignUpClose} fullScreen={isMobile}>
+            <ContentContainer>
+                <HeaderContainer>
                     <Typography variant="h3">Sign up</Typography>
                     <IconButton onClick={handleSignUpClose}>
                         <CloseIcon />
                     </IconButton>
-                </Stack>
-                <Container sx={{ marginTop: "25px" }}>
-                    <Stack direction="column" alignItems="center" spacing={2}>
-                        <Stepper activeStep={activeStep} alternativeLabel={isMobile} sx={{ width: "80%" }}>
-                            {STEPS.map((label) => (
-                                <Step key={label}>
-                                    <StepLabel>{label}</StepLabel>
-                                </Step>
-                            ))}
-                        </Stepper>
-                        {activeStep === 0 && <SignUpStep1 setActiveStep={setActiveStep} />}
-                        {activeStep === 1 && <SignUpStep2 setActiveStep={setActiveStep} />}
-                        {activeStep === 2 && <SignUpStep3 setActiveStep={setActiveStep} />}
-                    </Stack>
-                </Container>
-            </Box>
+                </HeaderContainer>
+                <FormContainer>
+                    <Stepper sx={{ width: "80%" }} activeStep={activeStep} alternativeLabel={isMobile}>
+                        {STEPS.map((label) => (
+                            <Step key={label}>
+                                <StepLabel>{label}</StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                    {activeStep === 0 && <SignUpStep1 setActiveStep={setActiveStep} />}
+                    {activeStep === 1 && <SignUpStep2 setActiveStep={setActiveStep} />}
+                    {activeStep === 2 && <SignUpStep3 setActiveStep={setActiveStep} />}
+                </FormContainer>
+            </ContentContainer>
         </Dialog>
     );
 }

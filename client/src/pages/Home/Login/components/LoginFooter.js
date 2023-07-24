@@ -5,7 +5,7 @@ function LoginFooter() {
     // Hooks
     const theme = useTheme();
 
-    return <Box minHeight="250px" bgcolor={theme.palette.common.black} />;
+    return <Box sx={{ flex: "1 0 0", backgroundColor: theme.palette.common.black }} />;
 }
 
 export default LoginFooter;

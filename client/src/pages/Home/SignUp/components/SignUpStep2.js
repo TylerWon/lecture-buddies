@@ -1,4 +1,5 @@
 import { Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useFormik } from "formik";
 import { useContext } from "react";
@@ -25,6 +26,15 @@ const validationSchema = yup.object({
     faculty: yup.string().required("Faculty is required"),
     major: yup.string().required("Major is required"),
 });
+
+// Container for the content
+const ContentContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: theme.spacing(2),
+}));
 
 // CustomTextField component
 function CustomTextField(props) {
@@ -132,8 +142,8 @@ function SignUpStep2(props) {
     }, []);
 
     return (
-        <FormControl component="form" fullWidth onSubmit={formik.handleSubmit}>
-            <Stack direction="column" alignItems="center" spacing={2}>
+        <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
+            <ContentContainer>
                 <Grid container spacing={2}>
                     <Grid xs={12} sm={6}>
                         <CustomSelectField id="school" label="School" formik={formik} options={schools} />
@@ -151,7 +161,7 @@ function SignUpStep2(props) {
                 <Button variant="contained" color="primary" type="submit" fullWidth>
                     Next
                 </Button>
-            </Stack>
+            </ContentContainer>
         </FormControl>
     );
 }

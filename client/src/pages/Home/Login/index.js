@@ -1,19 +1,26 @@
-import { Box, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 import LoginForm from "./components/LoginForm";
 import LoginFooter from "./components/LoginFooter";
+
+// Container for the content
+const ContentContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    minHeight: "inherit",
+}));
 
 // Login component
 function Login(props) {
     const { setShowSignUp } = props;
 
     return (
-        <Box minHeight="inherit">
-            <Stack justifyContent="space-between" minHeight="inherit">
-                <LoginForm setShowSignUp={setShowSignUp} />
-                <LoginFooter />
-            </Stack>
-        </Box>
+        <ContentContainer>
+            <LoginForm setShowSignUp={setShowSignUp} />
+            <LoginFooter />
+        </ContentContainer>
     );
 }
 

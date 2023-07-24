@@ -1,4 +1,5 @@
-import { Box, Link as MuiLink, Paper, Stack, Typography } from "@mui/material";
+import { Link as MuiLink, Paper, Stack, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { useNavigate, Link as ReactRouterLink } from "react-router-dom";
 import { useFormik } from "formik";
 import { useContext } from "react";
@@ -14,6 +15,50 @@ const validationSchema = yup.object({
     email: yup.string().email("Enter a valid email").required("Email is required"),
     password: yup.string().required("Password is required"),
 });
+
+// Container for the content
+const ContentContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: theme.spacing(20),
+    padding: theme.spacing(4),
+    flex: "2 0 0",
+    [theme.breakpoints.down("md")]: {
+        flexDirection: "column",
+        gap: theme.spacing(4),
+    },
+}));
+
+// Container for the header
+const HeaderContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "start",
+    [theme.breakpoints.down("md")]: {
+        alignItems: "center",
+    },
+}));
+
+// Container for the form background
+const FormBackground = styled(Paper)(({ theme }) => ({
+    width: "400px",
+    padding: theme.spacing(2),
+    [theme.breakpoints.down("sm")]: {
+        width: "100%",
+    },
+}));
+
+// Container for the form
+const FormContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: theme.spacing(2),
+}));
 
 // LoginForm component
 function LoginForm(props) {
@@ -62,30 +107,23 @@ function LoginForm(props) {
     };
 
     return (
-        <Box minHeight="400px" marginTop="200px" marginBottom="92px">
-            <Stack
-                direction={{ xs: "column", md: "row" }}
-                justifyContent="center"
-                alignItems="center"
-                spacing={{ xs: 5, md: 15, lg: 40 }}
-            >
-                <Stack direction="column" justifyContent="center" alignItems={{ xs: "center", md: "start" }}>
-                    <Typography variant="h1">Lecture Buddies</Typography>
-                    <Typography variant="h6">Meet new people in your classes</Typography>
-                </Stack>
-                <Paper elevation={2} sx={{ width: { xs: "250px", sm: "400px" }, padding: "16px" }}>
-                    <Stack direction="column" alignItems="center" spacing={2}>
-                        <AuthForm formik={formik} submitButtonText="Login" />
-                        <Typography variant="body1">
-                            Don't have an account yet?{" "}
-                            <MuiLink component={ReactRouterLink} variant="body1" onClick={handleSignUpClick}>
-                                Sign up
-                            </MuiLink>
-                        </Typography>
-                    </Stack>
-                </Paper>
-            </Stack>
-        </Box>
+        <ContentContainer>
+            <HeaderContainer>
+                <Typography variant="h1">Lecture Buddies</Typography>
+                <Typography variant="h6">Meet new people in your classes</Typography>
+            </HeaderContainer>
+            <FormBackground>
+                <FormContainer>
+                    <AuthForm formik={formik} submitButtonText="Login" />
+                    <Typography variant="body1">
+                        Don't have an account yet?{" "}
+                        <MuiLink component={ReactRouterLink} variant="body1" onClick={handleSignUpClick}>
+                            Sign up
+                        </MuiLink>
+                    </Typography>
+                </FormContainer>
+            </FormBackground>
+        </ContentContainer>
     );
 }
 

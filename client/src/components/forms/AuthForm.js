@@ -1,7 +1,17 @@
 import { Button, FormControl, IconButton, InputAdornment, Stack, TextField } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
+
+// Container for the content
+const ContentContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: theme.spacing(2),
+}));
 
 // AuthForm component
 function AuthForm(props) {
@@ -17,8 +27,8 @@ function AuthForm(props) {
     };
 
     return (
-        <FormControl component="form" fullWidth onSubmit={formik.handleSubmit}>
-            <Stack direction="column" alignItems="center" spacing={2}>
+        <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
+            <ContentContainer>
                 <TextField
                     fullWidth
                     id="email"
@@ -49,10 +59,10 @@ function AuthForm(props) {
                         ),
                     }}
                 />
-                <Button color="primary" variant="contained" fullWidth type="submit">
+                <Button fullWidth color="primary" variant="contained" type="submit">
                     {submitButtonText}
                 </Button>
-            </Stack>
+            </ContentContainer>
         </FormControl>
     );
 }
