@@ -1,4 +1,4 @@
-import { Button, FormControl, Stack } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useFormik } from "formik";
 import { useContext } from "react";
@@ -6,14 +6,16 @@ import * as yup from "yup";
 
 import { UserContext } from "../../../../../contexts/UserContext";
 import { updateStudent } from "../../../../../utils/requests";
-import EducationSection from "./EducationSection";
 
-// Yup validation schema for form
-const validationSchema = yup.object({
+import EducationForm from "./components/EducationForm";
+
+// Yup validation schema for education form
+const educationFormValidationSchema = yup.object({
     school: yup.number().required("School is required"),
     year: yup.string().required("Year is required"),
     faculty: yup.string().required("Faculty is required"),
     major: yup.string().required("Major is required"),
+    bio: yup.string().max(500, "Character limit is 500").required("Bio is required"),
 });
 
 // Container for the content
@@ -22,7 +24,7 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    gap: theme.spacing(2),
+    gap: theme.spacing(4),
 }));
 
 // SignUpStep2 component
@@ -32,7 +34,7 @@ function SignUpStep2(props) {
 
     // Hooks
     const { userId } = useContext(UserContext);
-    const formik = useFormik({
+    const educationFormFormik = useFormik({
         initialValues: {
             school: "",
             year: "",
@@ -40,21 +42,29 @@ function SignUpStep2(props) {
             major: "",
             bio: "",
         },
-        validationSchema: validationSchema,
-        onSubmit: (values) => {
-            handleEducationFormSubmit(values);
-        },
+        validationSchema: educationFormValidationSchema,
+        onSubmit: () => {},
     });
 
-    // Handler for when form is submitted
-    const handleEducationFormSubmit = async (values) => {
+    // Handler for when next button is clicked
+    const handleNextClick = async () => {
+        // Submit education form to check if there are errors
+        await educationFormFormik.submitForm();
+        if (!educationFormFormik.isValid) {
+            return;
+        }
+
         try {
             // Update student
-            const updateStudentResponse = await updateStudent(userId, values);
+            const updateStudentResponse = await updateStudent(userId, educationFormFormik.values);
             const updateStudentData = await updateStudentResponse.json();
             if (updateStudentResponse.status === 400) {
                 throw new Error(updateStudentData.message);
             }
+
+            // Create interests
+
+            // Create social medias
 
             // Move to next step in the sign up process
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -64,14 +74,12 @@ function SignUpStep2(props) {
     };
 
     return (
-        <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
-            <ContentContainer>
-                <EducationSection formik={formik} />
-                <Button variant="contained" color="primary" type="submit" fullWidth>
-                    Next
-                </Button>
-            </ContentContainer>
-        </FormControl>
+        <ContentContainer>
+            <EducationForm formik={educationFormFormik} />
+            <Button fullWidth variant="contained" color="primary" onClick={handleNextClick}>
+                Next
+            </Button>
+        </ContentContainer>
     );
 }
 
