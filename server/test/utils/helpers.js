@@ -1,8 +1,6 @@
 require("dotenv").config();
 
-const request = require("supertest");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
 
 const queries = require("../utils/queries");
 
