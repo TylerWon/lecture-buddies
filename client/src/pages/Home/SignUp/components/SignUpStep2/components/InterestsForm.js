@@ -84,7 +84,7 @@ function InterestsForm() {
             const newInterests = interests.filter((interest) => interest.interest_id !== interestId);
             setInterests(newInterests);
         } catch (err) {
-            console.log(err); // unexpected error
+            console.log(err); // unexpected server error
         }
     };
 
@@ -115,7 +115,7 @@ function InterestsForm() {
             // Close add interest form
             handleCancelAddInterestClick();
         } catch (err) {
-            console.log(err); // unexpected error
+            console.log(err); // unexpected server error
         }
     };
 

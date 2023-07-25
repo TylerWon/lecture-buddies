@@ -62,7 +62,7 @@ function SignUpStep1(props) {
             // Move to next step in the sign up process
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
         } catch (err) {
-            console.log(err); // unexpected error
+            console.log(err); // unexpected server error
         }
     };
 

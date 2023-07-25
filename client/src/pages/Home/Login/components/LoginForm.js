@@ -97,7 +97,7 @@ function LoginForm(props) {
             // Navigate to the courses page
             navigate("/courses");
         } catch (err) {
-            console.log(err); // unexpected error
+            console.log(err); // unexpected server error
         }
     };
 

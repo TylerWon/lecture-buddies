@@ -80,7 +80,7 @@ function EducationForm(props) {
             // Set schools state
             setSchools(schools);
         } catch (err) {
-            console.log(err); // unexpected error
+            console.log(err); // unexpected server error
         }
     };
 

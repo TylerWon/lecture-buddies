@@ -29,7 +29,7 @@ function AutoLogin() {
 
             setIsLoading(false);
         } catch (err) {
-            console.log(err); // unexpected error
+            console.log(err); // unexpected server error
         }
     };
 
