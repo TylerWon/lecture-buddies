@@ -5,7 +5,7 @@ import { autoLogin } from "../../utils/requests";
 import { UserContext } from "../../contexts/UserContext";
 
 // AutoLogin component
-function AutoLogin() {
+export default function AutoLogin() {
     // Hooks
     const { setIsLoggedIn, setUserId } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(true);
@@ -37,5 +37,3 @@ function AutoLogin() {
 
     return <>{isLoading ? null : <Outlet />}</>;
 }
-
-export default AutoLogin;

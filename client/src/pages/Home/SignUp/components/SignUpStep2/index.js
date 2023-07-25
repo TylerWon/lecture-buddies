@@ -9,6 +9,7 @@ import { updateStudent } from "../../../../../utils/requests";
 
 import EducationForm from "./components/EducationForm";
 import InterestsForm from "./components/InterestsForm";
+import SocialMediasForm from "./components/SocialMediasForm";
 
 // Yup validation schema for education form
 const educationFormValidationSchema = yup.object({
@@ -29,7 +30,7 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
 }));
 
 // SignUpStep2 component
-function SignUpStep2(props) {
+export default function SignUpStep2(props) {
     // Props
     const { setActiveStep } = props;
 
@@ -74,11 +75,10 @@ function SignUpStep2(props) {
         <ContentContainer>
             <EducationForm formik={educationFormFormik} />
             <InterestsForm />
+            <SocialMediasForm />
             <Button fullWidth variant="contained" color="primary" onClick={handleNextClick}>
                 Next
             </Button>
         </ContentContainer>
     );
 }
-
-export default SignUpStep2;

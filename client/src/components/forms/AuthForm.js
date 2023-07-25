@@ -15,7 +15,7 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
 }));
 
 // AuthForm component
-function AuthForm(props) {
+export default function AuthForm(props) {
     //Props
     const { formik, submitButtonText } = props;
 
@@ -53,5 +53,3 @@ function AuthForm(props) {
         </FormControl>
     );
 }
-
-export default AuthForm;

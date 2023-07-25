@@ -17,7 +17,7 @@ const YEARS = [
 ];
 
 // EducationForm component
-function EducationForm(props) {
+export default function EducationForm(props) {
     // Props
     const { formik } = props;
 
@@ -65,5 +65,3 @@ function EducationForm(props) {
         </FormControl>
     );
 }
-
-export default EducationForm;

@@ -61,7 +61,7 @@ const FormContainer = styled(Stack)(({ theme }) => ({
 }));
 
 // LoginForm component
-function LoginForm(props) {
+export default function LoginForm(props) {
     // Props
     const { setShowSignUp } = props;
 
@@ -126,5 +126,3 @@ function LoginForm(props) {
         </ContentContainer>
     );
 }
-
-export default LoginForm;

@@ -1,6 +1,4 @@
 // Courses component
-function Courses() {
+export default function Courses() {
     return;
 }
-
-export default Courses;

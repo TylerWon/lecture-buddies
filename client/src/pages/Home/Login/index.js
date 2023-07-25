@@ -13,7 +13,7 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
 }));
 
 // Login component
-function Login(props) {
+export default function Login(props) {
     const { setShowSignUp } = props;
 
     return (
@@ -23,5 +23,3 @@ function Login(props) {
         </ContentContainer>
     );
 }
-
-export default Login;

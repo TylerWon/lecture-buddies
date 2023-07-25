@@ -47,7 +47,7 @@ const FormContentContainer = styled(Stack)(({ theme }) => ({
 }));
 
 // InterestsForm component
-function InterestsForm() {
+export default function InterestsForm() {
     // Hooks
     const { userId } = useContext(UserContext);
     const formik = useFormik({
@@ -142,5 +142,3 @@ function InterestsForm() {
         </ContentContainer>
     );
 }
-
-export default InterestsForm;

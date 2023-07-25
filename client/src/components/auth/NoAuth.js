@@ -4,7 +4,7 @@ import { useContext, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
 
 // NoAuth component
-function NoAuth() {
+export default function NoAuth() {
     // Hooks
     const { isLoggedIn } = useContext(UserContext);
     const navigate = useNavigate();
@@ -18,5 +18,3 @@ function NoAuth() {
 
     return <>{isLoggedIn ? null : <Outlet />}</>;
 }
-
-export default NoAuth;

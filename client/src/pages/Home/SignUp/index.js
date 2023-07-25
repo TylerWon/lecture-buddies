@@ -52,7 +52,7 @@ const FormContainer = styled(Stack)(({ theme }) => ({
 }));
 
 // SignUp component
-function SignUp(props) {
+export default function SignUp(props) {
     // Props
     const { showSignUp, setShowSignUp } = props;
 
@@ -91,5 +91,3 @@ function SignUp(props) {
         </Dialog>
     );
 }
-
-export default SignUp;

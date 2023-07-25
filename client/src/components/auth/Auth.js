@@ -4,7 +4,7 @@ import { useContext, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
 
 // Auth component
-function Auth() {
+export default function Auth() {
     // Hooks
     const { isLoggedIn } = useContext(UserContext);
     const navigate = useNavigate();
@@ -18,5 +18,3 @@ function Auth() {
 
     return <>{isLoggedIn ? <Outlet /> : null}</>;
 }
-
-export default Auth;

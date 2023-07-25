@@ -4,7 +4,7 @@ import Login from "./Login";
 import SignUp from "./SignUp";
 
 // Home component
-function Home() {
+export default function Home() {
     // Hooks
     const [showSignUp, setShowSignUp] = useState(false);
 
@@ -15,5 +15,3 @@ function Home() {
         </>
     );
 }
-
-export default Home;

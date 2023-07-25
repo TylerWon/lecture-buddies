@@ -25,7 +25,7 @@ const validationSchema = yup.object({
 });
 
 // SignUpStep1 component
-function SignUpStep1(props) {
+export default function SignUpStep1(props) {
     // Props
     const { setActiveStep } = props;
 
@@ -68,5 +68,3 @@ function SignUpStep1(props) {
 
     return <AuthForm formik={formik} submitButtonText="Sign up" />;
 }
-
-export default SignUpStep1;
