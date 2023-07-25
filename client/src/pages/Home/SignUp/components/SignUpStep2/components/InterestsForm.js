@@ -93,7 +93,7 @@ export default function InterestsForm() {
     const handleAddInterestFormSubmit = async (values) => {
         try {
             // Create interest
-            const createInterestResponse = await createInterest({ student_id: userId, interest: values.interest });
+            const createInterestResponse = await createInterest({ student_id: userId, ...values });
             const createInterestData = await createInterestResponse.json();
             if (createInterestResponse.status === 400) {
                 throw new Error(createInterestData.message);
