@@ -1,10 +1,8 @@
 import { Outlet } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 
+import { autoLogin } from "../../utils/requests";
 import { UserContext } from "../../contexts/UserContext";
-
-// Constants
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 // AutoLogin component
 function AutoLogin() {
@@ -13,29 +11,28 @@ function AutoLogin() {
     const [isLoading, setIsLoading] = useState(true);
 
     // Logs a user in if they have a valid session cookie
-    const autoLogin = async () => {
+    const login = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/autologin`, {
-                method: "POST",
-                credentials: "include",
-            });
+            // Try to log user in
+            const autoLoginResponse = await autoLogin();
+            const autoLoginData = await autoLoginResponse.json();
 
-            if (response.status === 200) {
-                const data = await response.json();
-
+            // If login is succesful, set user context
+            if (autoLoginResponse.status === 200) {
                 setIsLoggedIn(true);
-                setUserId(data.userId);
+                setUserId(autoLoginData.userId);
             }
 
+            // Set loading to false
             setIsLoading(false);
         } catch (err) {
             console.log(err); // unexpected server error
         }
     };
 
-    // Tries to automatically log a user in
+    // Tries to log a user in
     useEffect(() => {
-        autoLogin();
+        login();
     }, []);
 
     return <>{isLoading ? null : <Outlet />}</>;

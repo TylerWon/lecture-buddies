@@ -1,6 +1,16 @@
 // Constants
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+// Logs a user in if they have a valid session cookie
+export const autoLogin = async () => {
+    const response = await fetch(`${API_BASE_URL}/auth/autologin`, {
+        method: "POST",
+        credentials: "include",
+    });
+
+    return response;
+};
+
 // Creates a new interest
 export const createInterest = async (values) => {
     const response = await fetch(`${API_BASE_URL}/interests`, {
