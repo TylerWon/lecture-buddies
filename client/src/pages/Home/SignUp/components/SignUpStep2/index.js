@@ -8,6 +8,7 @@ import { UserContext } from "../../../../../contexts/UserContext";
 import { updateStudent } from "../../../../../utils/requests";
 
 import EducationForm from "./components/EducationForm";
+import InterestsForm from "./components/InterestsForm";
 
 // Yup validation schema for education form
 const educationFormValidationSchema = yup.object({
@@ -62,10 +63,6 @@ function SignUpStep2(props) {
                 throw new Error(updateStudentData.message);
             }
 
-            // Create interests
-
-            // Create social medias
-
             // Move to next step in the sign up process
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
         } catch (err) {
@@ -76,6 +73,7 @@ function SignUpStep2(props) {
     return (
         <ContentContainer>
             <EducationForm formik={educationFormFormik} />
+            <InterestsForm />
             <Button fullWidth variant="contained" color="primary" onClick={handleNextClick}>
                 Next
             </Button>

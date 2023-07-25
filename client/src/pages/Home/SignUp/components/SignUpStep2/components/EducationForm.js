@@ -62,8 +62,8 @@ function CustomSelectField(props) {
     );
 }
 
-// EducationSection component
-function EducationSection(props) {
+// EducationForm component
+function EducationForm(props) {
     // Props
     const { formik } = props;
 
@@ -123,4 +123,4 @@ function EducationSection(props) {
     );
 }
 
-export default EducationSection;
+export default EducationForm;

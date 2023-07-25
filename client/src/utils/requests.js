@@ -1,6 +1,23 @@
 // Constants
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+// Creates a new interest
+export const createInterest = async (values) => {
+    const response = await fetch(`${API_BASE_URL}/interests`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            student_id: values.student_id,
+            interest_name: values.interest,
+        }),
+        credentials: "include",
+    });
+
+    return response;
+};
+
 // Creates a new student
 export const createStudent = async (values) => {
     const response = await fetch(`${API_BASE_URL}/students`, {
@@ -34,6 +51,26 @@ export const createUser = async (values) => {
     return response;
 };
 
+// Deletes an interest
+export const deleteInterest = async (interestId) => {
+    const response = await fetch(`${API_BASE_URL}/interests/${interestId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+// Gets schools
+export const getSchools = async () => {
+    const response = await fetch(`${API_BASE_URL}/schools`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    return response;
+};
+
 // Logs a user in
 export const login = async (values) => {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -45,16 +82,6 @@ export const login = async (values) => {
             username: values.email,
             password: values.password,
         }),
-        credentials: "include",
-    });
-
-    return response;
-};
-
-// Gets schools
-export const getSchools = async () => {
-    const response = await fetch(`${API_BASE_URL}/schools`, {
-        method: "GET",
         credentials: "include",
     });
 
