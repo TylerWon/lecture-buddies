@@ -1,10 +1,22 @@
-import { IconButton } from "@mui/material";
+import { IconButton, Stack, Typography } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-// DefaultAcceptButton component
-export function DefaultAcceptButton(props) {
+// AddButtonWithLabel component
+export function AddButtonWithLabel(props) {
+    const { label, ...iconButtonProps } = props;
+
+    return (
+        <Stack direction="column" justifyContent="center" alignItems="center">
+            <AddButton {...iconButtonProps} />
+            <Typography variant="body1">{label}</Typography>
+        </Stack>
+    );
+}
+
+// AcceptButton component
+export function AcceptButton(props) {
     return (
         <IconButton color="secondary" size="small" {...props}>
             <CheckCircleIcon />
@@ -12,8 +24,8 @@ export function DefaultAcceptButton(props) {
     );
 }
 
-// DefaultAddButton component
-export function DefaultAddButton(props) {
+// AddButton component
+export function AddButton(props) {
     return (
         <IconButton color="primary" size="small" {...props}>
             <AddCircleIcon />
@@ -21,8 +33,8 @@ export function DefaultAddButton(props) {
     );
 }
 
-// DefaultCancelButton component
-export function DefaultCancelButton(props) {
+// CancelButton component
+export function CancelButton(props) {
     return (
         <IconButton color="grey" size="small" {...props}>
             <CancelIcon />

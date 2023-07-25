@@ -10,7 +10,7 @@ import { createInterest, deleteInterest } from "../../../../../../utils/requests
 import { UserContext } from "../../../../../../contexts/UserContext";
 
 import { DefaultTextField } from "../../../../../../components/atoms/input";
-import { DefaultAcceptButton, DefaultAddButton, DefaultCancelButton } from "../../../../../../components/atoms/button";
+import { AddButtonWithLabel, AcceptButton, CancelButton } from "../../../../../../components/atoms/button";
 
 // Yup validation schema for form
 const validationSchema = yup.object({
@@ -140,15 +140,12 @@ function InterestsForm() {
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer>
                         <DefaultTextField id="interest" label="Interest" formik={formik} />
-                        <DefaultAcceptButton type="submit" />
-                        <DefaultCancelButton onClick={handleCancelAddInterestClick} />
+                        <AcceptButton type="submit" />
+                        <CancelButton onClick={handleCancelAddInterestClick} />
                     </FormContentContainer>
                 </FormControl>
             ) : (
-                <AddInterestButtonContainer>
-                    <DefaultAddButton onClick={handleAddInterestClick} />
-                    <Typography variant="body1">Add Interest</Typography>
-                </AddInterestButtonContainer>
+                <AddButtonWithLabel label="Add interest" onClick={handleAddInterestClick} />
             )}
         </ContentContainer>
     );
