@@ -1,4 +1,4 @@
-import { Button, FormControl, IconButton, InputAdornment, Stack, TextField } from "@mui/material";
+import { Button, FormControl, IconButton, InputAdornment, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -31,16 +31,11 @@ function AuthForm(props) {
         <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
             <ContentContainer>
                 <DefaultTextField id="email" label="Email" formik={formik} />
-                <TextField
-                    fullWidth
+                <DefaultTextField
                     id="password"
-                    name="password"
                     label="Password"
+                    formik={formik}
                     type={showPassword ? "text" : "password"}
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    error={formik.touched.password && Boolean(formik.errors.password)}
-                    helperText={formik.touched.password && formik.errors.password}
                     InputProps={{
                         endAdornment: (
                             <InputAdornment position="end">

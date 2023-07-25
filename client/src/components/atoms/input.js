@@ -52,7 +52,7 @@ export function DefaultTextArea(props) {
 
 // DefaultTextField component
 export function DefaultTextField(props) {
-    const { id, label, formik } = props;
+    const { id, label, formik, ...textFieldProps } = props;
 
     return (
         <TextField
@@ -64,6 +64,7 @@ export function DefaultTextField(props) {
             onChange={formik.handleChange}
             error={formik.touched[id] && Boolean(formik.errors[id])}
             helperText={formik.touched[id] && formik.errors[id]}
+            {...textFieldProps}
         />
     );
 }

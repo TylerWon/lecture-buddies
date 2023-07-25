@@ -46,14 +46,6 @@ const FormContentContainer = styled(Stack)(({ theme }) => ({
     gap: theme.spacing(1),
 }));
 
-// Container for add interest button
-const AddInterestButtonContainer = styled(Stack)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-}));
-
 // InterestsForm component
 function InterestsForm() {
     // Hooks
