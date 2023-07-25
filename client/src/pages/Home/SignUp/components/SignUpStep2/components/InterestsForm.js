@@ -38,9 +38,7 @@ const HeaderContainer = styled(Stack)(({ theme }) => ({
 }));
 
 // Container for form content
-const FormContentContainer = styled(Stack)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "row",
+const FormContentContainer = styled(Grid)(({ theme }) => ({
     justifyContent: "center",
     alignItems: "center",
     gap: theme.spacing(1),
@@ -130,10 +128,16 @@ export default function InterestsForm() {
             </HeaderContainer>
             {showAddInterestForm ? (
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
-                    <FormContentContainer>
-                        <DefaultTextField id="interest" label="Interest" formik={formik} />
-                        <AcceptButton type="submit" />
-                        <CancelButton onClick={handleCancelAddInterestClick} />
+                    <FormContentContainer container>
+                        <Grid xs={10.15}>
+                            <DefaultTextField id="interest" label="Interest" formik={formik} />
+                        </Grid>
+                        <Grid xs>
+                            <AcceptButton type="submit" />
+                        </Grid>
+                        <Grid xs>
+                            <CancelButton onClick={handleCancelAddInterestClick} />
+                        </Grid>
                     </FormContentContainer>
                 </FormControl>
             ) : (
