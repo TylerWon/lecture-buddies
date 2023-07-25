@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Chip, FormControl, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Chip, FormControl, IconButton, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { styled } from "@mui/material/styles";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -11,6 +11,8 @@ import * as yup from "yup";
 
 import { createInterest, deleteInterest } from "../../../../../../utils/requests";
 import { UserContext } from "../../../../../../contexts/UserContext";
+
+import { DefaultTextField } from "../../../../../../components/atoms/input";
 
 // Yup validation schema for form
 const validationSchema = yup.object({
@@ -140,16 +142,7 @@ function InterestsForm() {
             {showAddInterestForm ? (
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer>
-                        <TextField
-                            fullWidth
-                            id="interest"
-                            name="interest"
-                            label="Interest"
-                            value={formik.values.interest}
-                            onChange={formik.handleChange}
-                            error={formik.touched.interest && Boolean(formik.errors.interest)}
-                            helperText={formik.touched.interest && formik.errors.interest}
-                        />
+                        <DefaultTextField id="interest" label="Interest" formik={formik} />
                         <IconButton color="secondary" size="small" type="submit">
                             <CheckCircleIcon />
                         </IconButton>

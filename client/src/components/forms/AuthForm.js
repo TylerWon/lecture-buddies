@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
+import { DefaultTextField } from "../atoms/input";
 
 // Container for the content
 const ContentContainer = styled(Stack)(({ theme }) => ({
@@ -29,16 +30,7 @@ function AuthForm(props) {
     return (
         <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
             <ContentContainer>
-                <TextField
-                    fullWidth
-                    id="email"
-                    name="email"
-                    label="Email"
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
-                />
+                <DefaultTextField id="email" label="Email" formik={formik} />
                 <TextField
                     fullWidth
                     id="password"
