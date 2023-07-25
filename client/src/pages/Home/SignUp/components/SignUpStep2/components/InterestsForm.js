@@ -1,10 +1,7 @@
 import { useContext, useState } from "react";
-import { Chip, FormControl, IconButton, Stack, Typography } from "@mui/material";
+import { Chip, FormControl, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { styled } from "@mui/material/styles";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
 import CloseIcon from "@mui/icons-material/Close";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -13,6 +10,7 @@ import { createInterest, deleteInterest } from "../../../../../../utils/requests
 import { UserContext } from "../../../../../../contexts/UserContext";
 
 import { DefaultTextField } from "../../../../../../components/atoms/input";
+import { DefaultAcceptButton, DefaultAddButton, DefaultCancelButton } from "../../../../../../components/atoms/button";
 
 // Yup validation schema for form
 const validationSchema = yup.object({
@@ -35,7 +33,7 @@ const HeaderContainer = styled(Stack)(({ theme }) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "start",
-    gap: theme.spacing(1),
+    gap: theme.spacing(1.5),
     width: "100%",
 }));
 
@@ -127,10 +125,9 @@ function InterestsForm() {
                 <Typography variant="body1">Interests</Typography>
                 <Grid container spacing={1}>
                     {interests.map((interest) => (
-                        <Grid item>
+                        <Grid key={interest.interest_id}>
                             <Chip
                                 variant="outlined"
-                                key={interest.interest_id}
                                 label={interest.interest_name}
                                 onDelete={() => handleDeleteInterestClick(interest.interest_id)}
                                 deleteIcon={<CloseIcon />}
@@ -143,19 +140,13 @@ function InterestsForm() {
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer>
                         <DefaultTextField id="interest" label="Interest" formik={formik} />
-                        <IconButton color="secondary" size="small" type="submit">
-                            <CheckCircleIcon />
-                        </IconButton>
-                        <IconButton size="small" onClick={handleCancelAddInterestClick}>
-                            <CancelIcon />
-                        </IconButton>
+                        <DefaultAcceptButton type="submit" />
+                        <DefaultCancelButton onClick={handleCancelAddInterestClick} />
                     </FormContentContainer>
                 </FormControl>
             ) : (
                 <AddInterestButtonContainer>
-                    <IconButton color="primary" size="small" onClick={handleAddInterestClick}>
-                        <AddCircleIcon />
-                    </IconButton>
+                    <DefaultAddButton onClick={handleAddInterestClick} />
                     <Typography variant="body1">Add Interest</Typography>
                 </AddInterestButtonContainer>
             )}

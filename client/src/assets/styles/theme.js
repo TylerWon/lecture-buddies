@@ -13,7 +13,7 @@ let theme = createTheme({
             main: "#ed6c02",
         },
         grey: {
-            main: "#dbdbdb",
+            main: "#00000061",
         },
     },
     typography: {
