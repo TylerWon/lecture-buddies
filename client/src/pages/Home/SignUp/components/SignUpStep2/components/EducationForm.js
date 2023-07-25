@@ -75,10 +75,10 @@ function EducationForm(props) {
         try {
             // Get schools
             const getSchoolsResponse = await getSchools();
-            const schools = await getSchoolsResponse.json();
+            const getSchoolsData = await getSchoolsResponse.json();
 
             // Set schools state
-            setSchools(schools);
+            setSchools(getSchoolsData);
         } catch (err) {
             console.log(err); // unexpected server error
         }
