@@ -28,6 +28,24 @@ export const createInterest = async (values) => {
     return response;
 };
 
+// Creates a social media
+export const createSocialMedia = async (values) => {
+    const response = await fetch(`${API_BASE_URL}/social-medias`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            student_id: values.student_id,
+            social_media_platform: values.platform,
+            social_media_url: values.url,
+        }),
+        credentials: "include",
+    });
+
+    return response;
+};
+
 // Creates a new student
 export const createStudent = async (values) => {
     const response = await fetch(`${API_BASE_URL}/students`, {
