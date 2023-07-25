@@ -23,7 +23,10 @@ export function DefaultSelectField(props) {
                     </MenuItem>
                 ))}
             </Select>
-            <FormHelperText error={formik.touched[id] && Boolean(formik.errors[id])}>
+            <FormHelperText
+                sx={formik.touched[id] && Boolean(formik.errors[id]) ? { display: "block" } : { display: "none" }}
+                error={formik.touched[id] && Boolean(formik.errors[id])}
+            >
                 {formik.touched[id] && formik.errors[id]}
             </FormHelperText>
         </FormControl>
