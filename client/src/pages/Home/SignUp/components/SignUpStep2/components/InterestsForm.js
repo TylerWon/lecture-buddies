@@ -22,18 +22,8 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "stretch",
     gap: theme.spacing(2),
-    width: "100%",
-}));
-
-// Container for the header
-const HeaderContainer = styled(Stack)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "start",
-    gap: theme.spacing(1.5),
     width: "100%",
 }));
 
@@ -111,21 +101,19 @@ export default function InterestsForm() {
 
     return (
         <ContentContainer>
-            <HeaderContainer>
-                <Typography variant="body1">Interests</Typography>
-                <Grid container spacing={1}>
-                    {interests.map((interest) => (
-                        <Grid key={interest.interest_id}>
-                            <Chip
-                                variant="outlined"
-                                label={interest.interest_name}
-                                onDelete={() => handleDeleteInterestClick(interest.interest_id)}
-                                deleteIcon={<CloseIcon />}
-                            />
-                        </Grid>
-                    ))}
-                </Grid>
-            </HeaderContainer>
+            <Typography variant="body1">Interests</Typography>
+            <Grid container spacing={1}>
+                {interests.map((interest) => (
+                    <Grid key={interest.interest_id}>
+                        <Chip
+                            variant="outlined"
+                            label={interest.interest_name}
+                            onDelete={() => handleDeleteInterestClick(interest.interest_id)}
+                            deleteIcon={<CloseIcon />}
+                        />
+                    </Grid>
+                ))}
+            </Grid>
             {showAddInterestForm ? (
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer container>
