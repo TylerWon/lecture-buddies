@@ -1,8 +1,7 @@
 import { useContext, useState } from "react";
-import { Chip, FormControl, Stack, Typography } from "@mui/material";
+import { FormControl, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { styled } from "@mui/material/styles";
-import CloseIcon from "@mui/icons-material/Close";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
@@ -11,6 +10,7 @@ import { UserContext } from "../../../../../../contexts/UserContext";
 
 import { DefaultTextField } from "../../../../../../components/atoms/input";
 import { AddButtonWithLabel, AcceptButton, CancelButton } from "../../../../../../components/atoms/button";
+import { InterestChipWithDelete } from "../../../../../../components/atoms/chip";
 
 // Yup validation schema for form
 const validationSchema = yup.object({
@@ -102,14 +102,12 @@ export default function InterestsForm() {
     return (
         <ContentContainer>
             <Typography variant="body1">Interests</Typography>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
                 {interests.map((interest) => (
                     <Grid key={interest.interest_id}>
-                        <Chip
-                            variant="outlined"
+                        <InterestChipWithDelete
                             label={interest.interest_name}
                             onDelete={() => handleDeleteInterestClick(interest.interest_id)}
-                            deleteIcon={<CloseIcon />}
                         />
                     </Grid>
                 ))}
