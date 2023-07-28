@@ -1,14 +1,16 @@
-import { FormControl, Stack, TextField, Typography } from "@mui/material";
+import { Badge, FormControl, IconButton, Paper, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { styled } from "@mui/material/styles";
 import { useContext, useState } from "react";
 import { useFormik } from "formik";
+import { SocialIcon } from "react-social-icons";
 import * as yup from "yup";
+
+import { createSocialMedia, deleteSocialMedia } from "../../../../../../utils/requests";
+import { UserContext } from "../../../../../../contexts/UserContext";
 
 import { AcceptButton, AddButtonWithLabel, CancelButton } from "../../../../../../components/atoms/button";
 import { DefaultSelectField, DefaultTextField } from "../../../../../../components/atoms/input";
-import { createSocialMedia } from "../../../../../../utils/requests";
-import { UserContext } from "../../../../../../contexts/UserContext";
 
 // Constants
 const PLATFORMS = [
@@ -29,23 +31,21 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "stretch",
     gap: theme.spacing(2),
     width: "100%",
 }));
 
-// Container for the header
-const HeaderContainer = styled(Stack)(({ theme }) => ({
+// Container for the delete social media button content
+const DeleteSocialMediaButtonContentContainer = styled(Paper)(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "start",
-    gap: theme.spacing(1.5),
-    width: "100%",
+    justifyContent: "end",
+    alignItems: "center",
+    width: "20px",
+    height: "20px",
+    borderRadius: "100%",
 }));
-
-// Container for added social medias
-const AddedSocialMediasContainer = styled(Grid)(({ theme }) => ({}));
 
 // Container for form content
 const FormContentContainer = styled(Grid)(({ theme }) => ({
@@ -54,6 +54,7 @@ const FormContentContainer = styled(Grid)(({ theme }) => ({
     gap: theme.spacing(1),
 }));
 
+// SocialMediasForm component
 export default function SocialMediasForm() {
     // Hooks
     const { userId } = useContext(UserContext);
@@ -71,7 +72,22 @@ export default function SocialMediasForm() {
     const [socialMedias, setSocialMedias] = useState([]);
 
     // Handler for when delete social media button is clicked
-    const handleDeleteSocialMediaClick = async (socialMediaId) => {};
+    const handleDeleteSocialMediaClick = async (socialMediaId) => {
+        try {
+            // Delete social media
+            const deleteSocialMediaResponse = await deleteSocialMedia(socialMediaId);
+            const deleteSocialMediaData = await deleteSocialMediaResponse.json();
+            if (deleteSocialMediaResponse.status === 400) {
+                throw new Error(deleteSocialMediaData.message);
+            }
+
+            // Remove social media from socialMedias state
+            const newSocialMedias = socialMedias.filter((socialMedia) => socialMedia.social_media_id !== socialMediaId);
+            setSocialMedias(newSocialMedias);
+        } catch (err) {
+            console.log(err); // unexpected server error
+        }
+    };
 
     // Handler for when add social media button is clicked
     const handleAddSocialMediaButtonClick = () => {
@@ -109,35 +125,31 @@ export default function SocialMediasForm() {
 
     return (
         <ContentContainer>
-            <HeaderContainer>
-                <Typography variant="body1">Social medias</Typography>
+            <Typography variant="body1">Social medias</Typography>
+            <Grid container spacing={2}>
                 {socialMedias.map((socialMedia) => (
-                    <Grid
-                        justifyContent="center"
-                        alignItems="center"
-                        width="100%"
-                        key={socialMedia.social_media_id}
-                        container
-                        spacing={1}
-                    >
-                        <Grid xs={3.2}>
-                            <Typography variant="body1">{socialMedia.social_media_platform}</Typography>
-                        </Grid>
-                        <Grid xs={8.1}>
-                            <TextField
-                                fullWidth
-                                defaultValue={socialMedia.social_media_url}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
+                    <Grid key={socialMedia.social_media_id}>
+                        <Badge
+                            badgeContent={
+                                <IconButton
+                                    size="small"
+                                    onClick={() => handleDeleteSocialMediaClick(socialMedia.social_media_id)}
+                                >
+                                    <DeleteSocialMediaButtonContentContainer>
+                                        <Typography variant="body1">x</Typography>
+                                    </DeleteSocialMediaButtonContentContainer>
+                                </IconButton>
+                            }
+                            overlap="circular"
+                        >
+                            <SocialIcon
+                                network={socialMedia.social_media_platform.toLowerCase()}
+                                url={socialMedia.social_media_url}
                             />
-                        </Grid>
-                        <Grid xs>
-                            <CancelButton onClick={() => handleDeleteSocialMediaClick(socialMedia.social_media_id)} />
-                        </Grid>
+                        </Badge>
                     </Grid>
                 ))}
-            </HeaderContainer>
+            </Grid>
             {showAddSocialMediaForm ? (
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer container>

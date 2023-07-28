@@ -89,6 +89,16 @@ export const deleteInterest = async (interestId) => {
     return response;
 };
 
+// Deletes a social media
+export const deleteSocialMedia = async (socialMediaId) => {
+    const response = await fetch(`${API_BASE_URL}/social-medias/${socialMediaId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+
+    return response;
+};
+
 // Gets schools
 export const getSchools = async () => {
     const response = await fetch(`${API_BASE_URL}/schools`, {
