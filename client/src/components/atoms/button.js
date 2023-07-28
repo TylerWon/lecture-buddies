@@ -5,11 +5,11 @@ import CancelIcon from "@mui/icons-material/Cancel";
 
 // AddButtonWithLabel component
 export function AddButtonWithLabel(props) {
-    const { label, ...iconButtonProps } = props;
+    const { label, onClick } = props;
 
     return (
         <Stack direction="column" justifyContent="center" alignItems="center">
-            <AddButton {...iconButtonProps} />
+            <AddButton onClick={onClick} />
             <Typography variant="body1">{label}</Typography>
         </Stack>
     );
@@ -26,8 +26,10 @@ export function AcceptButton(props) {
 
 // AddButton component
 export function AddButton(props) {
+    const { onClick } = props;
+
     return (
-        <IconButton color="primary" size="small" {...props}>
+        <IconButton color="primary" size="small" onClick={onClick}>
             <AddCircleIcon />
         </IconButton>
     );
@@ -35,8 +37,10 @@ export function AddButton(props) {
 
 // CancelButton component
 export function CancelButton(props) {
+    const { onClick } = props;
+
     return (
-        <IconButton color="grey" size="small" {...props}>
+        <IconButton color="grey" size="small" onClick={onClick}>
             <CancelIcon />
         </IconButton>
     );
