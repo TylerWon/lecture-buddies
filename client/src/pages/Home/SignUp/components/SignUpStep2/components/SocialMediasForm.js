@@ -1,9 +1,8 @@
-import { Badge, FormControl, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { FormControl, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { styled } from "@mui/material/styles";
 import { useContext, useState } from "react";
 import { useFormik } from "formik";
-import { SocialIcon } from "react-social-icons";
 import * as yup from "yup";
 
 import { createSocialMedia, deleteSocialMedia } from "../../../../../../utils/requests";
@@ -11,6 +10,7 @@ import { UserContext } from "../../../../../../contexts/UserContext";
 
 import { AcceptButton, AddButtonWithLabel, CancelButton } from "../../../../../../components/atoms/button";
 import { DefaultSelectField, DefaultTextField } from "../../../../../../components/atoms/input";
+import { SocialMediaIconWithDelete } from "../../../../../../components/atoms/icon";
 
 // Constants
 const PLATFORMS = [
@@ -34,17 +34,6 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     alignItems: "stretch",
     gap: theme.spacing(2),
     width: "100%",
-}));
-
-// Container for the delete social media button content
-const DeleteSocialMediaButtonContentContainer = styled(Paper)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "end",
-    alignItems: "center",
-    width: "20px",
-    height: "20px",
-    borderRadius: "100%",
 }));
 
 // Container for form content
@@ -129,24 +118,11 @@ export default function SocialMediasForm() {
             <Grid container spacing={2}>
                 {socialMedias.map((socialMedia) => (
                     <Grid key={socialMedia.social_media_id}>
-                        <Badge
-                            badgeContent={
-                                <IconButton
-                                    size="small"
-                                    onClick={() => handleDeleteSocialMediaClick(socialMedia.social_media_id)}
-                                >
-                                    <DeleteSocialMediaButtonContentContainer>
-                                        <Typography variant="body1">x</Typography>
-                                    </DeleteSocialMediaButtonContentContainer>
-                                </IconButton>
-                            }
-                            overlap="circular"
-                        >
-                            <SocialIcon
-                                network={socialMedia.social_media_platform.toLowerCase()}
-                                url={socialMedia.social_media_url}
-                            />
-                        </Badge>
+                        <SocialMediaIconWithDelete
+                            network={socialMedia.social_media_platform}
+                            url={socialMedia.social_media_url}
+                            onDelete={() => handleDeleteSocialMediaClick(socialMedia.social_media_id)}
+                        />
                     </Grid>
                 ))}
             </Grid>
