@@ -78,23 +78,6 @@ export const createStudent = async (values) => {
     return response;
 };
 
-// Creates a new user
-export const createUser = async (values) => {
-    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            username: values.email,
-            password: values.password,
-        }),
-        credentials: "include",
-    });
-
-    return response;
-};
-
 // Deletes an interest
 export const deleteInterest = async (interestId) => {
     const response = await fetch(`${API_BASE_URL}/interests/${interestId}`, {
@@ -136,6 +119,27 @@ export const login = async (values) => {
             username: values.email,
             password: values.password,
         }),
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
+ * Registers a user
+ *
+ * @param {string} values.username - The user's email
+ * @param {string} values.password - The user's password
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const signup = async (values) => {
+    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
         credentials: "include",
     });
 
