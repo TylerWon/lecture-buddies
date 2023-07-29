@@ -1,7 +1,11 @@
 // Constants
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-// Logs a user in if they have a valid session cookie
+/**
+ * Logs a user in if they have a valid session cookie
+ *
+ * @returns {Promise<Response>} response from the API
+ */
 export const autoLogin = async () => {
     const response = await fetch(`${API_BASE_URL}/auth/autologin`, {
         method: "POST",
@@ -11,7 +15,14 @@ export const autoLogin = async () => {
     return response;
 };
 
-// Creates a new interest
+/**
+ * Creates an interest
+ *
+ * @param {number} values.student_id - the ID of the student that likes the interest
+ * @param {number} values.interest_name - the interest's name
+ *
+ * @returns {Promise<Response>} response from the API
+ */
 export const createInterest = async (values) => {
     const response = await fetch(`${API_BASE_URL}/interests`, {
         method: "POST",
@@ -20,7 +31,7 @@ export const createInterest = async (values) => {
         },
         body: JSON.stringify({
             student_id: values.student_id,
-            interest_name: values.interest,
+            interest_name: values.interest_name,
         }),
         credentials: "include",
     });
