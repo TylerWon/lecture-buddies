@@ -54,7 +54,7 @@ export default function SignUpStep1(props) {
             }
 
             // Create student
-            await createStudent(createUserData);
+            await createStudent({ student_id: createUserData.user_id });
 
             // Set user id for the user context
             setUserId(createUserData.user_id);

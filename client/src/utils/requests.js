@@ -58,16 +58,20 @@ export const createSocialMedia = async (values) => {
     return response;
 };
 
-// Creates a new student
+/**
+ * Creates a student
+ *
+ * @param {number} values.student_id - the ID of the user associated with the student
+ *
+ * @returns {Promise<Response>} response from the API
+ */
 export const createStudent = async (values) => {
     const response = await fetch(`${API_BASE_URL}/students`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            student_id: values.user_id,
-        }),
+        body: JSON.stringify(values),
         credentials: "include",
     });
 
