@@ -26,7 +26,7 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    gap: theme.spacing(4),
+    gap: theme.spacing(2),
 }));
 
 // SignUpStep2 component

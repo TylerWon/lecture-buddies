@@ -26,10 +26,9 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    gap: theme.spacing(4),
+    gap: theme.spacing(2),
     backgroundColor: theme.palette.common.white,
     padding: theme.spacing(4),
-    // width: "100%",
 }));
 
 // Container for the header
@@ -38,16 +37,6 @@ const HeaderContainer = styled(Stack)(({ theme }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
-}));
-
-// Container for the form
-const FormContainer = styled(Stack)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: theme.spacing(2),
     width: "100%",
 }));
 
@@ -75,18 +64,16 @@ export default function SignUp(props) {
                         <CloseIcon />
                     </IconButton>
                 </HeaderContainer>
-                <FormContainer>
-                    <Stepper sx={{ width: "80%" }} activeStep={activeStep} alternativeLabel={isMobile}>
-                        {STEPS.map((label) => (
-                            <Step key={label}>
-                                <StepLabel>{label}</StepLabel>
-                            </Step>
-                        ))}
-                    </Stepper>
-                    {activeStep === 0 && <SignUpStep1 setActiveStep={setActiveStep} />}
-                    {activeStep === 1 && <SignUpStep2 setActiveStep={setActiveStep} />}
-                    {activeStep === 2 && <SignUpStep3 setActiveStep={setActiveStep} />}
-                </FormContainer>
+                <Stepper sx={{ width: "80%" }} activeStep={activeStep} alternativeLabel={isMobile}>
+                    {STEPS.map((label) => (
+                        <Step key={label}>
+                            <StepLabel>{label}</StepLabel>
+                        </Step>
+                    ))}
+                </Stepper>
+                {activeStep === 0 && <SignUpStep1 setActiveStep={setActiveStep} />}
+                {activeStep === 1 && <SignUpStep2 setActiveStep={setActiveStep} />}
+                {activeStep === 2 && <SignUpStep3 setActiveStep={setActiveStep} />}
             </ContentContainer>
         </Dialog>
     );
