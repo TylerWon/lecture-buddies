@@ -78,7 +78,13 @@ export const createStudent = async (values) => {
     return response;
 };
 
-// Deletes an interest
+/**
+ * Deletes an interest
+ *
+ * @param {number} interestId - the interest's ID
+ *
+ * @returns {Promise<Response>} response from the API
+ */
 export const deleteInterest = async (interestId) => {
     const response = await fetch(`${API_BASE_URL}/interests/${interestId}`, {
         method: "DELETE",
@@ -88,7 +94,13 @@ export const deleteInterest = async (interestId) => {
     return response;
 };
 
-// Deletes a social media
+/**
+ * Deletes an interest
+ *
+ * @param {number} socialMediaId - the social media's ID
+ *
+ * @returns {Promise<Response>} response from the API
+ */
 export const deleteSocialMedia = async (socialMediaId) => {
     const response = await fetch(`${API_BASE_URL}/social-medias/${socialMediaId}`, {
         method: "DELETE",
