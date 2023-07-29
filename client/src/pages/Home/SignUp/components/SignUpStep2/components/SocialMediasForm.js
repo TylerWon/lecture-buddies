@@ -99,7 +99,8 @@ export default function SocialMediasForm() {
             // Create social media
             const createSocialMediaResponse = await createSocialMedia({
                 student_id: userId,
-                ...values,
+                social_media_platform: values.platform,
+                social_media_url: values.url,
             });
             const createSocialMediaData = await createSocialMediaResponse.json();
             if (createSocialMediaResponse.status === 400) {

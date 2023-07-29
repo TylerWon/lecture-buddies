@@ -29,28 +29,29 @@ export const createInterest = async (values) => {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            student_id: values.student_id,
-            interest_name: values.interest_name,
-        }),
+        body: JSON.stringify(values),
         credentials: "include",
     });
 
     return response;
 };
 
-// Creates a social media
+/**
+ * Creates a social media
+ *
+ * @param {number} values.student_id - the ID of the student that the social media belongs to
+ * @param {string} values.social_media_platform - the social media platform
+ * @param {string} values.social_media_url - the URL of the student's profile on the platform
+ *
+ * @returns {Promise<Response>} response from the API
+ */
 export const createSocialMedia = async (values) => {
     const response = await fetch(`${API_BASE_URL}/social-medias`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            student_id: values.student_id,
-            social_media_platform: values.platform,
-            social_media_url: values.url,
-        }),
+        body: JSON.stringify(values),
         credentials: "include",
     });
 
