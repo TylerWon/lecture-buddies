@@ -116,7 +116,7 @@ describe("interest routes tests", () => {
         describe("DELETE", () => {
             test("DELETE - should delete an interest", async () => {
                 await verifyDeleteRequestResponse(testSession, `/interests/${interest1.interest_id}`, 200, {
-                    message: "interest deleted",
+                    message: `interest with id '${interest1.interest_id}' deleted`,
                 });
             });
 

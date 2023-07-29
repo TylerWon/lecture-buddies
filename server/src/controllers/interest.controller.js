@@ -53,7 +53,7 @@ const deleteInterest = async (req, res, next) => {
     // Delete interest
     try {
         await db.none(queries.interests.deleteInterest, [interestId]);
-        return res.status(200).json({ message: "interest deleted" });
+        return res.status(200).json({ message: `interest with id '${interestId}' deleted` });
     } catch (err) {
         return next(err); // unexpected error
     }

@@ -123,7 +123,7 @@ describe("enrolment routes tests", () => {
                 `/enrolments/${enrolment1.student_id}/${enrolment1.section_id}`,
                 200,
                 {
-                    message: "enrolment deleted",
+                    message: `enrolment with student id '${enrolment1.student_id}' and section id '${enrolment1.section_id}' deleted`,
                 }
             );
         });

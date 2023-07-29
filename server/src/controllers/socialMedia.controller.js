@@ -57,7 +57,7 @@ const deleteSocialMedia = async (req, res, next) => {
     // Delete social media
     try {
         await db.none(queries.socialMedias.deleteSocialMedia, [socialMediaId]);
-        return res.status(200).json({ message: "social media deleted" });
+        return res.status(200).json({ message: `social media with id '${socialMediaId}' deleted` });
     } catch (err) {
         return next(err); // unexpected error
     }

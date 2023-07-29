@@ -61,7 +61,7 @@ const deleteEnrolment = async (req, res, next) => {
     try {
         await db.none(queries.enrolments.deleteEnrolment, [student_id, section_id]);
         return res.status(200).json({
-            message: "enrolment deleted",
+            message: `enrolment with student id '${student_id}' and section id '${section_id}' deleted`,
         });
     } catch (err) {
         return next(err); // unexpected error

@@ -132,7 +132,7 @@ describe("social media routes tests", () => {
         describe("DELETE", () => {
             test("DELETE - should delete a social media", async () => {
                 await verifyDeleteRequestResponse(testSession, `/social-medias/${socialMedia1.social_media_id}`, 200, {
-                    message: "social media deleted",
+                    message: `social media with id '${socialMedia1.social_media_id}' deleted`,
                 });
             });
 
