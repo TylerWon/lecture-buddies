@@ -7,12 +7,12 @@ import * as yup from "yup";
 import { UserContext } from "../../../../../contexts/UserContext";
 import { updateStudent } from "../../../../../utils/requests";
 
-import EducationForm from "./components/EducationForm";
+import StudentForm from "./components/StudentForm";
 import InterestsForm from "./components/InterestsForm";
 import SocialMediasForm from "./components/SocialMediasForm";
 
-// Yup validation schema for education form
-const educationFormValidationSchema = yup.object({
+// Yup validation schema for student form
+const studentFormValidationSchema = yup.object({
     school: yup.number().required("School is required"),
     year: yup.string().required("Year is required"),
     faculty: yup.string().required("Faculty is required"),
@@ -36,7 +36,7 @@ export default function SignUpStep2(props) {
 
     // Hooks
     const { studentId } = useContext(UserContext);
-    const educationFormFormik = useFormik({
+    const studentFormFormik = useFormik({
         initialValues: {
             school: "",
             year: "",
@@ -44,26 +44,26 @@ export default function SignUpStep2(props) {
             major: "",
             bio: "",
         },
-        validationSchema: educationFormValidationSchema,
+        validationSchema: studentFormValidationSchema,
         onSubmit: () => {},
     });
 
     // Handler for when next button is clicked
     const handleNextClick = async () => {
-        // Submit education form to check if there are errors
-        await educationFormFormik.submitForm();
-        if (!educationFormFormik.isValid) {
+        // Submit student form to check if there are errors
+        await studentFormFormik.submitForm();
+        if (!studentFormFormik.isValid) {
             return;
         }
 
         try {
             // Update student
             const updateStudentResponse = await updateStudent(studentId, {
-                school_id: educationFormFormik.values.school,
-                year: educationFormFormik.values.year,
-                faculty: educationFormFormik.values.faculty,
-                major: educationFormFormik.values.major,
-                bio: educationFormFormik.values.bio,
+                school_id: studentFormFormik.values.school,
+                year: studentFormFormik.values.year,
+                faculty: studentFormFormik.values.faculty,
+                major: studentFormFormik.values.major,
+                bio: studentFormFormik.values.bio,
             });
             const updateStudentData = await updateStudentResponse.json();
             if (updateStudentResponse.status === 400) {
@@ -79,7 +79,7 @@ export default function SignUpStep2(props) {
 
     return (
         <ContentContainer>
-            <EducationForm formik={educationFormFormik} />
+            <StudentForm formik={studentFormFormik} />
             <InterestsForm />
             <SocialMediasForm />
             <Button fullWidth variant="contained" color="primary" onClick={handleNextClick}>

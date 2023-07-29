@@ -16,8 +16,8 @@ const YEARS = [
     { year_id: "5th+", year_name: "5th+" },
 ];
 
-// EducationForm component
-export default function EducationForm(props) {
+// StudentForm component
+export default function StudentForm(props) {
     // Props
     const { formik } = props;
 

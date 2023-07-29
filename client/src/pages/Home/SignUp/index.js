@@ -18,7 +18,7 @@ import SignUpStep2 from "./components/SignUpStep2";
 import SignUpStep3 from "./components/SignUpStep3";
 
 // Constants
-const STEPS = ["General", "Education", "Personal"];
+const STEPS = ["General", "Personal", "Courses"];
 
 // Container for the content
 const ContentContainer = styled(Stack)(({ theme }) => ({
