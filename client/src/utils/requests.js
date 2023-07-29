@@ -110,7 +110,11 @@ export const deleteSocialMedia = async (socialMediaId) => {
     return response;
 };
 
-// Gets schools
+/**
+ * Gets all schools
+ *
+ * @returns {Promise<Response>} response from the API
+ */
 export const getSchools = async () => {
     const response = await fetch(`${API_BASE_URL}/schools`, {
         method: "GET",
@@ -120,17 +124,21 @@ export const getSchools = async () => {
     return response;
 };
 
-// Logs a user in
+/**
+ * Logs a user in
+ *
+ * @param {string} values.username - The user's email
+ * @param {string} values.password - The user's password
+ *
+ * @returns {Promise<Response>} response from the API
+ */
 export const login = async (values) => {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            username: values.email,
-            password: values.password,
-        }),
+        body: JSON.stringify(values),
         credentials: "include",
     });
 

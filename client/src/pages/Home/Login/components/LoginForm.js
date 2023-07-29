@@ -83,7 +83,7 @@ export default function LoginForm(props) {
     const handleAuthFormSubmit = async (values) => {
         try {
             // Log the user in
-            const loginResponse = await login(values);
+            const loginResponse = await login({ username: values.email, password: values.password });
             const loginData = await loginResponse.json();
             if (loginResponse.status !== 200) {
                 formik.setErrors({ email: "Invalid email or password", password: "Invalid email or password" });
