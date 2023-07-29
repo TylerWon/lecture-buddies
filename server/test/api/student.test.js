@@ -141,9 +141,9 @@ describe("student routes tests", () => {
         interest1 = await createInterest(db, student1.student_id, "reading");
         interest2 = await createInterest(db, student2.student_id, "video games");
         interest3 = await createInterest(db, student3.student_id, "yoshi");
-        socialMedia1 = await createSocialMedia(db, student1.student_id, "LinkedIn", "www.linkedin.com/tylerwon");
-        socialMedia2 = await createSocialMedia(db, student2.student_id, "Instagram", "www.instagram.com/connorwon");
-        socialMedia3 = await createSocialMedia(db, student3.student_id, "Facebook", "www.facebook.com/brianwu");
+        socialMedia1 = await createSocialMedia(db, student1.student_id, "linkedin", "www.linkedin.com/tylerwon");
+        socialMedia2 = await createSocialMedia(db, student2.student_id, "instagram", "www.instagram.com/connorwon");
+        socialMedia3 = await createSocialMedia(db, student3.student_id, "facebook", "www.facebook.com/brianwu");
         await createEnrolment(db, student1.student_id, section1.section_id);
         await createEnrolment(db, student1.student_id, section2.section_id);
         await createEnrolment(db, student1.student_id, section3.section_id);

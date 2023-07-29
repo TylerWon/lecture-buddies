@@ -322,9 +322,9 @@ const createSocialMediaValidationSchema = () =>
                     errorMessage: "social_media_platform is required",
                 },
                 matches: {
-                    options: [/^(Facebook|Instagram|LinkedIn|Twitter)$/],
+                    options: [/^(facebook|instagram|linkedin|twitter)$/],
                     errorMessage:
-                        "social_media_platform must be one of 'Facebook', 'Instagram', 'LinkedIn', or 'Twitter'",
+                        "social_media_platform must be one of 'facebook', 'instagram', 'linkedin', or 'twitter'",
                 },
             },
             social_media_url: {
@@ -352,9 +352,9 @@ const updateSocialMediaValidationSchema = () =>
             social_media_platform: {
                 optional: true,
                 matches: {
-                    options: [/^(Facebook|Instagram|LinkedIn|Twitter)$/],
+                    options: [/^(facebook|instagram|linkedin|twitter)$/],
                     errorMessage:
-                        "social_media_platform must be one of 'Facebook', 'Instagram', 'LinkedIn', or 'Twitter'",
+                        "social_media_platform must be one of 'facebook', 'instagram', 'linkedin', or 'twitter'",
                 },
             },
             social_media_url: {

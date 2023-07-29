@@ -92,7 +92,7 @@ CREATE TABLE interests (
 		ON UPDATE CASCADE
 );
 
-CREATE TYPE SOCIAL_MEDIA_PLATFORM AS ENUM ('Facebook', 'Instagram', 'LinkedIn', 'Twitter');
+CREATE TYPE SOCIAL_MEDIA_PLATFORM AS ENUM ('facebook', 'instagram', 'linkedin', 'twitter');
 
 CREATE TABLE social_medias (
 	social_media_id SERIAL PRIMARY KEY,  

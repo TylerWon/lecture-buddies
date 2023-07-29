@@ -42,8 +42,8 @@ describe("social media routes tests", () => {
             "www.tylerwon.com/profile_photo.jpg",
             "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
         );
-        socialMedia1 = await createSocialMedia(db, student1.student_id, "LinkedIn", "www.linkedin.com/tylerwon");
-        socialMedia2 = await createSocialMedia(db, student1.student_id, "Instagram", "www.instagram.com/connorwon");
+        socialMedia1 = await createSocialMedia(db, student1.student_id, "linkedin", "www.linkedin.com/tylerwon");
+        socialMedia2 = await createSocialMedia(db, student1.student_id, "instagram", "www.instagram.com/connorwon");
 
         await loginUser(testSession, user1Username, user1Password);
     });
@@ -59,7 +59,7 @@ describe("social media routes tests", () => {
         beforeEach(() => {
             payload = {
                 student_id: student1.student_id,
-                social_media_platform: "LinkedIn",
+                social_media_platform: "linkedin",
                 social_media_url: "www.linkedin.com/tylerwon",
             };
         });
@@ -108,7 +108,7 @@ describe("social media routes tests", () => {
         });
 
         test("POST - should not create a social media when the social_media_platform body parameter is not a valid option", async () => {
-            payload.social_media_platform = "Youtube";
+            payload.social_media_platform = "youtube";
 
             await verifyPostRequestResponse(testSession, "/social-medias", payload, 400, [
                 {
@@ -116,7 +116,7 @@ describe("social media routes tests", () => {
                     location: "body",
                     path: "social_media_platform",
                     value: payload.social_media_platform,
-                    msg: "social_media_platform must be one of 'Facebook', 'Instagram', 'LinkedIn', or 'Twitter'",
+                    msg: "social_media_platform must be one of 'facebook', 'instagram', 'linkedin', or 'twitter'",
                 },
             ]);
         });
@@ -159,7 +159,7 @@ describe("social media routes tests", () => {
 
             beforeEach(() => {
                 payload = {
-                    social_media_platform: "Twitter",
+                    social_media_platform: "twitter",
                     social_media_url: "www.twitter.com/connorwon",
                 };
             });
@@ -192,7 +192,7 @@ describe("social media routes tests", () => {
                             location: "body",
                             path: "social_media_platform",
                             value: payload.social_media_platform,
-                            msg: "social_media_platform must be one of 'Facebook', 'Instagram', 'LinkedIn', or 'Twitter'",
+                            msg: "social_media_platform must be one of 'facebook', 'instagram', 'linkedin', or 'twitter'",
                         },
                     ]
                 );
