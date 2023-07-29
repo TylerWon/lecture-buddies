@@ -13,6 +13,8 @@ import SocialMediasForm from "./components/SocialMediasForm";
 
 // Yup validation schema for student form
 const studentFormValidationSchema = yup.object({
+    firstName: yup.string().required("First name is required"),
+    lastName: yup.string().required("Last name is required"),
     school: yup.number().required("School is required"),
     year: yup.string().required("Year is required"),
     faculty: yup.string().required("Faculty is required"),
@@ -38,6 +40,8 @@ export default function SignUpStep2(props) {
     const { studentId } = useContext(UserContext);
     const studentFormFormik = useFormik({
         initialValues: {
+            firstName: "",
+            lastName: "",
             school: "",
             year: "",
             faculty: "",
@@ -59,6 +63,8 @@ export default function SignUpStep2(props) {
         try {
             // Update student
             const updateStudentResponse = await updateStudent(studentId, {
+                first_name: studentFormFormik.values.firstName,
+                last_name: studentFormFormik.values.lastName,
                 school_id: studentFormFormik.values.school,
                 year: studentFormFormik.values.year,
                 faculty: studentFormFormik.values.faculty,

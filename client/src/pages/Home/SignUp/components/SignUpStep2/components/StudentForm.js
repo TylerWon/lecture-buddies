@@ -47,6 +47,12 @@ export default function StudentForm(props) {
         <FormControl fullWidth component="form">
             <Grid container spacing={2}>
                 <Grid xs={12} sm={6}>
+                    <DefaultTextField id="firstName" label="First name" formik={formik} />
+                </Grid>
+                <Grid xs={12} sm={6}>
+                    <DefaultTextField id="lastName" label="Last name" formik={formik} />
+                </Grid>
+                <Grid xs={12} sm={6}>
                     <DefaultSelectField id="school" label="School" formik={formik} options={schools} />
                 </Grid>
                 <Grid xs={12} sm={6}>
