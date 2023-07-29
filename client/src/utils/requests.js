@@ -166,19 +166,28 @@ export const signup = async (values) => {
     return response;
 };
 
-// Updates a student
+/**
+ * Updates a student
+ *
+ * @param {number} userId - The student's ID
+ * @param {number} values.school_id - the ID of the new school the student attends
+ * @param {string} values.first_name - the student's new first name
+ * @param {string} values.last_name - the student's new last name
+ * @param {string} values.year - the student's new year of schooling
+ * @param {string} values.faculty - the student's new faculty
+ * @param {string} values.major - the student's new major
+ * @param {string} valuesy.profile_photo_url - the new url of the student's profile photo
+ * @param {string} values.bio - the student's new bio
+ *
+ * @returns {Promise<Response>} response from the API
+ */
 export const updateStudent = async (userId, values) => {
     const response = await fetch(`${API_BASE_URL}/students/${userId}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            school_id: values.school,
-            year: values.year,
-            faculty: values.faculty,
-            major: values.major,
-        }),
+        body: JSON.stringify(values),
         credentials: "include",
     });
 

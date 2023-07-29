@@ -58,7 +58,13 @@ export default function SignUpStep2(props) {
 
         try {
             // Update student
-            const updateStudentResponse = await updateStudent(userId, educationFormFormik.values);
+            const updateStudentResponse = await updateStudent(userId, {
+                school_id: educationFormFormik.values.school,
+                year: educationFormFormik.values.year,
+                faculty: educationFormFormik.values.faculty,
+                major: educationFormFormik.values.major,
+                bio: educationFormFormik.values.bio,
+            });
             const updateStudentData = await updateStudentResponse.json();
             if (updateStudentResponse.status === 400) {
                 throw new Error(updateStudentData.message);
