@@ -7,7 +7,7 @@ import { UserContext } from "../../contexts/UserContext";
 // AutoLogin component
 export default function AutoLogin() {
     // Hooks
-    const { setIsLoggedIn, setUserId } = useContext(UserContext);
+    const { setIsLoggedIn, setStudentId } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(true);
 
     // Logs a user in if they have a valid session cookie
@@ -20,7 +20,7 @@ export default function AutoLogin() {
             // If login is succesful, set user context
             if (autoLoginResponse.status === 200) {
                 setIsLoggedIn(true);
-                setUserId(autoLoginData.userId);
+                setStudentId(autoLoginData.userId);
             }
 
             // Set loading to false

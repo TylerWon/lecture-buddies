@@ -46,7 +46,7 @@ const FormContentContainer = styled(Grid)(({ theme }) => ({
 // SocialMediasForm component
 export default function SocialMediasForm() {
     // Hooks
-    const { userId } = useContext(UserContext);
+    const { studentId } = useContext(UserContext);
     const formik = useFormik({
         initialValues: {
             platform: "",
@@ -98,7 +98,7 @@ export default function SocialMediasForm() {
         try {
             // Create social media
             const createSocialMediaResponse = await createSocialMedia({
-                student_id: userId,
+                student_id: studentId,
                 social_media_platform: values.platform,
                 social_media_url: values.url,
             });

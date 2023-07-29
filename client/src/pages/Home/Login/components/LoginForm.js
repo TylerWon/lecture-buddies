@@ -66,7 +66,7 @@ export default function LoginForm(props) {
     const { setShowSignUp } = props;
 
     // Hooks
-    const { setIsLoggedIn, setUserId } = useContext(UserContext);
+    const { setIsLoggedIn, setsetStudentId } = useContext(UserContext);
     const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
@@ -92,7 +92,7 @@ export default function LoginForm(props) {
 
             // Set the user context
             setIsLoggedIn(true);
-            setUserId(loginData.user_id);
+            setsetStudentId(loginData.user_id);
 
             // Navigate to the courses page
             navigate("/courses");

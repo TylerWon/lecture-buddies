@@ -30,7 +30,7 @@ export default function SignUpStep1(props) {
     const { setActiveStep } = props;
 
     // Hooks
-    const { setUserId } = useContext(UserContext);
+    const { setStudentId } = useContext(UserContext);
     const formik = useFormik({
         initialValues: {
             email: "",
@@ -57,7 +57,7 @@ export default function SignUpStep1(props) {
             await createStudent({ student_id: createUserData.user_id });
 
             // Set user id for the user context
-            setUserId(createUserData.user_id);
+            setStudentId(createUserData.user_id);
 
             // Move to next step in the sign up process
             setActiveStep((prevActiveStep) => prevActiveStep + 1);

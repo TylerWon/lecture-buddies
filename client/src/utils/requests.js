@@ -169,7 +169,7 @@ export const signup = async (values) => {
 /**
  * Updates a student
  *
- * @param {number} userId - The student's ID
+ * @param {number} studentId - The student's ID
  * @param {number} values.school_id - the ID of the new school the student attends
  * @param {string} values.first_name - the student's new first name
  * @param {string} values.last_name - the student's new last name
@@ -181,8 +181,8 @@ export const signup = async (values) => {
  *
  * @returns {Promise<Response>} response from the API
  */
-export const updateStudent = async (userId, values) => {
-    const response = await fetch(`${API_BASE_URL}/students/${userId}`, {
+export const updateStudent = async (studentId, values) => {
+    const response = await fetch(`${API_BASE_URL}/students/${studentId}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",

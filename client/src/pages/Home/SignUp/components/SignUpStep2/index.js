@@ -35,7 +35,7 @@ export default function SignUpStep2(props) {
     const { setActiveStep } = props;
 
     // Hooks
-    const { userId } = useContext(UserContext);
+    const { studentId } = useContext(UserContext);
     const educationFormFormik = useFormik({
         initialValues: {
             school: "",
@@ -58,7 +58,7 @@ export default function SignUpStep2(props) {
 
         try {
             // Update student
-            const updateStudentResponse = await updateStudent(userId, {
+            const updateStudentResponse = await updateStudent(studentId, {
                 school_id: educationFormFormik.values.school,
                 year: educationFormFormik.values.year,
                 faculty: educationFormFormik.values.faculty,
