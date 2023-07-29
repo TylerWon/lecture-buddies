@@ -18,7 +18,7 @@ export function DefaultSelectField(props) {
                 error={formik.touched[id] && Boolean(formik.errors[id])}
             >
                 {options.map((option) => (
-                    <MenuItem key={option[`${id}_id`]} value={option[`${id}_id`]}>
+                    <MenuItem key={option[`${id}_id`]} value={option[`${id}_id`]} disabled={option["disabled"]}>
                         {option[`${id}_name`]}
                     </MenuItem>
                 ))}

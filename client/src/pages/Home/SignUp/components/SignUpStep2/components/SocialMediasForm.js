@@ -14,10 +14,10 @@ import { SocialMediaIconWithDelete } from "../../../../../../components/atoms/ic
 
 // Constants
 const PLATFORMS = [
-    { platform_id: "facebook", platform_name: "Facebook" },
-    { platform_id: "instagram", platform_name: "Instagram" },
-    { platform_id: "linkedin", platform_name: "LinkedIn" },
-    { platform_id: "twitter", platform_name: "Twitter" },
+    { platform_id: "facebook", platform_name: "Facebook", disabled: false },
+    { platform_id: "instagram", platform_name: "Instagram", disabled: false },
+    { platform_id: "linkedin", platform_name: "LinkedIn", disabled: false },
+    { platform_id: "twitter", platform_name: "Twitter", disabled: false },
 ];
 
 // Yup validation schema for form
@@ -61,7 +61,7 @@ export default function SocialMediasForm() {
     const [socialMedias, setSocialMedias] = useState([]);
 
     // Handler for when delete social media button is clicked
-    const handleDeleteSocialMediaClick = async (socialMediaId) => {
+    const handleDeleteSocialMediaClick = async (socialMediaId, socialMediaPlatform) => {
         try {
             // Delete social media
             const deleteSocialMediaResponse = await deleteSocialMedia(socialMediaId);
@@ -73,6 +73,10 @@ export default function SocialMediasForm() {
             // Remove social media from socialMedias state
             const newSocialMedias = socialMedias.filter((socialMedia) => socialMedia.social_media_id !== socialMediaId);
             setSocialMedias(newSocialMedias);
+
+            // Re-enable social media as option in select field
+            const platform = PLATFORMS.find((platform) => platform.platform_id === socialMediaPlatform);
+            platform.disabled = false;
         } catch (err) {
             console.log(err); // unexpected server error
         }
@@ -102,8 +106,12 @@ export default function SocialMediasForm() {
                 throw new Error(createSocialMediaData.message);
             }
 
-            // Add social medias to socialMedias state
+            // Add social media to socialMedias state
             setSocialMedias([...socialMedias, createSocialMediaData]);
+
+            // Disable social media as option in select field
+            const platform = PLATFORMS.find((platform) => platform.platform_id === values.platform);
+            platform.disabled = true;
 
             // Close add interest form
             handleCancelAddSocialMediaClick();
@@ -121,7 +129,12 @@ export default function SocialMediasForm() {
                         <SocialMediaIconWithDelete
                             network={socialMedia.social_media_platform}
                             url={socialMedia.social_media_url}
-                            onDelete={() => handleDeleteSocialMediaClick(socialMedia.social_media_id)}
+                            onDelete={() =>
+                                handleDeleteSocialMediaClick(
+                                    socialMedia.social_media_id,
+                                    socialMedia.social_media_platform
+                                )
+                            }
                         />
                     </Grid>
                 ))}
