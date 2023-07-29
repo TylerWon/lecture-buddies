@@ -17,7 +17,7 @@ const SocialMediaIconWithDeleteButtonContentContainer = styled(Paper)(({ theme }
 export function SocialMediaIcon(props) {
     const { network, url } = props;
 
-    return <SocialIcon network={network.toLowerCase()} url={url} />;
+    return <SocialIcon network={network} url={url} />;
 }
 
 // SocialMediaIconWithDelete component

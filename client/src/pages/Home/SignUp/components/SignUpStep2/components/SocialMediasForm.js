@@ -14,10 +14,10 @@ import { SocialMediaIconWithDelete } from "../../../../../../components/atoms/ic
 
 // Constants
 const PLATFORMS = [
-    { platform_id: "Facebook", platform_name: "Facebook" },
-    { platform_id: "Instagram", platform_name: "Instagram" },
-    { platform_id: "LinkedIn", platform_name: "LinkedIn" },
-    { platform_id: "Twitter", platform_name: "Twitter" },
+    { platform_id: "facebook", platform_name: "Facebook" },
+    { platform_id: "instagram", platform_name: "Instagram" },
+    { platform_id: "linkedin", platform_name: "LinkedIn" },
+    { platform_id: "twitter", platform_name: "Twitter" },
 ];
 
 // Yup validation schema for form
