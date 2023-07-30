@@ -40,6 +40,7 @@ export default function SignUpStep2(props) {
     const { studentId } = useContext(UserContext);
     const studentFormFormik = useFormik({
         initialValues: {
+            profilePicture: null,
             firstName: "",
             lastName: "",
             school: "",

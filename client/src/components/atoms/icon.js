@@ -1,4 +1,4 @@
-import { Badge, IconButton, Paper, Typography } from "@mui/material";
+import { Avatar, Badge, IconButton, Paper, Typography } from "@mui/material";
 import { SocialIcon } from "react-social-icons";
 import { styled } from "@mui/material/styles";
 
@@ -12,6 +12,11 @@ const SocialMediaIconWithDeleteButtonContentContainer = styled(Paper)(({ theme }
     height: "20px",
     borderRadius: "100%",
 }));
+
+// ProfilePicture component
+export function ProfilePicture(props) {
+    return <Avatar sx={{ width: "125px", height: "125px" }} {...props} />;
+}
 
 // SocialMediaIcon component
 export function SocialMediaIcon(props) {
