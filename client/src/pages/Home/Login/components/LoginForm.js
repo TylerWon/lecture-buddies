@@ -6,7 +6,7 @@ import { useContext } from "react";
 import * as yup from "yup";
 
 import { UserContext } from "../../../../contexts/UserContext";
-import { login } from "../../../../utils/requests";
+import { login } from "../../../../utils/apiRequests";
 
 import AuthForm from "../../../../components/forms/AuthForm";
 

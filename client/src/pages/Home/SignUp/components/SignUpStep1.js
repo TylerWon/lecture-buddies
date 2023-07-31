@@ -4,7 +4,7 @@ import * as yup from "yup";
 import YupPassword from "yup-password";
 
 import { UserContext } from "../../../../contexts/UserContext";
-import { createStudent, signup } from "../../../../utils/requests";
+import { createStudent, signup } from "../../../../utils/apiRequests";
 
 import AuthForm from "../../../../components/forms/AuthForm";
 

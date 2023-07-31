@@ -5,7 +5,7 @@ import { useContext, useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
-import { createSocialMedia, deleteSocialMedia } from "../../../../../../utils/requests";
+import { createSocialMedia, deleteSocialMedia } from "../../../../../../utils/apiRequests";
 import { UserContext } from "../../../../../../contexts/UserContext";
 
 import { AcceptButton, AddButtonWithLabel, CancelButton } from "../../../../../../components/atoms/button";

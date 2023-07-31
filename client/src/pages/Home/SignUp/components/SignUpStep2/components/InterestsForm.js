@@ -5,7 +5,7 @@ import { styled } from "@mui/material/styles";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
-import { createInterest, deleteInterest } from "../../../../../../utils/requests";
+import { createInterest, deleteInterest } from "../../../../../../utils/apiRequests";
 import { UserContext } from "../../../../../../contexts/UserContext";
 
 import { DefaultTextField } from "../../../../../../components/atoms/input";

@@ -1,7 +1,7 @@
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect, useState } from "react";
 
-import { getSchools } from "../../../../../../../../utils/requests";
+import { getSchools } from "../../../../../../../../utils/apiRequests";
 
 import { DefaultSelectField, DefaultTextArea, DefaultTextField } from "../../../../../../../../components/atoms/input";
 

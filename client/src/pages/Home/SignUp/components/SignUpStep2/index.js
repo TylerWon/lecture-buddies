@@ -5,7 +5,7 @@ import { useContext } from "react";
 import * as yup from "yup";
 
 import { UserContext } from "../../../../../contexts/UserContext";
-import { updateStudent } from "../../../../../utils/requests";
+import { updateStudent } from "../../../../../utils/apiRequests";
 
 import StudentForm from "./components/StudentForm";
 import InterestsForm from "./components/InterestsForm";

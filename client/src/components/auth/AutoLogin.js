@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 
-import { autoLogin } from "../../utils/requests";
+import { autoLogin } from "../../utils/apiRequests";
 import { UserContext } from "../../contexts/UserContext";
 
 // AutoLogin component
