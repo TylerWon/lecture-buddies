@@ -1,5 +1,5 @@
 // Constants
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_URL = process.env.REACT_APP_API_URL;
 
 /**
  * Logs a user in if they have a valid session cookie
@@ -7,7 +7,8 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
  * @returns {Promise<Response>} response from the API
  */
 export const autoLogin = async () => {
-    const response = await fetch(`${API_BASE_URL}/auth/autologin`, {
+    console.log(API_URL);
+    const response = await fetch(`${API_URL}/auth/autologin`, {
         method: "POST",
         credentials: "include",
     });
@@ -24,7 +25,7 @@ export const autoLogin = async () => {
  * @returns {Promise<Response>} response from the API
  */
 export const createInterest = async (values) => {
-    const response = await fetch(`${API_BASE_URL}/interests`, {
+    const response = await fetch(`${API_URL}/interests`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -46,7 +47,7 @@ export const createInterest = async (values) => {
  * @returns {Promise<Response>} response from the API
  */
 export const createSocialMedia = async (values) => {
-    const response = await fetch(`${API_BASE_URL}/social-medias`, {
+    const response = await fetch(`${API_URL}/social-medias`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -66,7 +67,7 @@ export const createSocialMedia = async (values) => {
  * @returns {Promise<Response>} response from the API
  */
 export const createStudent = async (values) => {
-    const response = await fetch(`${API_BASE_URL}/students`, {
+    const response = await fetch(`${API_URL}/students`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -86,7 +87,7 @@ export const createStudent = async (values) => {
  * @returns {Promise<Response>} response from the API
  */
 export const deleteInterest = async (interestId) => {
-    const response = await fetch(`${API_BASE_URL}/interests/${interestId}`, {
+    const response = await fetch(`${API_URL}/interests/${interestId}`, {
         method: "DELETE",
         credentials: "include",
     });
@@ -102,7 +103,7 @@ export const deleteInterest = async (interestId) => {
  * @returns {Promise<Response>} response from the API
  */
 export const deleteSocialMedia = async (socialMediaId) => {
-    const response = await fetch(`${API_BASE_URL}/social-medias/${socialMediaId}`, {
+    const response = await fetch(`${API_URL}/social-medias/${socialMediaId}`, {
         method: "DELETE",
         credentials: "include",
     });
@@ -116,7 +117,7 @@ export const deleteSocialMedia = async (socialMediaId) => {
  * @returns {Promise<Response>} response from the API
  */
 export const getSchools = async () => {
-    const response = await fetch(`${API_BASE_URL}/schools`, {
+    const response = await fetch(`${API_URL}/schools`, {
         method: "GET",
         credentials: "include",
     });
@@ -133,7 +134,7 @@ export const getSchools = async () => {
  * @returns {Promise<Response>} response from the API
  */
 export const login = async (values) => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -154,7 +155,7 @@ export const login = async (values) => {
  * @returns {Promise<Response>} response from the API
  */
 export const signup = async (values) => {
-    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+    const response = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -182,7 +183,7 @@ export const signup = async (values) => {
  * @returns {Promise<Response>} response from the API
  */
 export const updateStudent = async (studentId, values) => {
-    const response = await fetch(`${API_BASE_URL}/students/${studentId}`, {
+    const response = await fetch(`${API_URL}/students/${studentId}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
