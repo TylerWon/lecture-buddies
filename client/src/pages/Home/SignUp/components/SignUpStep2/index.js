@@ -41,7 +41,7 @@ export default function SignUpStep2(props) {
     const { studentId } = useContext(UserContext);
     const studentFormFormik = useFormik({
         initialValues: {
-            profilePicture: null,
+            profilePhoto: null,
             firstName: "",
             lastName: "",
             school: "",
@@ -63,9 +63,9 @@ export default function SignUpStep2(props) {
         }
 
         try {
-            // If student added a profile picture, upload it to s3
-            if (studentFormFormik.values.profilePicture) {
-                uploadPfpToS3(studentFormFormik.values.profilePicture, studentId);
+            // If student added a profile photo, upload it to s3
+            if (studentFormFormik.values.profilePhoto) {
+                uploadPfpToS3(studentFormFormik.values.profilePhoto, studentId);
             }
 
             // Update student

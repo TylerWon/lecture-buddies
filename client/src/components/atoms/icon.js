@@ -13,8 +13,8 @@ const SocialMediaIconWithDeleteButtonContentContainer = styled(Paper)(({ theme }
     borderRadius: "100%",
 }));
 
-// ProfilePicture component
-export function ProfilePicture(props) {
+// ProfilePhoto component
+export function ProfilePhoto(props) {
     return <Avatar sx={{ width: "125px", height: "125px" }} {...props} />;
 }
 

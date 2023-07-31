@@ -2,7 +2,7 @@ import { Button, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 
-import { ProfilePicture } from "../../../../../../../../components/atoms/icon";
+import { ProfilePhoto } from "../../../../../../../../components/atoms/icon";
 
 // Container for content
 const ContentContainer = styled(Stack)(({ theme }) => ({
@@ -13,7 +13,7 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     gap: theme.spacing(1),
 }));
 
-// Container for profile picture upload
+// Container for profile photo upload
 const UploadContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "row",
@@ -22,7 +22,7 @@ const UploadContainer = styled(Stack)(({ theme }) => ({
     gap: theme.spacing(2),
 }));
 
-// Container for profile picture upload button
+// Container for profile photo upload button
 const UploadButtonContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "row",
@@ -31,43 +31,43 @@ const UploadButtonContainer = styled(Stack)(({ theme }) => ({
     gap: theme.spacing(1),
 }));
 
-// ProfilePictureUpload component
-export function ProfilePictureUpload(props) {
+// ProfilePhotoUpload component
+export default function ProfilePhotoUpload(props) {
     // Props
     const { formik } = props;
 
     // Hooks
     const [srcUrlForPreview, setSrcUrlForPreview] = useState("");
 
-    // Creates src url for profile picture preview
+    // Creates src url for profile photo preview
     const createSrcUrlForPreview = () => {
-        return URL.createObjectURL(formik.values.profilePicture);
+        return URL.createObjectURL(formik.values.profilePhoto);
     };
 
-    // Handler for when profile picture uploaded
-    const handleProfilePictureChange = (event) => {
-        formik.setFieldValue("profilePicture", event.target.files[0]);
+    // Handler for when profile photo uploaded
+    const handleProfilePhotoChange = (event) => {
+        formik.setFieldValue("profilePhoto", event.target.files[0]);
     };
 
-    // Sets src url for profile picture preview when profile picture changes
+    // Sets src url for profile photo preview when profile photo changes
     useEffect(() => {
-        if (formik.values.profilePicture) {
+        if (formik.values.profilePhoto) {
             setSrcUrlForPreview(createSrcUrlForPreview());
         }
-    }, [formik.values.profilePicture]);
+    }, [formik.values.profilePhoto]);
 
     return (
         <ContentContainer>
-            <Typography variant="body1">Profile picture</Typography>
+            <Typography variant="body1">Profile photo</Typography>
             <UploadContainer>
-                {formik.values.profilePicture ? <ProfilePicture src={srcUrlForPreview} /> : <ProfilePicture />}
+                {formik.values.profilePhoto ? <ProfilePhoto src={srcUrlForPreview} /> : <ProfilePhoto />}
                 <UploadButtonContainer>
                     <Button variant="outlined" component="label">
                         Upload
-                        <input hidden type="file" accept="image/*" onChange={handleProfilePictureChange} />
+                        <input hidden type="file" accept="image/*" onChange={handleProfilePhotoChange} />
                     </Button>
                     <Typography variant="caption" noWrap sx={{ maxWidth: "200px" }}>
-                        {formik.values.profilePicture ? formik.values.profilePicture.name : "No file chosen"}
+                        {formik.values.profilePhoto ? formik.values.profilePhoto.name : "No file chosen"}
                     </Typography>
                 </UploadButtonContainer>
             </UploadContainer>

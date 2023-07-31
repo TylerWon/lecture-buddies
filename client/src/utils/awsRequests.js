@@ -1,12 +1,12 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 /**
- * Uploads a student's profile picture to S3
+ * Uploads a student's profile photo to S3
  *
- * @param {file} file - the file to upload
+ * @param {file} photo - the photo to upload
  * @param {number} studentId - the student's id
  */
-export const uploadPfpToS3 = async (file, studentId) => {
+export const uploadPfpToS3 = async (photo, studentId) => {
     const s3 = new S3Client({
         region: process.env.REACT_APP_AWS_REGION,
         credentials: {
@@ -18,7 +18,7 @@ export const uploadPfpToS3 = async (file, studentId) => {
     const command = new PutObjectCommand({
         Bucket: process.env.REACT_APP_AWS_S3_BUCKET_NAME,
         Key: studentId.toString(),
-        Body: file,
+        Body: photo,
     });
 
     await s3.send(command);

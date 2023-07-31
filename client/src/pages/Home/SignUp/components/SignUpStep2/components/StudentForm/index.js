@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import { ProfilePictureUpload } from "./components/ProfilePictureUpload";
+import ProfilePhotoUpload from "./components/ProfilePhotoUpload";
 import TextInputs from "./components/TextInputs";
 
 // Container for content
@@ -20,7 +20,7 @@ export default function StudentForm(props) {
 
     return (
         <ContentContainer>
-            <ProfilePictureUpload formik={formik} />
+            <ProfilePhotoUpload formik={formik} />
             <TextInputs formik={formik} />
         </ContentContainer>
     );
