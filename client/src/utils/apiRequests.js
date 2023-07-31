@@ -7,7 +7,6 @@ const API_URL = process.env.REACT_APP_API_URL;
  * @returns {Promise<Response>} response from the API
  */
 export const autoLogin = async () => {
-    console.log(API_URL);
     const response = await fetch(`${API_URL}/auth/autologin`, {
         method: "POST",
         credentials: "include",

@@ -6,6 +6,7 @@ import * as yup from "yup";
 
 import { UserContext } from "../../../../../contexts/UserContext";
 import { updateStudent } from "../../../../../utils/apiRequests";
+import { uploadPfpToS3 } from "../../../../../utils/awsRequests";
 
 import StudentForm from "./components/StudentForm";
 import InterestsForm from "./components/InterestsForm";
@@ -62,6 +63,11 @@ export default function SignUpStep2(props) {
         }
 
         try {
+            // If student added a profile picture, upload it to s3
+            if (studentFormFormik.values.profilePicture) {
+                uploadPfpToS3(studentFormFormik.values.profilePicture, studentId);
+            }
+
             // Update student
             const updateStudentResponse = await updateStudent(studentId, {
                 first_name: studentFormFormik.values.firstName,
@@ -71,6 +77,7 @@ export default function SignUpStep2(props) {
                 faculty: studentFormFormik.values.faculty,
                 major: studentFormFormik.values.major,
                 bio: studentFormFormik.values.bio,
+                profile_photo_url: `${process.env.REACT_APP_AWS_S3_BUCKET_URL}/${studentId}`,
             });
             const updateStudentData = await updateStudentResponse.json();
             if (updateStudentResponse.status === 400) {
