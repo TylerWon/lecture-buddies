@@ -49,6 +49,7 @@ export default function SignUp(props) {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const [activeStep, setActiveStep] = useState(0);
+    const [selectedSchoolId, setSelectedSchoolId] = useState(null);
 
     // Handler for when sign up is closed
     const handleSignUpClose = () => {
@@ -72,8 +73,10 @@ export default function SignUp(props) {
                     ))}
                 </Stepper>
                 {activeStep === 0 && <SignUpStep1 setActiveStep={setActiveStep} />}
-                {activeStep === 1 && <SignUpStep2 setActiveStep={setActiveStep} />}
-                {activeStep === 2 && <SignUpStep3 setActiveStep={setActiveStep} />}
+                {activeStep === 1 && (
+                    <SignUpStep2 setActiveStep={setActiveStep} setSelectedSchoolId={setSelectedSchoolId} />
+                )}
+                {activeStep === 2 && <SignUpStep3 selectedSchoolId={selectedSchoolId} />}
             </ContentContainer>
         </Dialog>
     );

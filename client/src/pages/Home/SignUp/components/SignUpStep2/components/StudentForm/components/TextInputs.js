@@ -23,8 +23,8 @@ export default function TextInputs(props) {
     // Hooks
     const [schools, setSchools] = useState([]);
 
-    // Initializes values
-    const init = async () => {
+    // Initializes schools state
+    const initSchools = async () => {
         try {
             // Get schools
             const getSchoolsResponse = await getSchools();
@@ -39,7 +39,7 @@ export default function TextInputs(props) {
 
     // Initializes values
     useEffect(() => {
-        init();
+        initSchools();
     }, []);
 
     return (

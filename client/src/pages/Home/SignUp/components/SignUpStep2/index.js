@@ -35,7 +35,7 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
 // SignUpStep2 component
 export default function SignUpStep2(props) {
     // Props
-    const { setActiveStep } = props;
+    const { setActiveStep, setSelectedSchoolId } = props;
 
     // Hooks
     const { studentId } = useContext(UserContext);
@@ -83,6 +83,9 @@ export default function SignUpStep2(props) {
             if (updateStudentResponse.status === 400) {
                 throw new Error(updateStudentData.message);
             }
+
+            // Set selected school id
+            setSelectedSchoolId(studentFormFormik.values.school);
 
             // Move to next step in the sign up process
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
