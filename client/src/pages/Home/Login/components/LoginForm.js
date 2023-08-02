@@ -84,11 +84,11 @@ export default function LoginForm(props) {
         try {
             // Log the user in
             const loginResponse = await login({ username: values.email, password: values.password });
-            const loginData = await loginResponse.json();
             if (loginResponse.status !== 200) {
                 formik.setErrors({ email: "Invalid email or password", password: "Invalid email or password" });
                 return;
             }
+            const loginData = await loginResponse.json();
 
             // Set the user context
             setIsLoggedIn(true);

@@ -16,8 +16,6 @@ export default function AutoLogin() {
             // Try to log user in
             const autoLoginResponse = await autoLogin();
             const autoLoginData = await autoLoginResponse.json();
-
-            // If login is succesful, set user context
             if (autoLoginResponse.status === 200) {
                 setIsLoggedIn(true);
                 setStudentId(autoLoginData.userId);
