@@ -57,7 +57,13 @@ export default function SignUp(props) {
     };
 
     return (
-        <Dialog fullWidth maxWidth="sm" open={showSignUp} onClose={handleSignUpClose} fullScreen={isMobile}>
+        <Dialog
+            fullWidth
+            maxWidth={activeStep === 0 ? "sm" : "md"}
+            open={showSignUp}
+            onClose={handleSignUpClose}
+            fullScreen={isMobile}
+        >
             <ContentContainer>
                 <HeaderContainer>
                     <Typography variant="h3">Sign up</Typography>

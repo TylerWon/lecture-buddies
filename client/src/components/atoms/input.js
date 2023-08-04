@@ -25,7 +25,7 @@ function BaseSelectField(props) {
                 ))}
             </Select>
             <FormHelperText
-                sx={formik.touched[id] && Boolean(formik.errors[id]) ? { display: "block" } : { display: "none" }}
+                sx={{ display: formik.touched[id] && Boolean(formik.errors[id]) ? "block" : "none" }}
                 error={formik.touched[id] && Boolean(formik.errors[id])}
             >
                 {formik.touched[id] && formik.errors[id]}
