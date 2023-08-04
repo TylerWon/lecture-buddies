@@ -13,14 +13,14 @@ import {
 } from "../../../../utils/apiRequests";
 import { UserContext } from "../../../../contexts/UserContext";
 
-import { AcceptButton, AddButtonWithLabel, CancelButton } from "../../../../components/atoms/button";
+import { AcceptButtonAndCancelButton, AddButtonWithLabel } from "../../../../components/atoms/button";
 import { useFormik } from "formik";
 import { DefaultSelectField, SelectFieldWithCustomHandleChange } from "../../../../components/atoms/input";
 
 // Yup validation schema for form
 const validationSchema = yup.object({
     subjectId: yup.number().required("Subject is required"),
-    courseId: yup.number().required("Course number is required"),
+    courseId: yup.number().required("Course # is required"),
     sectionId: yup.number().required("Section is required"),
 });
 
@@ -80,14 +80,20 @@ export default function SignUpStep3(props) {
                 student_id: studentId,
                 section_id: values.sectionId,
             });
-            const createEnrolmentData = await createEnrolmentResponse.json();
-            if (createEnrolmentResponse.status !== 201) {
-                throw new Error(createEnrolmentData.message);
+            if (createEnrolmentResponse.status === 400) {
+                formik.setErrors({
+                    subjectId: "Course already added",
+                    courseId: " ",
+                    sectionId: " ",
+                });
+                return;
             }
 
             // Close add course form
             handleCancelAddCourseClick();
-        } catch (err) {}
+        } catch (err) {
+            console.log(err); // unexpected server error
+        }
     };
 
     // Handler for when cancel add course button is clicked
@@ -220,7 +226,7 @@ export default function SignUpStep3(props) {
             {showAddCourseForm ? (
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer container>
-                        <Grid xs={3}>
+                        <Grid xs>
                             <SelectFieldWithCustomHandleChange
                                 id="subjectId"
                                 label="Subject"
@@ -231,7 +237,7 @@ export default function SignUpStep3(props) {
                                 formik={formik}
                             />
                         </Grid>
-                        <Grid xs={3}>
+                        <Grid xs>
                             <SelectFieldWithCustomHandleChange
                                 id="courseId"
                                 label="Course #"
@@ -243,7 +249,7 @@ export default function SignUpStep3(props) {
                                 disabled={courseNumSelectDisabled}
                             />
                         </Grid>
-                        <Grid xs={3}>
+                        <Grid xs>
                             <DefaultSelectField
                                 id="sectionId"
                                 label="Section"
@@ -254,11 +260,11 @@ export default function SignUpStep3(props) {
                                 disabled={sectionSelectDisabled}
                             />
                         </Grid>
-                        <Grid xs>
-                            <AcceptButton type="submit" />
-                        </Grid>
-                        <Grid xs>
-                            <CancelButton onClick={handleCancelAddCourseClick} />
+                        <Grid xs="auto">
+                            <AcceptButtonAndCancelButton
+                                acceptButtonProps={{ type: "submit" }}
+                                cancelButtonProps={{ onClick: handleCancelAddCourseClick }}
+                            />
                         </Grid>
                     </FormContentContainer>
                 </FormControl>

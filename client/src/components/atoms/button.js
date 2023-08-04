@@ -3,18 +3,6 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-// AddButtonWithLabel component
-export function AddButtonWithLabel(props) {
-    const { label, onClick } = props;
-
-    return (
-        <Stack direction="column" justifyContent="center" alignItems="center">
-            <AddButton onClick={onClick} />
-            <Typography variant="body1">{label}</Typography>
-        </Stack>
-    );
-}
-
 // AcceptButton component
 export function AcceptButton(props) {
     return (
@@ -32,6 +20,30 @@ export function AddButton(props) {
         <IconButton color="primary" size="small" onClick={onClick}>
             <AddCircleIcon />
         </IconButton>
+    );
+}
+
+// AddButtonWithLabel component
+export function AddButtonWithLabel(props) {
+    const { label, onClick } = props;
+
+    return (
+        <Stack direction="column" justifyContent="center" alignItems="center">
+            <AddButton onClick={onClick} />
+            <Typography variant="body1">{label}</Typography>
+        </Stack>
+    );
+}
+
+// AcceptButtonAndCancelButton component
+export function AcceptButtonAndCancelButton(props) {
+    const { acceptButtonProps, cancelButtonProps } = props;
+
+    return (
+        <Stack direction="row" justifyContent="center" alignItems="center" spacing={2}>
+            <AcceptButton {...acceptButtonProps} />
+            <CancelButton {...cancelButtonProps} />
+        </Stack>
     );
 }
 
