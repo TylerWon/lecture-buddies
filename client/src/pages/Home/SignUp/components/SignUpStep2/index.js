@@ -77,7 +77,9 @@ export default function SignUpStep2(props) {
                 faculty: studentFormFormik.values.faculty,
                 major: studentFormFormik.values.major,
                 bio: studentFormFormik.values.bio,
-                profile_photo_url: `${process.env.REACT_APP_AWS_S3_BUCKET_URL}/${studentId}`,
+                profile_photo_url: studentFormFormik.values.profilePhoto
+                    ? `${process.env.REACT_APP_AWS_S3_BUCKET_URL}/${studentId}`
+                    : "",
             });
             const updateStudentData = await updateStudentResponse.json();
             if (updateStudentResponse.status === 400) {
