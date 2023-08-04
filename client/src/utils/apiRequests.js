@@ -16,6 +16,27 @@ export const autoLogin = async () => {
 };
 
 /**
+ * Creates an enrolment
+ *
+ * @param {number} values.student_id - the ID of the student to enrol in the section
+ * @param {number} values.section_id - the ID of the section to enrol the student in
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const createEnrolment = async (values) => {
+    const response = await fetch(`${API_URL}/enrolments`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
  * Creates an interest
  *
  * @param {number} values.student_id - the ID of the student that likes the interest
@@ -111,12 +132,76 @@ export const deleteSocialMedia = async (socialMediaId) => {
 };
 
 /**
+ * Gets the courses for a subject
+ *
+ * @param {number} subjectId - The subject's ID
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const getCoursesForSubject = async (subjectId) => {
+    const response = await fetch(`${API_URL}/subjects/${subjectId}/courses`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
  * Gets all schools
  *
  * @returns {Promise<Response>} response from the API
  */
 export const getSchools = async () => {
     const response = await fetch(`${API_URL}/schools`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
+ * Gets a school
+ *
+ * @param {number} schoolId - the school's ID
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const getSchool = async (schoolId) => {
+    const response = await fetch(`${API_URL}/schools/${schoolId}`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
+ * Gets the sections for a course
+ *
+ * @param {number} courseId - The course's ID
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const getSectionsForCourse = async (courseId) => {
+    const response = await fetch(`${API_URL}/courses/${courseId}/sections`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
+ * Gets the subjects for a school
+ *
+ * @param {number} schoolId - the school's ID
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const getSubjectsForSchool = async (schoolId) => {
+    const response = await fetch(`${API_URL}/schools/${schoolId}/subjects`, {
         method: "GET",
         credentials: "include",
     });
