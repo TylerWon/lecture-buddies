@@ -2,7 +2,7 @@ import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } 
 
 // DefaultSelectField component
 export function DefaultSelectField(props) {
-    const { id, label, formik, options } = props;
+    const { id, label, options, optionValueField, optionTextField, formik, ...selectProps } = props;
 
     return (
         <FormControl fullWidth>
@@ -16,10 +16,11 @@ export function DefaultSelectField(props) {
                 value={formik.values[id]}
                 onChange={formik.handleChange}
                 error={formik.touched[id] && Boolean(formik.errors[id])}
+                {...selectProps}
             >
-                {options.map((option) => (
-                    <MenuItem key={option[`${id}_id`]} value={option[`${id}_id`]} disabled={option["disabled"]}>
-                        {option[`${id}_name`]}
+                {options.map((option, index) => (
+                    <MenuItem key={index} value={option[optionValueField]} disabled={option["disabled"]}>
+                        {option[optionTextField]}
                     </MenuItem>
                 ))}
             </Select>

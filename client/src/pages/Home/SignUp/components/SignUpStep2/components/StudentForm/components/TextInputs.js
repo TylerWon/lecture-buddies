@@ -6,14 +6,7 @@ import { getSchools } from "../../../../../../../../utils/apiRequests";
 import { DefaultSelectField, DefaultTextArea, DefaultTextField } from "../../../../../../../../components/atoms/input";
 
 // Constants
-const YEARS = [
-    { year_id: "1st", year_name: "1st" },
-    { year_id: "2nd", year_name: "2nd" },
-    { year_id: "3rd", year_name: "3rd" },
-    { year_id: "4th", year_name: "4th" },
-    { year_id: "5th", year_name: "5th" },
-    { year_id: "5th+", year_name: "5th+" },
-];
+const YEARS = [{ year: "1st" }, { year: "2nd" }, { year: "3rd" }, { year: "4th" }, { year: "5th" }, { year: "5th+" }];
 
 // TextInputs component
 export default function TextInputs(props) {
@@ -51,10 +44,24 @@ export default function TextInputs(props) {
                 <DefaultTextField id="lastName" label="Last name" formik={formik} />
             </Grid>
             <Grid xs={12} sm={6}>
-                <DefaultSelectField id="school" label="School" formik={formik} options={schools} />
+                <DefaultSelectField
+                    id="school"
+                    label="School"
+                    options={schools}
+                    optionValueField="school_id"
+                    optionTextField="school_name"
+                    formik={formik}
+                />
             </Grid>
             <Grid xs={12} sm={6}>
-                <DefaultSelectField id="year" label="Year" formik={formik} options={YEARS} />
+                <DefaultSelectField
+                    id="year"
+                    label="Year"
+                    options={YEARS}
+                    optionValueField="year"
+                    optionTextField="year"
+                    formik={formik}
+                />
             </Grid>
             <Grid xs={12} sm={6}>
                 <DefaultTextField id="faculty" label="Faculty" formik={formik} />
