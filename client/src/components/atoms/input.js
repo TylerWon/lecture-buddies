@@ -1,8 +1,8 @@
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 
-// DefaultSelectField component
-export function DefaultSelectField(props) {
-    const { id, label, options, optionValueField, optionTextField, formik, ...selectProps } = props;
+// BaseSelectField component
+function BaseSelectField(props) {
+    const { id, label, handleChange, options, optionValueField, optionTextField, formik, ...selectFieldProps } = props;
 
     return (
         <FormControl fullWidth>
@@ -14,9 +14,9 @@ export function DefaultSelectField(props) {
                 labelId={`${id}-label`}
                 label={label}
                 value={formik.values[id]}
-                onChange={formik.handleChange}
+                onChange={handleChange}
                 error={formik.touched[id] && Boolean(formik.errors[id])}
-                {...selectProps}
+                {...selectFieldProps}
             >
                 {options.map((option, index) => (
                     <MenuItem key={index} value={option[optionValueField]} disabled={option["disabled"]}>
@@ -31,6 +31,42 @@ export function DefaultSelectField(props) {
                 {formik.touched[id] && formik.errors[id]}
             </FormHelperText>
         </FormControl>
+    );
+}
+
+// DefaultSelectField component
+export function DefaultSelectField(props) {
+    const { id, label, options, optionValueField, optionTextField, formik, ...selectFieldProps } = props;
+
+    return (
+        <BaseSelectField
+            id={id}
+            label={label}
+            handleChange={formik.handleChange}
+            options={options}
+            optionValueField={optionValueField}
+            optionTextField={optionTextField}
+            formik={formik}
+            {...selectFieldProps}
+        />
+    );
+}
+
+// SelectFieldWithCustomHandleChange component
+export function SelectFieldWithCustomHandleChange(props) {
+    const { id, label, handleChange, options, optionValueField, optionTextField, formik, ...selectFieldProps } = props;
+
+    return (
+        <BaseSelectField
+            id={id}
+            label={label}
+            handleChange={handleChange}
+            options={options}
+            optionValueField={optionValueField}
+            optionTextField={optionTextField}
+            formik={formik}
+            {...selectFieldProps}
+        />
     );
 }
 
