@@ -8,6 +8,7 @@ const queries = require("../utils/queries");
  *
  * @returns
  * - 200 OK if successful
+ * - 400 Bad Request if subject does not exist
  * - 500 Internal Server Error if unexpected error
  */
 const getCoursesForSubject = async (req, res, next) => {
