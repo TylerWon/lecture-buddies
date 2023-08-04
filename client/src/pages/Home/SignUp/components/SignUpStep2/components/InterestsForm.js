@@ -48,7 +48,7 @@ export default function InterestsForm() {
         },
     });
     const [showAddInterestForm, setShowAddInterestForm] = useState(false);
-    const [interests, setInterests] = useState([]);
+    const [interestsAdded, setInterestsAdded] = useState([]);
 
     // Handler for when delete interest button is clicked
     const handleDeleteInterestClick = async (interestId) => {
@@ -60,9 +60,9 @@ export default function InterestsForm() {
                 throw new Error(deleteInterestData.message);
             }
 
-            // Remove interest form interests state
-            const newInterests = interests.filter((interest) => interest.interest_id !== interestId);
-            setInterests(newInterests);
+            // Remove interest form interestsAdded state
+            const newInterests = interestsAdded.filter((interest) => interest.interest_id !== interestId);
+            setInterestsAdded(newInterests);
         } catch (err) {
             console.log(err); // unexpected server error
         }
@@ -92,8 +92,8 @@ export default function InterestsForm() {
                 throw new Error(createInterestData.message);
             }
 
-            // Add interest to interests state
-            setInterests([...interests, createInterestData]);
+            // Add interest to interestsAdded state
+            setInterestsAdded([...interestsAdded, createInterestData]);
 
             // Close add interest form
             handleCancelAddInterestClick();
@@ -106,7 +106,7 @@ export default function InterestsForm() {
         <ContentContainer>
             <Typography variant="body1">Interests</Typography>
             <Grid container spacing={2}>
-                {interests.map((interest) => (
+                {interestsAdded.map((interest) => (
                     <Grid key={interest.interest_id}>
                         <InterestChipWithDelete
                             label={interest.interest_name}

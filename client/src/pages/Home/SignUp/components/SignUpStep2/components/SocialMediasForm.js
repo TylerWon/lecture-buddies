@@ -58,7 +58,7 @@ export default function SocialMediasForm() {
         },
     });
     const [showAddSocialMediaForm, setShowAddSocialMediaForm] = useState(false);
-    const [socialMedias, setSocialMedias] = useState([]);
+    const [socialMediasAdded, setSocialMediasAdded] = useState([]);
 
     // Handler for when delete social media button is clicked
     const handleDeleteSocialMediaClick = async (socialMediaId, socialMediaPlatform) => {
@@ -70,9 +70,11 @@ export default function SocialMediasForm() {
                 throw new Error(deleteSocialMediaData.message);
             }
 
-            // Remove social media from socialMedias state
-            const newSocialMedias = socialMedias.filter((socialMedia) => socialMedia.social_media_id !== socialMediaId);
-            setSocialMedias(newSocialMedias);
+            // Remove social media from socialMediasAdded state
+            const newSocialMedias = socialMediasAdded.filter(
+                (socialMedia) => socialMedia.social_media_id !== socialMediaId
+            );
+            setSocialMediasAdded(newSocialMedias);
 
             // Re-enable social media as option in select field
             const platform = PLATFORMS.find((platform) => platform.platform_value === socialMediaPlatform);
@@ -107,8 +109,8 @@ export default function SocialMediasForm() {
                 throw new Error(createSocialMediaData.message);
             }
 
-            // Add social media to socialMedias state
-            setSocialMedias([...socialMedias, createSocialMediaData]);
+            // Add social media to socialMediasAdded state
+            setSocialMediasAdded([...socialMediasAdded, createSocialMediaData]);
 
             // Disable social media as option in select field
             const platform = PLATFORMS.find((platform) => platform.platform_value === values.platform);
@@ -125,7 +127,7 @@ export default function SocialMediasForm() {
         <ContentContainer>
             <Typography variant="body1">Social medias</Typography>
             <Grid container spacing={2}>
-                {socialMedias.map((socialMedia) => (
+                {socialMediasAdded.map((socialMedia) => (
                     <Grid key={socialMedia.social_media_id}>
                         <SocialMediaIconWithDelete
                             network={socialMedia.social_media_platform}
