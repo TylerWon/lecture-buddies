@@ -37,7 +37,7 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
 // Container for form content
 const FormContentContainer = styled(Grid)(({ theme }) => ({
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "stretch",
     gap: theme.spacing(2),
 }));
 
@@ -260,7 +260,7 @@ export default function SignUpStep3(props) {
                                 disabled={sectionSelectDisabled}
                             />
                         </Grid>
-                        <Grid xs="auto">
+                        <Grid sx={{ display: "flex", alignItems: "center" }} xs="auto">
                             <AcceptAndCancelButtons
                                 acceptButtonProps={{ type: "submit" }}
                                 cancelButtonProps={{ onClick: handleCancelAddCourseClick }}

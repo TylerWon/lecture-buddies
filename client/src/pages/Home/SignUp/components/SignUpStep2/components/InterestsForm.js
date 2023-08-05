@@ -30,8 +30,8 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
 // Container for form content
 const FormContentContainer = styled(Grid)(({ theme }) => ({
     justifyContent: "center",
-    alignItems: "center",
-    gap: theme.spacing(1),
+    alignItems: "stretch",
+    gap: theme.spacing(2),
 }));
 
 // InterestsForm component
@@ -121,7 +121,7 @@ export default function InterestsForm() {
                         <Grid xs>
                             <DefaultTextField id="interest" label="Interest" formik={formik} />
                         </Grid>
-                        <Grid xs="auto">
+                        <Grid sx={{ display: "flex", alignItems: "center" }} xs="auto">
                             <AcceptAndCancelButtons
                                 acceptButtonProps={{ type: "submit" }}
                                 cancelButtonProps={{ onClick: handleCancelAddInterestClick }}

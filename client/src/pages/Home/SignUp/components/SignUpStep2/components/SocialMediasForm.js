@@ -39,8 +39,8 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
 // Container for form content
 const FormContentContainer = styled(Grid)(({ theme }) => ({
     justifyContent: "center",
-    alignItems: "center",
-    gap: theme.spacing(1),
+    alignItems: "stretch",
+    gap: theme.spacing(2),
 }));
 
 // SocialMediasForm component
@@ -158,7 +158,7 @@ export default function SocialMediasForm() {
                         <Grid xs>
                             <DefaultTextField id="url" label="URL" formik={formik} />
                         </Grid>
-                        <Grid xs="auto">
+                        <Grid sx={{ display: "flex", alignItems: "center" }} xs="auto">
                             <AcceptAndCancelButtons
                                 acceptButtonProps={{ type: "submit" }}
                                 cancelButtonProps={{ onClick: handleCancelAddSocialMediaClick }}
