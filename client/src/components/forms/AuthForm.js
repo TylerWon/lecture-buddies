@@ -39,7 +39,7 @@ export default function AuthForm(props) {
                     InputProps={{
                         endAdornment: (
                             <InputAdornment position="end">
-                                <IconButton onClick={handleShowPasswordClick} edge="end">
+                                <IconButton sx={{ marginRight: "5px" }} onClick={handleShowPasswordClick} edge="end">
                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
                             </InputAdornment>

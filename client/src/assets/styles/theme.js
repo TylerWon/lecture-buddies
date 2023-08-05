@@ -58,6 +58,15 @@ let theme = createTheme({
             fontSize: "10px",
         },
     },
+    components: {
+        MuiIconButton: {
+            styleOverrides: {
+                root: {
+                    padding: "0px",
+                },
+            },
+        },
+    },
 });
 
 theme = responsiveFontSizes(theme);
