@@ -13,7 +13,7 @@ import {
 } from "../../../../utils/apiRequests";
 import { UserContext } from "../../../../contexts/UserContext";
 
-import { AcceptButtonAndCancelButton, AddButtonWithLabel } from "../../../../components/atoms/button";
+import { AcceptAndCancelButtons, AddButtonWithLabel } from "../../../../components/atoms/button";
 import { useFormik } from "formik";
 import { DefaultSelectField, SelectFieldWithCustomHandleChange } from "../../../../components/atoms/input";
 
@@ -261,7 +261,7 @@ export default function SignUpStep3(props) {
                             />
                         </Grid>
                         <Grid xs="auto">
-                            <AcceptButtonAndCancelButton
+                            <AcceptAndCancelButtons
                                 acceptButtonProps={{ type: "submit" }}
                                 cancelButtonProps={{ onClick: handleCancelAddCourseClick }}
                             />
