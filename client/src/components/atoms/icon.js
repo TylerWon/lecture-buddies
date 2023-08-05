@@ -2,17 +2,6 @@ import { Avatar, Badge, IconButton, Paper, Typography } from "@mui/material";
 import { SocialIcon } from "react-social-icons";
 import { styled } from "@mui/material/styles";
 
-// Container for the SocialMediaIconWithDelete button content
-const SocialMediaIconWithDeleteButtonContentContainer = styled(Paper)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "end",
-    alignItems: "center",
-    width: "20px",
-    height: "20px",
-    borderRadius: "100%",
-}));
-
 // ProfilePhoto component
 export function ProfilePhoto(props) {
     return <Avatar sx={{ width: "125px", height: "125px" }} {...props} />;
@@ -33,9 +22,19 @@ export function SocialMediaIconWithDelete(props) {
         <Badge
             badgeContent={
                 <IconButton size="small" onClick={onDelete}>
-                    <SocialMediaIconWithDeleteButtonContentContainer>
+                    <Paper
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "end",
+                            alignItems: "center",
+                            width: "20px",
+                            height: "20px",
+                            borderRadius: "100%",
+                        }}
+                    >
                         <Typography variant="body1">x</Typography>
-                    </SocialMediaIconWithDeleteButtonContentContainer>
+                    </Paper>
                 </IconButton>
             }
             overlap="circular"
