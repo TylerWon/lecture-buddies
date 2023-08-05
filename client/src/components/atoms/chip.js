@@ -3,10 +3,14 @@ import CloseIcon from "@mui/icons-material/Close";
 
 // InterestChip component
 export function InterestChip(props) {
-    return <Chip variant="outlined" {...props} />;
+    const { ...chipProps } = props;
+
+    return <Chip variant="outlined" {...chipProps} />;
 }
 
 // InterestChipWithDelete component
 export function InterestChipWithDelete(props) {
-    return <InterestChip deleteIcon={<CloseIcon />} {...props} />;
+    const { ...interestChipProps } = props;
+
+    return <InterestChip deleteIcon={<CloseIcon />} {...interestChipProps} />;
 }

@@ -5,8 +5,10 @@ import CancelIcon from "@mui/icons-material/Cancel";
 
 // AcceptButton component
 export function AcceptButton(props) {
+    const { ...iconButtonProps } = props;
+
     return (
-        <IconButton color="secondary" size="small" {...props}>
+        <IconButton color="secondary" size="small" {...iconButtonProps}>
             <CheckCircleIcon />
         </IconButton>
     );
