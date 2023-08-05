@@ -9,7 +9,7 @@ import { createInterest, deleteInterest } from "../../../../../../utils/apiReque
 import { UserContext } from "../../../../../../contexts/UserContext";
 
 import { DefaultTextField } from "../../../../../../components/atoms/input";
-import { AddButtonWithLabel, AcceptButton, CancelButton } from "../../../../../../components/atoms/button";
+import { AcceptAndCancelButtons, AddButtonWithLabel } from "../../../../../../components/atoms/button";
 import { InterestChipWithDelete } from "../../../../../../components/atoms/chip";
 
 // Yup validation schema for form
@@ -118,14 +118,14 @@ export default function InterestsForm() {
             {showAddInterestForm ? (
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer container>
-                        <Grid xs={10.15}>
+                        <Grid xs>
                             <DefaultTextField id="interest" label="Interest" formik={formik} />
                         </Grid>
-                        <Grid xs>
-                            <AcceptButton type="submit" />
-                        </Grid>
-                        <Grid xs>
-                            <CancelButton onClick={handleCancelAddInterestClick} />
+                        <Grid xs="auto">
+                            <AcceptAndCancelButtons
+                                acceptButtonProps={{ type: "submit" }}
+                                cancelButtonProps={{ onClick: handleCancelAddInterestClick }}
+                            />
                         </Grid>
                     </FormContentContainer>
                 </FormControl>

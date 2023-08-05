@@ -8,7 +8,7 @@ import * as yup from "yup";
 import { createSocialMedia, deleteSocialMedia } from "../../../../../../utils/apiRequests";
 import { UserContext } from "../../../../../../contexts/UserContext";
 
-import { AcceptButton, AddButtonWithLabel, CancelButton } from "../../../../../../components/atoms/button";
+import { AcceptAndCancelButtons, AddButtonWithLabel } from "../../../../../../components/atoms/button";
 import { DefaultSelectField, DefaultTextField } from "../../../../../../components/atoms/input";
 import { SocialMediaIconWithDelete } from "../../../../../../components/atoms/icon";
 
@@ -155,14 +155,14 @@ export default function SocialMediasForm() {
                                 formik={formik}
                             />
                         </Grid>
-                        <Grid xs={7}>
+                        <Grid xs>
                             <DefaultTextField id="url" label="URL" formik={formik} />
                         </Grid>
-                        <Grid xs>
-                            <AcceptButton type="submit" />
-                        </Grid>
-                        <Grid xs>
-                            <CancelButton onClick={handleCancelAddSocialMediaClick} />
+                        <Grid xs="auto">
+                            <AcceptAndCancelButtons
+                                acceptButtonProps={{ type: "submit" }}
+                                cancelButtonProps={{ onClick: handleCancelAddSocialMediaClick }}
+                            />
                         </Grid>
                     </FormContentContainer>
                 </FormControl>
