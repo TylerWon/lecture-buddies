@@ -2,7 +2,7 @@ import { Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 import ProfilePhotoUpload from "./components/ProfilePhotoUpload";
-import TextInputs from "./components/TextInputs";
+import PersonalInfoFields from "./components/PersonalInfoFields";
 
 // Container for content
 const ContentContainer = styled(Stack)(({ theme }) => ({
@@ -13,15 +13,15 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     gap: theme.spacing(2),
 }));
 
-// StudentForm component
-export default function StudentForm(props) {
+// StudentSection component
+export default function StudentSection(props) {
     // Props
     const { formik } = props;
 
     return (
         <ContentContainer>
             <ProfilePhotoUpload formik={formik} />
-            <TextInputs formik={formik} />
+            <PersonalInfoFields formik={formik} />
         </ContentContainer>
     );
 }

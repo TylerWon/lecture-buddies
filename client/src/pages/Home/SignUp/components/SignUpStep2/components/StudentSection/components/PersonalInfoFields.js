@@ -8,8 +8,8 @@ import { DefaultSelectField, DefaultTextArea, DefaultTextField } from "../../../
 // Constants
 const YEARS = [{ year: "1st" }, { year: "2nd" }, { year: "3rd" }, { year: "4th" }, { year: "5th" }, { year: "5th+" }];
 
-// TextInputs component
-export default function TextInputs(props) {
+// PersonalInfoFields component
+export default function PersonalInfoFields(props) {
     // Props
     const { formik } = props;
 

@@ -8,12 +8,12 @@ import { UserContext } from "../../../../../contexts/UserContext";
 import { updateStudent } from "../../../../../utils/apiRequests";
 import { uploadPfpToS3 } from "../../../../../utils/awsRequests";
 
-import StudentForm from "./components/StudentForm";
-import InterestsForm from "./components/InterestsForm";
-import SocialMediasForm from "./components/SocialMediasForm";
+import StudentSection from "./components/StudentSection";
+import InterestsSection from "./components/InterestsSection";
+import SocialMediasSection from "./components/SocialMediasSection";
 
-// Yup validation schema for student form
-const studentFormValidationSchema = yup.object({
+// Yup validation schema for student section form
+const studentSectionFormValidationSchema = yup.object({
     firstName: yup.string().required("First name is required"),
     lastName: yup.string().required("Last name is required"),
     schoolId: yup.number().required("School is required"),
@@ -39,7 +39,7 @@ export default function SignUpStep2(props) {
 
     // Hooks
     const { studentId } = useContext(UserContext);
-    const studentFormFormik = useFormik({
+    const studentSectionFormFormik = useFormik({
         initialValues: {
             firstName: "",
             lastName: "",
@@ -50,34 +50,34 @@ export default function SignUpStep2(props) {
             bio: "",
             profilePhoto: null,
         },
-        validationSchema: studentFormValidationSchema,
+        validationSchema: studentSectionFormValidationSchema,
         onSubmit: () => {},
     });
 
     // Handler for when next button is clicked
     const handleNextClick = async () => {
         // Submit student form to check if there are errors
-        await studentFormFormik.submitForm();
-        if (!studentFormFormik.isValid) {
+        await studentSectionFormFormik.submitForm();
+        if (!studentSectionFormFormik.isValid) {
             return;
         }
 
         try {
             // If student added a profile photo, upload it to s3
-            if (studentFormFormik.values.profilePhoto) {
-                uploadPfpToS3(studentFormFormik.values.profilePhoto, studentId);
+            if (studentSectionFormFormik.values.profilePhoto) {
+                uploadPfpToS3(studentSectionFormFormik.values.profilePhoto, studentId);
             }
 
             // Update student
             const updateStudentResponse = await updateStudent(studentId, {
-                first_name: studentFormFormik.values.firstName,
-                last_name: studentFormFormik.values.lastName,
-                school_id: studentFormFormik.values.schoolId,
-                year: studentFormFormik.values.year,
-                faculty: studentFormFormik.values.faculty,
-                major: studentFormFormik.values.major,
-                bio: studentFormFormik.values.bio,
-                profile_photo_url: studentFormFormik.values.profilePhoto
+                first_name: studentSectionFormFormik.values.firstName,
+                last_name: studentSectionFormFormik.values.lastName,
+                school_id: studentSectionFormFormik.values.schoolId,
+                year: studentSectionFormFormik.values.year,
+                faculty: studentSectionFormFormik.values.faculty,
+                major: studentSectionFormFormik.values.major,
+                bio: studentSectionFormFormik.values.bio,
+                profile_photo_url: studentSectionFormFormik.values.profilePhoto
                     ? `${process.env.REACT_APP_AWS_S3_BUCKET_URL}/${studentId}`
                     : "",
             });
@@ -87,7 +87,7 @@ export default function SignUpStep2(props) {
             }
 
             // Set selected school id
-            setSelectedSchoolId(studentFormFormik.values.schoolId);
+            setSelectedSchoolId(studentSectionFormFormik.values.schoolId);
 
             // Move to next step in the sign up process
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -98,9 +98,9 @@ export default function SignUpStep2(props) {
 
     return (
         <ContentContainer>
-            <StudentForm formik={studentFormFormik} />
-            <InterestsForm />
-            <SocialMediasForm />
+            <StudentSection formik={studentSectionFormFormik} />
+            <InterestsSection />
+            <SocialMediasSection />
             <Button fullWidth variant="contained" color="primary" onClick={handleNextClick}>
                 Next
             </Button>

@@ -43,8 +43,8 @@ const FormContentContainer = styled(Grid)(({ theme }) => ({
     gap: theme.spacing(2),
 }));
 
-// SocialMediasForm component
-export default function SocialMediasForm() {
+// SocialMediasSection component
+export default function SocialMediasSection() {
     // Hooks
     const { studentId } = useContext(UserContext);
     const formik = useFormik({
@@ -145,7 +145,7 @@ export default function SocialMediasForm() {
             {showAddSocialMediaForm ? (
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer container>
-                        <Grid xs={3}>
+                        <Grid xs={12} sm={3}>
                             <DefaultSelectField
                                 id="socialMediaPlatform"
                                 label="Platform"
@@ -155,7 +155,7 @@ export default function SocialMediasForm() {
                                 formik={formik}
                             />
                         </Grid>
-                        <Grid xs>
+                        <Grid xs={12} sm>
                             <DefaultTextField id="socialMediaUrl" label="URL" formik={formik} />
                         </Grid>
                         <Grid sx={{ display: "flex", alignItems: "center" }} xs="auto">

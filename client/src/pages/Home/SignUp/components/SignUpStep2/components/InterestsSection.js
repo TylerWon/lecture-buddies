@@ -34,8 +34,8 @@ const FormContentContainer = styled(Grid)(({ theme }) => ({
     gap: theme.spacing(2),
 }));
 
-// InterestsForm component
-export default function InterestsForm() {
+// InterestsSection component
+export default function InterestsSection() {
     // Hooks
     const { studentId } = useContext(UserContext);
     const formik = useFormik({
@@ -118,7 +118,7 @@ export default function InterestsForm() {
             {showAddInterestForm ? (
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer container>
-                        <Grid xs>
+                        <Grid xs={12} sm>
                             <DefaultTextField id="interestName" label="Interest" formik={formik} />
                         </Grid>
                         <Grid sx={{ display: "flex", alignItems: "center" }} xs="auto">
