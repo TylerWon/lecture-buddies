@@ -100,6 +100,23 @@ export const createStudent = async (values) => {
 };
 
 /**
+ * Deletes an enrolment
+ *
+ * @param {number} studentId - the ID of the student enrolled in the section
+ * @param {number} sectionId - the ID of the section the student is enrolled in
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const deleteEnrolment = async (studentId, sectionId) => {
+    const response = await fetch(`${API_URL}/enrolments/${studentId}/${sectionId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
  * Deletes an interest
  *
  * @param {number} interestId - the interest's ID
