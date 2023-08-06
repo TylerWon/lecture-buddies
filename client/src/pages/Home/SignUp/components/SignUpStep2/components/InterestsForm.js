@@ -14,7 +14,7 @@ import { InterestChipWithDelete } from "../../../../../../components/atoms/chip"
 
 // Yup validation schema for form
 const validationSchema = yup.object({
-    interest: yup.string().required("Interest is required"),
+    interestName: yup.string().required("Interest is required"),
 });
 
 // Container for the content
@@ -40,7 +40,7 @@ export default function InterestsForm() {
     const { studentId } = useContext(UserContext);
     const formik = useFormik({
         initialValues: {
-            interest: "",
+            interestName: "",
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
@@ -85,7 +85,7 @@ export default function InterestsForm() {
             // Create interest
             const createInterestResponse = await createInterest({
                 student_id: studentId,
-                interest_name: values.interest,
+                interest_name: values.interestName,
             });
             const createInterestData = await createInterestResponse.json();
             if (createInterestResponse.status === 400) {
@@ -119,7 +119,7 @@ export default function InterestsForm() {
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer container>
                         <Grid xs>
-                            <DefaultTextField id="interest" label="Interest" formik={formik} />
+                            <DefaultTextField id="interestName" label="Interest" formik={formik} />
                         </Grid>
                         <Grid sx={{ display: "flex", alignItems: "center" }} xs="auto">
                             <AcceptAndCancelButtons

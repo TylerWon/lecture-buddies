@@ -45,7 +45,7 @@ export default function TextInputs(props) {
             </Grid>
             <Grid xs={12} sm={6}>
                 <DefaultSelectField
-                    id="school"
+                    id="schoolId"
                     label="School"
                     options={schools}
                     optionValueField="school_id"

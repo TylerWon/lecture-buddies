@@ -16,7 +16,7 @@ import SocialMediasForm from "./components/SocialMediasForm";
 const studentFormValidationSchema = yup.object({
     firstName: yup.string().required("First name is required"),
     lastName: yup.string().required("Last name is required"),
-    school: yup.number().required("School is required"),
+    schoolId: yup.number().required("School is required"),
     year: yup.string().required("Year is required"),
     faculty: yup.string().required("Faculty is required"),
     major: yup.string().required("Major is required"),
@@ -41,14 +41,14 @@ export default function SignUpStep2(props) {
     const { studentId } = useContext(UserContext);
     const studentFormFormik = useFormik({
         initialValues: {
-            profilePhoto: null,
             firstName: "",
             lastName: "",
-            school: "",
+            schoolId: "",
             year: "",
             faculty: "",
             major: "",
             bio: "",
+            profilePhoto: null,
         },
         validationSchema: studentFormValidationSchema,
         onSubmit: () => {},
@@ -72,7 +72,7 @@ export default function SignUpStep2(props) {
             const updateStudentResponse = await updateStudent(studentId, {
                 first_name: studentFormFormik.values.firstName,
                 last_name: studentFormFormik.values.lastName,
-                school_id: studentFormFormik.values.school,
+                school_id: studentFormFormik.values.schoolId,
                 year: studentFormFormik.values.year,
                 faculty: studentFormFormik.values.faculty,
                 major: studentFormFormik.values.major,
@@ -87,7 +87,7 @@ export default function SignUpStep2(props) {
             }
 
             // Set selected school id
-            setSelectedSchoolId(studentFormFormik.values.school);
+            setSelectedSchoolId(studentFormFormik.values.schoolId);
 
             // Move to next step in the sign up process
             setActiveStep((prevActiveStep) => prevActiveStep + 1);

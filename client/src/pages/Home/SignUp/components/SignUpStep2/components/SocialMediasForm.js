@@ -22,8 +22,8 @@ const PLATFORMS = [
 
 // Yup validation schema for form
 const validationSchema = yup.object({
-    platform: yup.string().required("Platform is required"),
-    url: yup.string().url("Enter a valid URL").required("URL is required"),
+    socialMediaPlatform: yup.string().required("Platform is required"),
+    socialMediaUrl: yup.string().url("Enter a valid URL").required("URL is required"),
 });
 
 // Container for the content
@@ -49,8 +49,8 @@ export default function SocialMediasForm() {
     const { studentId } = useContext(UserContext);
     const formik = useFormik({
         initialValues: {
-            platform: "",
-            url: "",
+            socialMediaPlatform: "",
+            socialMediaUrl: "",
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
@@ -101,8 +101,8 @@ export default function SocialMediasForm() {
             // Create social media
             const createSocialMediaResponse = await createSocialMedia({
                 student_id: studentId,
-                social_media_platform: values.platform,
-                social_media_url: values.url,
+                social_media_platform: values.socialMediaPlatform,
+                social_media_url: values.socialMediaUrl,
             });
             const createSocialMediaData = await createSocialMediaResponse.json();
             if (createSocialMediaResponse.status === 400) {
@@ -113,7 +113,7 @@ export default function SocialMediasForm() {
             setSocialMediasAdded([...socialMediasAdded, createSocialMediaData]);
 
             // Disable social media as option in select field
-            const platform = PLATFORMS.find((platform) => platform.platform_value === values.platform);
+            const platform = PLATFORMS.find((platform) => platform.platform_value === values.socialMediaPlatform);
             platform.disabled = true;
 
             // Close add interest form
@@ -147,7 +147,7 @@ export default function SocialMediasForm() {
                     <FormContentContainer container>
                         <Grid xs={3}>
                             <DefaultSelectField
-                                id="platform"
+                                id="socialMediaPlatform"
                                 label="Platform"
                                 options={PLATFORMS}
                                 optionValueField="platform_value"
@@ -156,7 +156,7 @@ export default function SocialMediasForm() {
                             />
                         </Grid>
                         <Grid xs>
-                            <DefaultTextField id="url" label="URL" formik={formik} />
+                            <DefaultTextField id="socialMediaUrl" label="URL" formik={formik} />
                         </Grid>
                         <Grid sx={{ display: "flex", alignItems: "center" }} xs="auto">
                             <AcceptAndCancelButtons
