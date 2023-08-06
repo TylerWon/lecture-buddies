@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { FormControl, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { styled } from "@mui/material/styles";
+import { useFormik } from "formik";
 import * as yup from "yup";
 
 import {
@@ -14,14 +15,13 @@ import {
 import { UserContext } from "../../../../contexts/UserContext";
 
 import { AcceptAndCancelButtons, AddButtonWithLabel } from "../../../../components/atoms/button";
-import { useFormik } from "formik";
 import { DefaultSelectField, SelectFieldWithCustomHandleChange } from "../../../../components/atoms/input";
 
 // Yup validation schema for form
 const validationSchema = yup.object({
-    subjectId: yup.number().required("Subject is required"),
-    courseId: yup.number().required("Course # is required"),
-    sectionId: yup.number().required("Section is required"),
+    subject: yup.object().required("Subject is required"),
+    course: yup.object().required("Course # is required"),
+    section: yup.object().required("Section is required"),
 });
 
 // Container for content
@@ -50,9 +50,9 @@ export default function SignUpStep3(props) {
     const { studentId } = useContext(UserContext);
     const formik = useFormik({
         initialValues: {
-            subjectId: "",
-            courseId: "",
-            sectionId: "",
+            subject: "",
+            course: "",
+            section: "",
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
@@ -66,6 +66,7 @@ export default function SignUpStep3(props) {
     const [showAddCourseForm, setShowAddCourseForm] = useState(false);
     const [courseNumSelectDisabled, setCourseNumSelectDisabled] = useState(true);
     const [sectionSelectDisabled, setSectionSelectDisabled] = useState(true);
+    const [coursesAdded, setCoursesAdded] = useState([]);
 
     // Handler for when add course button is clicked
     const handleAddCourseClick = () => {
@@ -78,16 +79,19 @@ export default function SignUpStep3(props) {
             // Create enrolment
             const createEnrolmentResponse = await createEnrolment({
                 student_id: studentId,
-                section_id: values.sectionId,
+                section_id: values.section.section_id,
             });
             if (createEnrolmentResponse.status === 400) {
                 formik.setErrors({
-                    subjectId: "Course already added",
-                    courseId: " ",
-                    sectionId: " ",
+                    subject: "Course already added",
+                    course: " ",
+                    section: " ",
                 });
                 return;
             }
+
+            // Add course to coursesAdded state
+            setCoursesAdded([...coursesAdded, { ...values.subject, ...values.course, ...values.section }]);
 
             // Close add course form
             handleCancelAddCourseClick();
@@ -111,14 +115,14 @@ export default function SignUpStep3(props) {
 
     // Handler for when subject select field is closed
     const handleSubjectChange = async (event) => {
-        const subjectId = event.target.value;
+        const subject = event.target.value;
 
-        // Set subjectId formik value
-        await formik.setFieldValue("subjectId", subjectId);
+        // Set subject formik value
+        await formik.setFieldValue("subject", subject);
 
         // Reset courses and sections formik values
-        await formik.setFieldValue("courseId", "");
-        await formik.setFieldValue("sectionId", "");
+        await formik.setFieldValue("course", "");
+        await formik.setFieldValue("section", "");
 
         // Reset courses and sections states
         setCourses([]);
@@ -130,7 +134,7 @@ export default function SignUpStep3(props) {
 
         try {
             // Get courses for subject
-            const getCoursesForSubjectResponse = await getCoursesForSubject(subjectId);
+            const getCoursesForSubjectResponse = await getCoursesForSubject(subject.subject_id);
             const getCoursesForSubjectData = await getCoursesForSubjectResponse.json();
             if (getCoursesForSubjectResponse.status !== 200) {
                 throw new Error(getCoursesForSubjectData.message);
@@ -148,13 +152,13 @@ export default function SignUpStep3(props) {
 
     // Handler for when course number select field is closed
     const handleCourseNumChange = async (event) => {
-        const courseId = event.target.value;
+        const course = event.target.value;
 
-        // Set courseId formik value
-        await formik.setFieldValue("courseId", courseId);
+        // Set course formik value
+        await formik.setFieldValue("course", course);
 
         // Reset sections formik value
-        await formik.setFieldValue("sectionId", "");
+        await formik.setFieldValue("section", "");
 
         // Reset sections state
         setSections([]);
@@ -164,7 +168,7 @@ export default function SignUpStep3(props) {
 
         try {
             // Get sections for course
-            const getSectionsForCourseResponse = await getSectionsForCourse(courseId);
+            const getSectionsForCourseResponse = await getSectionsForCourse(course.course_id);
             const getSectionsForCourseData = await getSectionsForCourseResponse.json();
             if (getSectionsForCourseResponse.status !== 200) {
                 throw new Error(getSectionsForCourseData.message);
@@ -226,35 +230,35 @@ export default function SignUpStep3(props) {
             {showAddCourseForm ? (
                 <FormControl fullWidth component="form" onSubmit={formik.handleSubmit}>
                     <FormContentContainer container>
-                        <Grid xs>
+                        <Grid xs={12} sm>
                             <SelectFieldWithCustomHandleChange
-                                id="subjectId"
+                                id="subject"
                                 label="Subject"
                                 handleChange={handleSubjectChange}
                                 options={subjects}
-                                optionValueField="subject_id"
+                                optionAsValue={true}
                                 optionTextField="subject_name"
                                 formik={formik}
                             />
                         </Grid>
-                        <Grid xs>
+                        <Grid xs={12} sm>
                             <SelectFieldWithCustomHandleChange
-                                id="courseId"
+                                id="course"
                                 label="Course #"
                                 handleChange={handleCourseNumChange}
                                 options={courses}
-                                optionValueField="course_id"
+                                optionAsValue={true}
                                 optionTextField="course_number"
                                 formik={formik}
                                 disabled={courseNumSelectDisabled}
                             />
                         </Grid>
-                        <Grid xs>
+                        <Grid xs={12} sm>
                             <DefaultSelectField
-                                id="sectionId"
+                                id="section"
                                 label="Section"
                                 options={sections}
-                                optionValueField="section_id"
+                                optionAsValue={true}
                                 optionTextField="section_number"
                                 formik={formik}
                                 disabled={sectionSelectDisabled}

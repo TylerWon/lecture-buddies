@@ -2,7 +2,7 @@ import { FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } 
 
 // BaseSelectField component
 function BaseSelectField(props) {
-    const { id, label, handleChange, options, optionValueField, optionTextField, formik, ...selectFieldProps } = props;
+    const { id, label, handleChange, options, optionValueField, optionAsValue, optionTextField, formik } = props;
 
     return (
         <FormControl fullWidth>
@@ -16,10 +16,13 @@ function BaseSelectField(props) {
                 value={formik.values[id]}
                 onChange={handleChange}
                 error={formik.touched[id] && Boolean(formik.errors[id])}
-                {...selectFieldProps}
             >
                 {options.map((option, index) => (
-                    <MenuItem key={index} value={option[optionValueField]} disabled={option["disabled"]}>
+                    <MenuItem
+                        key={index}
+                        value={optionAsValue ? option : option[optionValueField]}
+                        disabled={option["disabled"]}
+                    >
                         {option[optionTextField]}
                     </MenuItem>
                 ))}
@@ -36,7 +39,7 @@ function BaseSelectField(props) {
 
 // DefaultSelectField component
 export function DefaultSelectField(props) {
-    const { id, label, options, optionValueField, optionTextField, formik, ...selectFieldProps } = props;
+    const { id, label, options, optionValueField, optionAsValue, optionTextField, formik } = props;
 
     return (
         <BaseSelectField
@@ -46,15 +49,15 @@ export function DefaultSelectField(props) {
             options={options}
             optionValueField={optionValueField}
             optionTextField={optionTextField}
+            optionAsValue={optionAsValue}
             formik={formik}
-            {...selectFieldProps}
         />
     );
 }
 
 // SelectFieldWithCustomHandleChange component
 export function SelectFieldWithCustomHandleChange(props) {
-    const { id, label, handleChange, options, optionValueField, optionTextField, formik, ...selectFieldProps } = props;
+    const { id, label, handleChange, options, optionValueField, optionAsValue, optionTextField, formik } = props;
 
     return (
         <BaseSelectField
@@ -64,8 +67,8 @@ export function SelectFieldWithCustomHandleChange(props) {
             options={options}
             optionValueField={optionValueField}
             optionTextField={optionTextField}
+            optionAsValue={optionAsValue}
             formik={formik}
-            {...selectFieldProps}
         />
     );
 }
