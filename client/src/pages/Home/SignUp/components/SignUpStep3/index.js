@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { Stack, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Button, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { styled } from "@mui/material/styles";
 
@@ -26,7 +27,8 @@ export default function SignUpStep3(props) {
     const { selectedSchoolId } = props;
 
     // Hooks
-    const { studentId } = useContext(UserContext);
+    const { setIsLoggedIn, studentId } = useContext(UserContext);
+    const navigate = useNavigate();
     const [school, setSchool] = useState(null);
     const [showAddCourseForm, setShowAddCourseForm] = useState(false);
     const [coursesAdded, setCoursesAdded] = useState([]);
@@ -52,6 +54,15 @@ export default function SignUpStep3(props) {
         } catch (err) {
             console.log(err); // unexpected server error
         }
+    };
+
+    // Handler for when done button is clicked
+    const handleDoneClick = () => {
+        // Set isLoggedIn in the user context
+        setIsLoggedIn(true);
+
+        // Navigate to courses page
+        navigate("/courses");
     };
 
     // Initializes school state
@@ -95,6 +106,9 @@ export default function SignUpStep3(props) {
             ) : (
                 <AddButtonWithLabel label="Add course" onClick={handleAddCourseClick} />
             )}
+            <Button fullWidth variant="contained" color="primary" onClick={handleDoneClick}>
+                Done
+            </Button>
         </ContentContainer>
     );
 }

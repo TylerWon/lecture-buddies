@@ -60,8 +60,8 @@ export default function SocialMediasSection() {
     const [showAddSocialMediaForm, setShowAddSocialMediaForm] = useState(false);
     const [socialMediasAdded, setSocialMediasAdded] = useState([]);
 
-    // Handler for when delete social media button is clicked
-    const handleDeleteSocialMediaClick = async (socialMediaId, socialMediaPlatform) => {
+    // Handler for when social media is deleted
+    const handleDeleteSocialMedia = async (socialMediaId, socialMediaPlatform) => {
         try {
             // Delete social media
             const deleteSocialMediaResponse = await deleteSocialMedia(socialMediaId);
@@ -133,10 +133,7 @@ export default function SocialMediasSection() {
                             network={socialMedia.social_media_platform}
                             url={socialMedia.social_media_url}
                             onDelete={() =>
-                                handleDeleteSocialMediaClick(
-                                    socialMedia.social_media_id,
-                                    socialMedia.social_media_platform
-                                )
+                                handleDeleteSocialMedia(socialMedia.social_media_id, socialMedia.social_media_platform)
                             }
                         />
                     </Grid>
