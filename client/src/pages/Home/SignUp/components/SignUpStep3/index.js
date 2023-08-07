@@ -107,9 +107,9 @@ export default function SignUpStep3(props) {
     return (
         <ContentContainer>
             <Typography variant="h5">Current term - {school?.current_term}</Typography>
-            <Grid container spacing={4}>
+            <Grid sx={{ justifyContent: "space-evenly" }} container spacing={2}>
                 {coursesAdded.map((course) => (
-                    <Grid sx={{ display: "flex" }} key={course.section_id}>
+                    <Grid sx={{ display: "flex" }} key={course.section_id} xs="auto" sm="auto">
                         <CourseCardBackground>
                             <CourseCardDeleteButtonContainer>
                                 <IconButton size="small" onClick={() => handleDeleteCourseClick(course.section_id)}>
