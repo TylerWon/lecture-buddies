@@ -20,28 +20,22 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     width: "100%",
 }));
 
-// Container for course cards
-const CourseCardsContainer = styled(Grid)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "row",
-    gap: theme.spacing(4),
-}));
-
-// Container for course card
-const CourseCardContainer = styled(Grid)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "stretch",
-}));
-
 // Background for course card
 const CourseCardBackground = styled(Paper)(({ theme }) => ({
+    position: "relative",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "stretch",
+    justifyContent: "center",
     alignItems: "center",
     width: "250px",
+    minHeight: "125px",
+}));
+
+// Container for course card delete button
+const CourseCardDeleteButtonContainer = styled(Box)(({ theme }) => ({
+    position: "absolute",
+    top: 0,
+    right: 0,
 }));
 
 // Container for course card content
@@ -51,16 +45,7 @@ const CourseCardContentContainer = styled(Stack)(({ theme }) => ({
     justifyContent: "center",
     alignItems: "center",
     height: "100%",
-    padding: `0 ${theme.spacing(2)} ${theme.spacing(2)} ${theme.spacing(2)}`,
-}));
-
-// Container for course card delete button
-const CourseCardDeleteButtonContainer = styled(Box)(({ theme }) => ({
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "end",
-    alignItems: "center",
-    width: "100%",
+    padding: theme.spacing(2),
 }));
 
 // SignUpStep3 component
@@ -122,9 +107,9 @@ export default function SignUpStep3(props) {
     return (
         <ContentContainer>
             <Typography variant="h5">Current term - {school?.current_term}</Typography>
-            <CourseCardsContainer container>
+            <Grid container spacing={4}>
                 {coursesAdded.map((course) => (
-                    <CourseCardContainer key={course.section_id}>
+                    <Grid sx={{ display: "flex" }} key={course.section_id}>
                         <CourseCardBackground>
                             <CourseCardDeleteButtonContainer>
                                 <IconButton size="small" onClick={() => handleDeleteCourseClick(course.section_id)}>
@@ -138,9 +123,9 @@ export default function SignUpStep3(props) {
                                 </Typography>
                             </CourseCardContentContainer>
                         </CourseCardBackground>
-                    </CourseCardContainer>
+                    </Grid>
                 ))}
-            </CourseCardsContainer>
+            </Grid>
             {showAddCourseForm ? (
                 <AddCourseForm
                     selectedSchoolId={selectedSchoolId}
