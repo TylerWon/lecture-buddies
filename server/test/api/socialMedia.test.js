@@ -6,7 +6,7 @@ const db = require("../../src/configs/db.config");
 const {
     cleanUpDatabase,
     createSocialMedia,
-    signupUser,
+    signUpUser,
     verifyDeleteRequestResponse,
     verifyPostRequestResponse,
     verifyPatchRequestResponse,
@@ -23,7 +23,7 @@ describe("social media routes tests", () => {
     const user1Password = "password1";
 
     beforeAll(async () => {
-        student1 = await signupUser(testSession, user1Username, user1Password);
+        student1 = await signUpUser(testSession, user1Username, user1Password);
         socialMedia1 = await createSocialMedia(db, student1.student_id, "linkedin", "www.linkedin.com/tylerwon");
         socialMedia2 = await createSocialMedia(db, student1.student_id, "instagram", "www.instagram.com/connorwon");
     });

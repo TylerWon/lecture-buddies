@@ -3,7 +3,7 @@ const session = require("supertest-session");
 
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
-const { cleanUpDatabase, signupUser, verifyPostRequestResponse } = require("../utils/helpers");
+const { cleanUpDatabase, signUpUser, verifyPostRequestResponse } = require("../utils/helpers");
 
 describe("auth routes tests", () => {
     const testSession = session(app);
@@ -16,7 +16,7 @@ describe("auth routes tests", () => {
     const user2Password = "password2";
 
     beforeAll(async () => {
-        student1 = await signupUser(testSession, user1Username, user1Password);
+        student1 = await signUpUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
@@ -108,7 +108,7 @@ describe("auth routes tests", () => {
         });
     });
 
-    describe("/auth/signup", () => {
+    describe("/auth/signUp", () => {
         let payload;
 
         beforeEach(() => {
@@ -116,7 +116,7 @@ describe("auth routes tests", () => {
         });
 
         test("POST - should sign a user up", async () => {
-            let response = await request(app).post("/auth/signup").send(payload);
+            let response = await request(app).post("/auth/signUp").send(payload);
             expect(response.statusCode).toEqual(200);
             expect(response.body.student_id).toBeDefined();
             expect(response.body.school_id).toBeNull();
@@ -132,7 +132,7 @@ describe("auth routes tests", () => {
         test("POST - should not sign a user up when missing some body parameters", async () => {
             delete payload.username;
 
-            await verifyPostRequestResponse(request(app), "/auth/signup", payload, 400, [
+            await verifyPostRequestResponse(request(app), "/auth/signUp", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -145,7 +145,7 @@ describe("auth routes tests", () => {
         test("POST - should not sign a user up when some body parameters are the wrong type", async () => {
             payload.password = 12345678;
 
-            await verifyPostRequestResponse(request(app), "/auth/signup", payload, 400, [
+            await verifyPostRequestResponse(request(app), "/auth/signUp", payload, 400, [
                 {
                     type: "field",
                     location: "body",
@@ -160,7 +160,7 @@ describe("auth routes tests", () => {
             payload.username = user1Username;
             payload.password = user1Password;
 
-            await verifyPostRequestResponse(request(app), "/auth/signup", payload, 400, {
+            await verifyPostRequestResponse(request(app), "/auth/signUp", payload, 400, {
                 message: "an account with that username already exists",
             });
         });

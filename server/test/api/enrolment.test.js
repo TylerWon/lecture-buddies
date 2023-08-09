@@ -10,7 +10,7 @@ const {
     createSection,
     createSubject,
     cleanUpDatabase,
-    signupUser,
+    signUpUser,
     verifyPostRequestResponse,
     verifyDeleteRequestResponse,
 } = require("../utils/helpers");
@@ -30,7 +30,7 @@ describe("enrolment routes tests", () => {
     const user1Password = "password1";
 
     beforeAll(async () => {
-        student1 = await signupUser(testSession, user1Username, user1Password);
+        student1 = await signUpUser(testSession, user1Username, user1Password);
         school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
         subject1 = await createSubject(db, school1.school_id, "CPSC");
         course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");

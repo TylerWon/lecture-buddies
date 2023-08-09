@@ -200,8 +200,8 @@ const createStudent = async (db, userId, schoolId, firstName, lastName, year, fa
  * @param {string} username - the user's username
  * @param {string} password - the user's password
  */
-const signupUser = async (request, username, password) => {
-    const response = await request.post("/auth/signup").send({ username: username, password: password });
+const signUpUser = async (request, username, password) => {
+    const response = await request.post("/auth/signUp").send({ username: username, password: password });
     return response.body;
 };
 
@@ -358,7 +358,7 @@ module.exports = {
     createSocialMedia,
     createSubject,
     createStudent,
-    signupUser,
+    signUpUser,
     updateFriendship,
     updateStudent,
     verifyDeleteRequestResponse,

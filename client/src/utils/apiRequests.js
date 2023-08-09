@@ -255,8 +255,8 @@ export const login = async (values) => {
  *
  * @returns {Promise<Response>} response from the API
  */
-export const signup = async (values) => {
-    const response = await fetch(`${API_URL}/auth/signup`, {
+export const signUp = async (values) => {
+    const response = await fetch(`${API_URL}/auth/signUp`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

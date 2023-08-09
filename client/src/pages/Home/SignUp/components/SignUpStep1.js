@@ -4,7 +4,7 @@ import * as yup from "yup";
 import YupPassword from "yup-password";
 
 import { UserContext } from "../../../../contexts/UserContext";
-import { createStudent, signup } from "../../../../utils/apiRequests";
+import { createStudent, signUp } from "../../../../utils/apiRequests";
 
 import AuthForm from "../../../../components/forms/AuthForm";
 
@@ -46,7 +46,7 @@ export default function SignUpStep1(props) {
     const handleAuthFormSubmit = async (values) => {
         try {
             // Create user
-            const createUserResponse = await signup({ username: values.email, password: values.password });
+            const createUserResponse = await signUp({ username: values.email, password: values.password });
             const createUserData = await createUserResponse.json();
             if (createUserResponse.status === 400) {
                 formik.setErrors({ email: "An account with this email already exists" });

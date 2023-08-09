@@ -6,7 +6,7 @@ const db = require("../../src/configs/db.config");
 const {
     createInterest,
     cleanUpDatabase,
-    signupUser,
+    signUpUser,
     verifyDeleteRequestResponse,
     verifyPostRequestResponse,
     verifyPatchRequestResponse,
@@ -23,7 +23,7 @@ describe("interest routes tests", () => {
     const user1Password = "password1";
 
     beforeAll(async () => {
-        student1 = await signupUser(testSession, user1Username, user1Password);
+        student1 = await signUpUser(testSession, user1Username, user1Password);
         interest1 = await createInterest(db, student1.student_id, "reading");
         interest2 = await createInterest(db, student1.student_id, "video games");
     });

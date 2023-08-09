@@ -133,7 +133,7 @@ const logout = (req, res, next) => {
  * - 400 Bad Request if missing or invalid body fields or an account with the username already exists
  * - 500 Internal Server Error if unexpected error
  */
-const signup = async (req, res, next) => {
+const signUp = async (req, res, next) => {
     const username = req.body.username;
     const password = req.body.password;
     const salt = crypto.randomBytes(16);
@@ -178,5 +178,5 @@ module.exports = {
     login,
     afterLogin,
     logout,
-    signup,
+    signUp,
 };

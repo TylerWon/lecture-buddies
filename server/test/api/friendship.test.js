@@ -5,7 +5,7 @@ const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
     cleanUpDatabase,
-    signupUser,
+    signUpUser,
     verifyPostRequestResponse,
     verifyPatchRequestResponse,
 } = require("../utils/helpers");
@@ -25,8 +25,8 @@ describe("friendship routes tests", () => {
     const user2Password = "password2";
 
     beforeAll(async () => {
-        student1 = await signupUser(testSession, user1Username, user1Password);
-        student2 = await signupUser(testSession, user2Username, user2Password);
+        student1 = await signUpUser(testSession, user1Username, user1Password);
+        student2 = await signUpUser(testSession, user2Username, user2Password);
     });
 
     afterAll(async () => {

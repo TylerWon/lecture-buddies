@@ -16,10 +16,10 @@ router.post(
 );
 router.post("/logout", authMiddleware.authenticateRequest, authController.logout);
 router.post(
-    "/signup",
+    "/signUp",
     validationSchemas.authValidationSchema(),
     validationMiddleware.validateRequest,
-    authController.signup
+    authController.signUp
 );
 
 module.exports = router;

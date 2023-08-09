@@ -16,7 +16,7 @@ const {
     createSocialMedia,
     createSubject,
     cleanUpDatabase,
-    signupUser,
+    signUpUser,
     updateFriendship,
     updateStudent,
     verifyPatchRequestResponse,
@@ -66,10 +66,10 @@ describe("student routes tests", () => {
 
     beforeAll(async () => {
         school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
-        student1 = await signupUser(testSession, user1Username, user1Password);
-        student2 = await signupUser(testSession, user2Username, user2Password);
-        student3 = await signupUser(testSession, user3Username, user3Password);
-        student4 = await signupUser(testSession, user4Username, user4Password);
+        student1 = await signUpUser(testSession, user1Username, user1Password);
+        student2 = await signUpUser(testSession, user2Username, user2Password);
+        student3 = await signUpUser(testSession, user3Username, user3Password);
+        student4 = await signUpUser(testSession, user4Username, user4Password);
         student1 = await updateStudent(
             db,
             student1.student_id,

@@ -7,7 +7,7 @@ const {
     cleanUpDatabase,
     createConversation,
     createConversationMember,
-    signupUser,
+    signUpUser,
     verifyPostRequestResponse,
 } = require("../utils/helpers");
 
@@ -24,8 +24,8 @@ describe("message routes tests", () => {
     const user2Password = "password2";
 
     beforeAll(async () => {
-        student1 = await signupUser(testSession, user1Username, user1Password);
-        student2 = await signupUser(testSession, user2Username, user2Password);
+        student1 = await signUpUser(testSession, user1Username, user1Password);
+        student2 = await signUpUser(testSession, user2Username, user2Password);
         conversation1 = await createConversation(db, "DM");
         await createConversationMember(db, conversation1.conversation_id, student1.student_id);
         await createConversationMember(db, conversation1.conversation_id, student2.student_id);
