@@ -24,13 +24,13 @@ describe("auth routes tests", () => {
         await db.$pool.end();
     });
 
-    describe("/auth/autologin", () => {
+    describe("/auth/autoLogin", () => {
         test("POST - should log a user in when the user's session is valid", async () => {
-            await verifyPostRequestResponse(testSession, "/auth/autologin", undefined, 200, student1);
+            await verifyPostRequestResponse(testSession, "/auth/autoLogin", undefined, 200, student1);
         });
 
         test("POST - should not log a user in when the user's session is invalid", async () => {
-            await verifyPostRequestResponse(request(app), "/auth/autologin", undefined, 401, {
+            await verifyPostRequestResponse(request(app), "/auth/autoLogin", undefined, 401, {
                 message: "unauthenticated",
             });
         });
