@@ -1,11 +1,5 @@
-import { Avatar, Badge, IconButton, Paper, Typography } from "@mui/material";
+import { Badge, IconButton, Paper, Typography } from "@mui/material";
 import { SocialIcon } from "react-social-icons";
-import { styled } from "@mui/material/styles";
-
-// ProfilePhoto component
-export function ProfilePhoto(props) {
-    return <Avatar sx={{ width: "125px", height: "125px" }} {...props} />;
-}
 
 // SocialMediaIcon component
 export function SocialMediaIcon(props) {

@@ -2,7 +2,7 @@ import { Button, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 
-import { ProfilePhoto } from "../../../../../../../../components/atoms/icon";
+import { BigProfilePhoto } from "../../../../../../../../components/atoms/avatar";
 
 // Container for content
 const ContentContainer = styled(Stack)(({ theme }) => ({
@@ -60,7 +60,7 @@ export default function ProfilePhotoUpload(props) {
         <ContentContainer>
             <Typography variant="body1">Profile photo</Typography>
             <UploadContainer>
-                {formik.values.profilePhoto ? <ProfilePhoto src={srcUrlForPreview} /> : <ProfilePhoto />}
+                <BigProfilePhoto src={srcUrlForPreview} />
                 <UploadButtonContainer>
                     <Button variant="outlined" component="label">
                         Upload
