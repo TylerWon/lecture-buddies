@@ -11,7 +11,7 @@ import {
     getSectionsForCourse,
     getSubjectsForSchool,
 } from "../../../../../../utils/apiRequests";
-import { UserContext } from "../../../../../../contexts/UserContext";
+import { StudentContext } from "../../../../../../contexts/StudentContext";
 
 import { AcceptAndCancelButtons } from "../../../../../../components/atoms/button";
 import { DefaultSelectField, SelectFieldWithCustomHandleChange } from "../../../../../../components/atoms/input";
@@ -36,7 +36,7 @@ export default function AddCourseForm(props) {
     const { selectedSchoolId, setCoursesAdded, setShowAddCourseForm } = props;
 
     // Hooks
-    const { studentId } = useContext(UserContext);
+    const { student } = useContext(StudentContext);
     const formik = useFormik({
         initialValues: {
             subject: "",
@@ -59,7 +59,7 @@ export default function AddCourseForm(props) {
         try {
             // Create enrolment
             const createEnrolmentResponse = await createEnrolment({
-                student_id: studentId,
+                student_id: student.student_id,
                 section_id: values.section.section_id,
             });
             if (createEnrolmentResponse.status === 400) {

@@ -1,12 +1,12 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useContext, useEffect } from "react";
 
-import { UserContext } from "../../contexts/UserContext";
+import { StudentContext } from "../../contexts/StudentContext";
 
 // NoAuth component
 export default function NoAuth() {
     // Hooks
-    const { isLoggedIn } = useContext(UserContext);
+    const { isLoggedIn } = useContext(StudentContext);
     const navigate = useNavigate();
 
     // Checks if user is logged in. If so, redirects to /courses

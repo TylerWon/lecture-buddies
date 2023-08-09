@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 import { createSocialMedia, deleteSocialMedia } from "../../../../../../utils/apiRequests";
-import { UserContext } from "../../../../../../contexts/UserContext";
+import { StudentContext } from "../../../../../../contexts/StudentContext";
 
 import { AcceptAndCancelButtons, AddButtonWithLabel } from "../../../../../../components/atoms/button";
 import { DefaultSelectField, DefaultTextField } from "../../../../../../components/atoms/input";
@@ -46,7 +46,7 @@ const FormContentContainer = styled(Grid)(({ theme }) => ({
 // SocialMediasSection component
 export default function SocialMediasSection() {
     // Hooks
-    const { studentId } = useContext(UserContext);
+    const { student } = useContext(StudentContext);
     const formik = useFormik({
         initialValues: {
             socialMediaPlatform: "",
@@ -100,7 +100,7 @@ export default function SocialMediasSection() {
         try {
             // Create social media
             const createSocialMediaResponse = await createSocialMedia({
-                student_id: studentId,
+                student_id: student.student_id,
                 social_media_platform: values.socialMediaPlatform,
                 social_media_url: values.socialMediaUrl,
             });

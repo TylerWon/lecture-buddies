@@ -7,7 +7,7 @@ import { styled } from "@mui/material/styles";
 import { deleteEnrolment, getSchool } from "../../../../../utils/apiRequests";
 
 import { AddButtonWithLabel } from "../../../../../components/atoms/button";
-import { UserContext } from "../../../../../contexts/UserContext";
+import { StudentContext } from "../../../../../contexts/StudentContext";
 import { CourseCardWithDelete } from "../../../../../components/atoms/card";
 import AddCourseForm from "./components/AddCourseForm";
 
@@ -27,7 +27,7 @@ export default function SignUpStep3(props) {
     const { selectedSchoolId } = props;
 
     // Hooks
-    const { setIsLoggedIn, studentId } = useContext(UserContext);
+    const { setIsLoggedIn, student } = useContext(StudentContext);
     const navigate = useNavigate();
     const [school, setSchool] = useState(null);
     const [showAddCourseForm, setShowAddCourseForm] = useState(false);
@@ -42,7 +42,7 @@ export default function SignUpStep3(props) {
     const handleCourseDelete = async (sectionId) => {
         try {
             // Delete enrolment
-            const deleteEnrolmentResponse = await deleteEnrolment(studentId, sectionId);
+            const deleteEnrolmentResponse = await deleteEnrolment(student.student_id, sectionId);
             const deleteEnrolmentData = await deleteEnrolmentResponse.json();
             if (deleteEnrolmentResponse.status === 400) {
                 throw new Error(deleteEnrolmentData.message);

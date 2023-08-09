@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 import { createInterest, deleteInterest } from "../../../../../../utils/apiRequests";
-import { UserContext } from "../../../../../../contexts/UserContext";
+import { StudentContext } from "../../../../../../contexts/StudentContext";
 
 import { DefaultTextField } from "../../../../../../components/atoms/input";
 import { AcceptAndCancelButtons, AddButtonWithLabel } from "../../../../../../components/atoms/button";
@@ -37,7 +37,7 @@ const FormContentContainer = styled(Grid)(({ theme }) => ({
 // InterestsSection component
 export default function InterestsSection() {
     // Hooks
-    const { studentId } = useContext(UserContext);
+    const { student } = useContext(StudentContext);
     const formik = useFormik({
         initialValues: {
             interestName: "",
@@ -84,7 +84,7 @@ export default function InterestsSection() {
         try {
             // Create interest
             const createInterestResponse = await createInterest({
-                student_id: studentId,
+                student_id: student.student_id,
                 interest_name: values.interestName,
             });
             const createInterestData = await createInterestResponse.json();

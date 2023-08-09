@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import { useContext } from "react";
 import * as yup from "yup";
 
-import { UserContext } from "../../../../contexts/UserContext";
+import { StudentContext } from "../../../../contexts/StudentContext";
 import { login } from "../../../../utils/apiRequests";
 
 import AuthForm from "../../../../components/forms/AuthForm";
@@ -66,7 +66,7 @@ export default function LoginForm(props) {
     const { setShowSignUp } = props;
 
     // Hooks
-    const { setIsLoggedIn, setsetStudentId } = useContext(UserContext);
+    const { setIsLoggedIn, setStudent } = useContext(StudentContext);
     const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
@@ -90,9 +90,9 @@ export default function LoginForm(props) {
             }
             const loginData = await loginResponse.json();
 
-            // Set the user context
+            // Set the student context
             setIsLoggedIn(true);
-            setsetStudentId(loginData.user_id);
+            setStudent(loginData);
 
             // Navigate to the courses page
             navigate("/courses");

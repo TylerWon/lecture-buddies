@@ -6,15 +6,15 @@ import { ThemeProvider } from "@mui/material/styles";
 import "./assets/styles/index.css";
 import App from "./App";
 import theme from "./assets/styles/theme";
-import { UserContextProvider } from "./contexts/UserContext";
+import { StudentContextProvider } from "./contexts/StudentContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <React.StrictMode>
         <ThemeProvider theme={theme}>
-            <UserContextProvider>
+            <StudentContextProvider>
                 <App />
-            </UserContextProvider>
+            </StudentContextProvider>
         </ThemeProvider>
     </React.StrictMode>
 );

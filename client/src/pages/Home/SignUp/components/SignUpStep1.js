@@ -3,7 +3,7 @@ import { useContext } from "react";
 import * as yup from "yup";
 import YupPassword from "yup-password";
 
-import { UserContext } from "../../../../contexts/UserContext";
+import { StudentContext } from "../../../../contexts/StudentContext";
 import { createStudent, signUp } from "../../../../utils/apiRequests";
 
 import AuthForm from "../../../../components/forms/AuthForm";
@@ -30,7 +30,7 @@ export default function SignUpStep1(props) {
     const { setActiveStep } = props;
 
     // Hooks
-    const { setStudentId } = useContext(UserContext);
+    const { setStudent } = useContext(StudentContext);
     const formik = useFormik({
         initialValues: {
             email: "",
@@ -53,11 +53,8 @@ export default function SignUpStep1(props) {
                 return;
             }
 
-            // Create student
-            await createStudent({ student_id: createUserData.user_id });
-
-            // Set user id for the user context
-            setStudentId(createUserData.user_id);
+            // Set student for the student context
+            setStudent(createUserData);
 
             // Move to next step in the sign up process
             setActiveStep((prevActiveStep) => prevActiveStep + 1);

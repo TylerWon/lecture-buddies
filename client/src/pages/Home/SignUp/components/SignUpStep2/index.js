@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import { useContext } from "react";
 import * as yup from "yup";
 
-import { UserContext } from "../../../../../contexts/UserContext";
+import { StudentContext } from "../../../../../contexts/StudentContext";
 import { updateStudent } from "../../../../../utils/apiRequests";
 import { uploadPfpToS3 } from "../../../../../utils/awsRequests";
 
@@ -38,7 +38,7 @@ export default function SignUpStep2(props) {
     const { setActiveStep, setSelectedSchoolId } = props;
 
     // Hooks
-    const { studentId } = useContext(UserContext);
+    const { student, setStudent } = useContext(StudentContext);
     const studentSectionFormFormik = useFormik({
         initialValues: {
             firstName: "",
@@ -65,11 +65,11 @@ export default function SignUpStep2(props) {
         try {
             // If student added a profile photo, upload it to s3
             if (studentSectionFormFormik.values.profilePhoto) {
-                uploadPfpToS3(studentSectionFormFormik.values.profilePhoto, studentId);
+                uploadPfpToS3(studentSectionFormFormik.values.profilePhoto, student.student_id);
             }
 
             // Update student
-            const updateStudentResponse = await updateStudent(studentId, {
+            const updateStudentResponse = await updateStudent(student.student_id, {
                 first_name: studentSectionFormFormik.values.firstName,
                 last_name: studentSectionFormFormik.values.lastName,
                 school_id: studentSectionFormFormik.values.schoolId,
@@ -78,13 +78,16 @@ export default function SignUpStep2(props) {
                 major: studentSectionFormFormik.values.major,
                 bio: studentSectionFormFormik.values.bio,
                 profile_photo_url: studentSectionFormFormik.values.profilePhoto
-                    ? `${process.env.REACT_APP_AWS_S3_BUCKET_URL}/${studentId}`
+                    ? `${process.env.REACT_APP_AWS_S3_BUCKET_URL}/${student.student_id}`
                     : "",
             });
             const updateStudentData = await updateStudentResponse.json();
             if (updateStudentResponse.status === 400) {
                 throw new Error(updateStudentData.message);
             }
+
+            // Set student in the student context
+            setStudent(updateStudentData);
 
             // Set selected school id
             setSelectedSchoolId(studentSectionFormFormik.values.schoolId);
