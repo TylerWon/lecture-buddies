@@ -5,46 +5,6 @@ const queries = require("../utils/queries");
 
 /********** CONTROLLERS **********/
 /**
- * Creates a student
- *
- * @param {number} req.body.student_id - the ID of the user associated with the student
- *
- * @returns
- * - 201 Created if successful
- * - 400 Bad Request if user does not exist or user is already associated with a student
- * - 500 Internal Server Error if unexpected error
- */
-const createStudent = async (req, res, next) => {
-    const payload = req.body;
-
-    // Check if user exists
-    try {
-        await db.one(queries.users.getUser, [payload.student_id]);
-    } catch (err) {
-        return res.status(400).json({
-            message: `user with id '${payload.student_id}' does not exist`,
-        });
-    }
-
-    // Check if user is already associated with a student
-    try {
-        await db.none(queries.students.getStudent, [payload.student_id]);
-    } catch (err) {
-        return res.status(400).json({
-            message: `user with id '${payload.user_id}' is already associated with another student`,
-        });
-    }
-
-    // Create student
-    try {
-        const student = await db.one(queries.students.createStudent, [payload.student_id]);
-        return res.status(201).json(student);
-    } catch (err) {
-        return next(err); // unexpected error
-    }
-};
-
-/**
  * Gets the classmates for a student in a section. Information about each classmate and their interests, social medias,
  * and mutual courses with the student for the term the section is in is included.
  *
@@ -679,7 +639,6 @@ const studentExists = async (studentId) => {
 };
 
 module.exports = {
-    createStudent,
     getClassmatesForStudentInSection,
     getConversationsForStudent,
     getCourseHistoryForStudent,

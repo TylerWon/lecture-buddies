@@ -6,13 +6,6 @@ const authMiddleware = require("../middlewares/auth.middleware");
 const validationMiddleware = require("../middlewares/validation.middleware");
 const validationSchemas = require("../utils/validationSchemas");
 
-router.post(
-    "/",
-    validationSchemas.createStudentValidationSchema(),
-    validationMiddleware.validateRequest,
-    authMiddleware.authenticateRequest,
-    studentController.createStudent
-);
 router.get("/:student_id(\\d+)", authMiddleware.authenticateRequest, studentController.getStudent);
 router.patch(
     "/:student_id(\\d+)",

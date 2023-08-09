@@ -200,22 +200,6 @@ const createMessageValidationSchema = () =>
     );
 
 // Students
-const createStudentValidationSchema = () =>
-    checkSchema(
-        {
-            student_id: {
-                exists: {
-                    errorMessage: "student_id is required",
-                },
-                isInt: {
-                    options: { gt: -1 },
-                    errorMessage: "student_id must be a positive integer",
-                },
-            },
-        },
-        ["body"]
-    );
-
 const getCourseHistoryForStudentValidationSchema = () =>
     checkSchema(
         {
@@ -411,7 +395,6 @@ module.exports = {
     createInterestValidationSchema,
     updateInterestValidationSchema,
     createMessageValidationSchema,
-    createStudentValidationSchema,
     getCourseHistoryForStudentValidationSchema,
     getFriendsForStudentValidationSchema,
     updateStudentValidationSchema,
