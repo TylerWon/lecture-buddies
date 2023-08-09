@@ -9,10 +9,8 @@ const {
     createSchool,
     createSection,
     createSubject,
-    createStudent,
-    createUser,
     cleanUpDatabase,
-    loginUser,
+    signupUser,
     verifyPostRequestResponse,
     verifyDeleteRequestResponse,
 } = require("../utils/helpers");
@@ -20,41 +18,26 @@ const {
 describe("enrolment routes tests", () => {
     const testSession = session(app);
 
-    let user1;
+    let student1;
     let school1;
     let course1;
     let course2;
     let section1;
     let section2;
-    let student1;
     let enrolment1;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
 
     beforeAll(async () => {
-        user1 = await createUser(db, user1Username, user1Password);
+        student1 = await signupUser(testSession, user1Username, user1Password);
         school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
         subject1 = await createSubject(db, school1.school_id, "CPSC");
         course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");
         course2 = await createCourse(db, subject1.subject_id, "121", "Models of Computation");
         section1 = await createSection(db, course1.course_id, "001", "2023W1");
         section2 = await createSection(db, course2.course_id, "001", "2023W1");
-        student1 = await createStudent(
-            db,
-            user1.user_id,
-            school1.school_id,
-            "Tyler",
-            "Won",
-            "4",
-            "Science",
-            "Computer Science",
-            "www.tylerwon.com/profile_photo.jpg",
-            "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
-        );
         enrolment1 = await createEnrolment(db, student1.student_id, section2.section_id);
-
-        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {

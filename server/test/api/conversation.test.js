@@ -8,10 +8,7 @@ const {
     createConversation,
     createConversationMember,
     createMessage,
-    createSchool,
-    createStudent,
-    createUser,
-    loginUser,
+    signupUser,
     verifyGetRequestResponse,
     verifyPostRequestResponse,
 } = require("../utils/helpers");
@@ -19,9 +16,6 @@ const {
 describe("conversation routes tests", () => {
     const testSession = session(app);
 
-    let user1;
-    let user2;
-    let school1;
     let student1;
     let student2;
     let conversation1;
@@ -34,33 +28,8 @@ describe("conversation routes tests", () => {
     const user2Password = "password2";
 
     beforeAll(async () => {
-        user1 = await createUser(db, user1Username, user1Password);
-        user2 = await createUser(db, user2Username, user2Password);
-        school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
-        student1 = await createStudent(
-            db,
-            user1.user_id,
-            school1.school_id,
-            "Tyler",
-            "Won",
-            "4",
-            "Science",
-            "Computer Science",
-            "www.tylerwon.com/profile_photo.jpg",
-            "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
-        );
-        student2 = await createStudent(
-            db,
-            user2.user_id,
-            school1.school_id,
-            "Connor",
-            "Won",
-            "3",
-            "Science",
-            "Computer Science",
-            "www.connorwon.com/profile_photo.jpg",
-            "Hello. I'm Connor. I'm a 3rd year computer science student at UBC."
-        );
+        student1 = await signupUser(testSession, user1Username, user1Password);
+        student2 = await signupUser(testSession, user2Username, user2Password);
         conversation1 = await createConversation(db, "DM");
         await createConversationMember(db, conversation1.conversation_id, student1.student_id);
         await createConversationMember(db, conversation1.conversation_id, student2.student_id);
@@ -78,8 +47,6 @@ describe("conversation routes tests", () => {
         );
         message1.sent_datetime = message1.sent_datetime.toJSON();
         message2.sent_datetime = message2.sent_datetime.toJSON();
-
-        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {

@@ -1,7 +1,6 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
 
 const db = require("../configs/db.config");
 const queries = require("../utils/queries");
@@ -15,8 +14,9 @@ const queries = require("../utils/queries");
  */
 passport.use(
     new LocalStrategy(async (username, password, cb) => {
-        let hashedPassword;
         let user;
+        let hashedPassword;
+        let student;
 
         // Check if user exists
         try {
@@ -36,21 +36,28 @@ passport.use(
             return cb(null, false); // authentication failure - password incorrect
         }
 
-        return cb(null, user); // authentication success
+        // Get student for user
+        try {
+            student = await db.one(queries.students.getStudent, [user.user_id]);
+        } catch (err) {
+            return cb(err); // unexpected error
+        }
+
+        return cb(null, student); // authentication success
     })
 );
 
-// Passport serializer - serializes user data in req.user into session store
-passport.serializeUser((user, cb) => {
+// Passport serializer - serializes data in req.user into session store
+passport.serializeUser((student, cb) => {
     process.nextTick(() => {
-        return cb(null, { user_id: user.user_id, username: user.username });
+        return cb(null, student);
     });
 });
 
-// Passport deserializer - deserializes user data from session store into req.user
-passport.deserializeUser((user, cb) => {
+// Passport deserializer - deserializes data from session store into req.user
+passport.deserializeUser((student, cb) => {
     process.nextTick(() => {
-        return cb(null, user);
+        return cb(null, student);
     });
 });
 
@@ -63,11 +70,13 @@ passport.deserializeUser((user, cb) => {
  * - 500 Internal Server Error if unexpected error
  */
 const autoLogin = (req, res, next) => {
-    if (!req.user) {
+    const student = req.user;
+
+    if (!student) {
         return res.status(401).json({ message: "unauthenticated" });
     }
 
-    return res.status(200).json({ user_id: req.user.user_id });
+    return res.status(200).json(student);
 };
 
 /**
@@ -85,16 +94,14 @@ const autoLogin = (req, res, next) => {
 const login = passport.authenticate("local");
 
 /**
- * Runs after a successful login. Sends the user id of the user who just logged in
+ * Runs after a successful login. Sends the student data of the user who just logged in
  *
  * @returns 200 OK
  */
 const afterLogin = (req, res, next) => {
-    const user = req.user;
+    const student = req.user;
 
-    return res.status(200).json({
-        user_id: user.user_id,
-    });
+    return res.status(200).json(student);
 };
 
 /**
@@ -116,7 +123,7 @@ const logout = (req, res, next) => {
 };
 
 /**
- * Registers a user by creating a user and a session for the user
+ * Registers a user by creating a user, student, and session for the user
  *
  * @param {string} req.body.username - The user's email
  * @param {string} req.body.password - The user's password
@@ -127,10 +134,13 @@ const logout = (req, res, next) => {
  * - 500 Internal Server Error if unexpected error
  */
 const signup = async (req, res, next) => {
-    let hashedPassword, user;
     const username = req.body.username;
     const password = req.body.password;
     const salt = crypto.randomBytes(16);
+
+    let hashedPassword;
+    let user;
+    let student;
 
     // Create hashed password
     try {
@@ -146,13 +156,20 @@ const signup = async (req, res, next) => {
         return res.status(400).json({ message: "an account with that username already exists" });
     }
 
+    // Create student
+    try {
+        student = await db.one(queries.students.createStudent, [user.user_id]);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+
     // Create session for the user
-    req.login(user, (err) => {
+    req.login(student, (err) => {
         if (err) {
             return next(err); // unexpected error
         }
 
-        return res.status(200).json({ user_id: user.user_id });
+        return res.status(200).json(student);
     });
 };
 

@@ -194,30 +194,15 @@ const createStudent = async (db, userId, schoolId, firstName, lastName, year, fa
 };
 
 /**
- * Creates a user
- *
- * @param {object} db - the database connection
- * @param {string} username - the user's username
- * @param {string} password - the user's password
- *
- * @returns {object} the created user
- */
-const createUser = async (db, username, password) => {
-    const salt = crypto.randomBytes(16);
-    const hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
-
-    return await db.one(queries.users.createUser, [username, hashedPassword, salt]);
-};
-
-/**
- * Logs a user in
+ * Signs a user up
  *
  * @param {object} app - a supertest request
  * @param {string} username - the user's username
  * @param {string} password - the user's password
  */
-const loginUser = async (request, username, password) => {
-    await request.post("/auth/login").send({ username: username, password: password });
+const signupUser = async (request, username, password) => {
+    const response = await request.post("/auth/signup").send({ username: username, password: password });
+    return response.body;
 };
 
 /**
@@ -232,6 +217,47 @@ const loginUser = async (request, username, password) => {
  */
 const updateFriendship = async (db, requestor_id, requestee_id, friendshipStatus) => {
     return await db.one(queries.friendships.updateFriendship, [friendshipStatus, requestor_id, requestee_id]);
+};
+
+/**
+ * Updates a student
+ *
+ * @param {object} db - the database connection
+ * @param {number} studentId - The student's ID
+ * @param {number} schoolId - the ID of the new school the student attends
+ * @param {string} firstName - the student's new first name
+ * @param {string} lastName - the student's new last name
+ * @param {string} year - the student's new year of schooling
+ * @param {string} faculty - the student's new faculty
+ * @param {string} major - the student's new major
+ * @param {string} profilePhotoUrl - the new url of the student's profile photo
+ * @param {string} bio - the student's new bio
+ *
+ * @returns {object} the updated student
+ */
+const updateStudent = async (
+    db,
+    studentId,
+    schoolId,
+    firstName,
+    lastName,
+    year,
+    faculty,
+    major,
+    profilePhotoUrl,
+    bio
+) => {
+    return await db.one(queries.students.updateStudent, [
+        schoolId,
+        firstName,
+        lastName,
+        year,
+        faculty,
+        major,
+        profilePhotoUrl,
+        bio,
+        studentId,
+    ]);
 };
 
 /**
@@ -332,9 +358,9 @@ module.exports = {
     createSocialMedia,
     createSubject,
     createStudent,
-    createUser,
-    loginUser,
+    signupUser,
     updateFriendship,
+    updateStudent,
     verifyDeleteRequestResponse,
     verifyGetRequestResponse,
     verifyPatchRequestResponse,

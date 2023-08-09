@@ -3,12 +3,12 @@ const session = require("supertest-session");
 
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
-const { cleanUpDatabase, createUser, loginUser, verifyPostRequestResponse } = require("../utils/helpers");
+const { cleanUpDatabase, signupUser, verifyPostRequestResponse } = require("../utils/helpers");
 
 describe("auth routes tests", () => {
     const testSession = session(app);
 
-    let user1;
+    let student1;
 
     const user1Username = "won.tyler1@gmail.com";
     const user1Password = "password1";
@@ -16,9 +16,7 @@ describe("auth routes tests", () => {
     const user2Password = "password2";
 
     beforeAll(async () => {
-        user1 = await createUser(db, user1Username, user1Password);
-
-        await loginUser(testSession, user1Username, user1Password);
+        student1 = await signupUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
@@ -28,9 +26,7 @@ describe("auth routes tests", () => {
 
     describe("/auth/autologin", () => {
         test("POST - should log a user in when the user's session is valid", async () => {
-            await verifyPostRequestResponse(testSession, "/auth/autologin", undefined, 200, {
-                user_id: user1.user_id,
-            });
+            await verifyPostRequestResponse(testSession, "/auth/autologin", undefined, 200, student1);
         });
 
         test("POST - should not log a user in when the user's session is invalid", async () => {
@@ -51,9 +47,7 @@ describe("auth routes tests", () => {
         });
 
         test("POST - should log a user in", async () => {
-            await verifyPostRequestResponse(request(app), "/auth/login", payload, 200, {
-                user_id: user1.user_id,
-            });
+            await verifyPostRequestResponse(request(app), "/auth/login", payload, 200, student1);
         });
 
         test("POST - should not log a user in when missing some body parameters", async () => {
@@ -124,11 +118,15 @@ describe("auth routes tests", () => {
         test("POST - should sign a user up", async () => {
             let response = await request(app).post("/auth/signup").send(payload);
             expect(response.statusCode).toEqual(200);
-            expect(response.body.user_id).toBeDefined();
-
-            response = await request(app).post("/auth/login").send(payload);
-            expect(response.statusCode).toEqual(200);
-            expect(response.body.user_id).toBeDefined();
+            expect(response.body.student_id).toBeDefined();
+            expect(response.body.school_id).toBeNull();
+            expect(response.body.first_name).toBeNull();
+            expect(response.body.last_name).toBeNull();
+            expect(response.body.year).toBeNull();
+            expect(response.body.faculty).toBeNull();
+            expect(response.body.major).toBeNull();
+            expect(response.body.bio).toBeNull();
+            expect(response.body.profile_photo_url).toBeNull();
         });
 
         test("POST - should not sign a user up when missing some body parameters", async () => {

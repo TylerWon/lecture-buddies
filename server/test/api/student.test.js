@@ -15,28 +15,21 @@ const {
     createSection,
     createSocialMedia,
     createSubject,
-    createStudent,
-    createUser,
     cleanUpDatabase,
-    loginUser,
+    signupUser,
+    updateFriendship,
+    updateStudent,
     verifyPatchRequestResponse,
     verifyGetRequestResponse,
-    verifyPostRequestResponse,
-    updateFriendship,
 } = require("../utils/helpers");
 
 describe("student routes tests", () => {
     const testSession = session(app);
 
-    let user1;
-    let user2;
-    let user3;
-    let user4;
-    let user5;
     let student1;
     let student2;
     let student3;
-    let student5;
+    let student4;
     let school1;
     let subject1;
     let subject2;
@@ -70,16 +63,61 @@ describe("student routes tests", () => {
     const user3Password = "password3";
     const user4Username = "won.tyler4@gmail.com";
     const user4Password = "password4";
-    const user5Username = "won.tyler5@gmail.com";
-    const user5Password = "password5";
 
     beforeAll(async () => {
-        user1 = await createUser(db, user1Username, user1Password);
-        user2 = await createUser(db, user2Username, user2Password);
-        user3 = await createUser(db, user3Username, user3Password);
-        user4 = await createUser(db, user4Username, user4Password);
-        user5 = await createUser(db, user5Username, user5Password);
         school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
+        student1 = await signupUser(testSession, user1Username, user1Password);
+        student2 = await signupUser(testSession, user2Username, user2Password);
+        student3 = await signupUser(testSession, user3Username, user3Password);
+        student4 = await signupUser(testSession, user4Username, user4Password);
+        student1 = await updateStudent(
+            db,
+            student1.student_id,
+            school1.school_id,
+            "Tyler",
+            "Won",
+            "4",
+            "Science",
+            "Computer Science",
+            "www.tylerwon.com/profile_photo.jpg",
+            "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
+        );
+        student2 = await updateStudent(
+            db,
+            student2.student_id,
+            school1.school_id,
+            "Connor",
+            "Won",
+            "3",
+            "Science",
+            "Computer Science",
+            "www.connorwon.com/profile_photo.jpg",
+            "Hello. I'm Connor. I'm a 3rd year computer science student at UBC."
+        );
+        student3 = await updateStudent(
+            db,
+            student3.student_id,
+            school1.school_id,
+            "Brian",
+            "Wu",
+            "4",
+            "Science",
+            "Cellular, Anatomical, and Physiological Sciences",
+            "www.brianwu.com/profile_photo.jpg",
+            "Hello. I'm Brian. I'm a 4th year cellular, anatomical, and physiological sciences student at UBC."
+        );
+        student4 = await updateStudent(
+            db,
+            student4.student_id,
+            school1.school_id,
+            "Lyndon",
+            "Won",
+            "5",
+            "Science",
+            "Computer Science",
+            "www.lyndonwon.com/profile_photo.jpg",
+            "Hello. I'm Lyndon. I'm a 5th year computer science student at UBC"
+        );
         subject1 = await createSubject(db, school1.school_id, "CPSC");
         subject2 = await createSubject(db, school1.school_id, "ENGL");
         course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");
@@ -90,54 +128,6 @@ describe("student routes tests", () => {
         section2 = await createSection(db, course2.course_id, "001", "2023W1");
         section3 = await createSection(db, course3.course_id, "001", "2023W2");
         section4 = await createSection(db, course4.course_id, "001", "2023W2");
-        student1 = await createStudent(
-            db,
-            user1.user_id,
-            school1.school_id,
-            "Tyler",
-            "Won",
-            "4",
-            "Science",
-            "Computer Science",
-            "www.tylerwon.com/profile_photo.jpg",
-            "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
-        );
-        student2 = await createStudent(
-            db,
-            user2.user_id,
-            school1.school_id,
-            "Connor",
-            "Won",
-            "3",
-            "Science",
-            "Computer Science",
-            "www.connorwon.com/profile_photo.jpg",
-            "Hello. I'm Connor. I'm a 3rd year computer science student at UBC."
-        );
-        student3 = await createStudent(
-            db,
-            user3.user_id,
-            school1.school_id,
-            "Brian",
-            "Wu",
-            "4",
-            "Science",
-            "Cellular, Anatomical, and Physiological Sciences",
-            "www.brianwu.com/profile_photo.jpg",
-            "Hello. I'm Brian. I'm a 4th year cellular, anatomical, and physiological sciences student at UBC."
-        );
-        student5 = await createStudent(
-            db,
-            user5.user_id,
-            school1.school_id,
-            "Lyndon",
-            "Won",
-            "5",
-            "Science",
-            "Computer Science",
-            "www.lyndonwon.com/profile_photo.jpg",
-            "Hello. I'm Lyndon. I'm a 5th year computer science student at UBC"
-        );
         interest1 = await createInterest(db, student1.student_id, "reading");
         interest2 = await createInterest(db, student2.student_id, "video games");
         interest3 = await createInterest(db, student3.student_id, "yoshi");
@@ -177,86 +167,11 @@ describe("student routes tests", () => {
             student1.student_id,
             "This is message 1 in conversation 2"
         );
-
-        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
         await cleanUpDatabase(db);
         await db.$pool.end();
-    });
-
-    describe("/students", () => {
-        let payload;
-
-        beforeEach(() => {
-            payload = {
-                student_id: user4.user_id,
-            };
-        });
-
-        test("POST - should create a student", async () => {
-            await verifyPostRequestResponse(testSession, "/students", payload, 201, {
-                student_id: payload.student_id,
-                school_id: null,
-                first_name: null,
-                last_name: null,
-                year: null,
-                faculty: null,
-                major: null,
-                profile_photo_url: null,
-                bio: null,
-            });
-        });
-
-        test("POST - should not create a student when missing some body parameters", async () => {
-            delete payload.student_id;
-
-            await verifyPostRequestResponse(testSession, "/students", payload, 400, [
-                {
-                    type: "field",
-                    location: "body",
-                    path: "student_id",
-                    msg: "student_id is required",
-                },
-            ]);
-        });
-
-        test("POST - should not create a student when some body parameters are the wrong type", async () => {
-            payload.student_id = false;
-
-            await verifyPostRequestResponse(testSession, "/students", payload, 400, [
-                {
-                    type: "field",
-                    location: "body",
-                    path: "student_id",
-                    value: payload.student_id,
-                    msg: "student_id must be a positive integer",
-                },
-            ]);
-        });
-
-        test("POST - should not create a student when user does not exist", async () => {
-            payload.student_id = user4.user_id + 100;
-
-            await verifyPostRequestResponse(testSession, "/students", payload, 400, {
-                message: `user with id '${payload.student_id}' does not exist`,
-            });
-        });
-
-        test("POST - should not create a student when user is already associated with another student", async () => {
-            payload.user_id = user1.user_id;
-
-            await verifyPostRequestResponse(testSession, "/students", payload, 400, {
-                message: `user with id '${payload.user_id}' is already associated with another student`,
-            });
-        });
-
-        test("POST - should not create a student when request is unauthenticated", async () => {
-            await verifyPostRequestResponse(request(app), "/students", payload, 401, {
-                message: "unauthenticated",
-            });
-        });
     });
 
     describe("/students/{student_id}", () => {
@@ -289,15 +204,15 @@ describe("student routes tests", () => {
             });
 
             test("PATCH - should update a student", async () => {
-                await verifyPatchRequestResponse(testSession, `/students/${student5.student_id}`, payload, 200, {
-                    student_id: student5.student_id,
-                    school_id: student5.school_id,
+                await verifyPatchRequestResponse(testSession, `/students/${student4.student_id}`, payload, 200, {
+                    student_id: student4.student_id,
+                    school_id: student4.school_id,
                     ...payload,
-                    year: student5.year,
-                    faculty: student5.faculty,
-                    major: student5.major,
-                    profile_photo_url: student5.profile_photo_url,
-                    bio: student5.bio,
+                    year: student4.year,
+                    faculty: student4.faculty,
+                    major: student4.major,
+                    profile_photo_url: student4.profile_photo_url,
+                    bio: student4.bio,
                 });
             });
 
@@ -305,7 +220,7 @@ describe("student routes tests", () => {
                 payload.faculty = 1;
                 payload.profile_photo_url = false;
 
-                await verifyPatchRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, [
+                await verifyPatchRequestResponse(testSession, `/students/${student4.student_id}`, payload, 400, [
                     {
                         type: "field",
                         location: "body",
@@ -324,21 +239,21 @@ describe("student routes tests", () => {
             });
 
             test("PATCH - should return error message when the student_id path parameter does not correspond to a student", async () => {
-                await verifyPatchRequestResponse(testSession, `/students/${student5.student_id + 100}`, payload, 400, {
-                    message: `student with id '${student5.student_id + 100}' does not exist`,
+                await verifyPatchRequestResponse(testSession, `/students/${student4.student_id + 100}`, payload, 400, {
+                    message: `student with id '${student4.student_id + 100}' does not exist`,
                 });
             });
 
             test("PATCH - should not update a student when school does not exist", async () => {
                 payload.school_id = school1.school_id + 100;
 
-                await verifyPatchRequestResponse(testSession, `/students/${student5.student_id}`, payload, 400, {
+                await verifyPatchRequestResponse(testSession, `/students/${student4.student_id}`, payload, 400, {
                     message: `school with id '${payload.school_id}' does not exist`,
                 });
             });
 
             test("PATCH - should not update a student when request is unauthenticated", async () => {
-                await verifyPatchRequestResponse(request(app), `/students/${student5.student_id}`, payload, 401, {
+                await verifyPatchRequestResponse(request(app), `/students/${student4.student_id}`, payload, 401, {
                     message: "unauthenticated",
                 });
             });

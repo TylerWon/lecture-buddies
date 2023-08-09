@@ -5,11 +5,8 @@ const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
 const {
     cleanUpDatabase,
-    createSchool,
     createSocialMedia,
-    createStudent,
-    createUser,
-    loginUser,
+    signupUser,
     verifyDeleteRequestResponse,
     verifyPostRequestResponse,
     verifyPatchRequestResponse,
@@ -18,8 +15,6 @@ const {
 describe("social media routes tests", () => {
     const testSession = session(app);
 
-    let user1;
-    let school1;
     let student1;
     let socialMedia1;
     let socialMedia2;
@@ -28,24 +23,9 @@ describe("social media routes tests", () => {
     const user1Password = "password1";
 
     beforeAll(async () => {
-        user1 = await createUser(db, user1Username, user1Password);
-        school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
-        student1 = await createStudent(
-            db,
-            user1.user_id,
-            school1.school_id,
-            "Tyler",
-            "Won",
-            "4",
-            "Science",
-            "Computer Science",
-            "www.tylerwon.com/profile_photo.jpg",
-            "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
-        );
+        student1 = await signupUser(testSession, user1Username, user1Password);
         socialMedia1 = await createSocialMedia(db, student1.student_id, "linkedin", "www.linkedin.com/tylerwon");
         socialMedia2 = await createSocialMedia(db, student1.student_id, "instagram", "www.instagram.com/connorwon");
-
-        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {

@@ -6,16 +6,15 @@ const db = require("../../src/configs/db.config");
 const {
     createSchool,
     createSubject,
-    createUser,
     cleanUpDatabase,
-    loginUser,
+    signupUser,
     verifyGetRequestResponse,
 } = require("../utils/helpers");
 
 describe("school routes tests", () => {
     const testSession = session(app);
 
-    let user1;
+    let student1;
     let school1;
     let subject1;
 
@@ -23,11 +22,9 @@ describe("school routes tests", () => {
     const user1Password = "password1";
 
     beforeAll(async () => {
-        user1 = await createUser(db, user1Username, user1Password);
+        student1 = await signupUser(testSession, user1Username, user1Password);
         school1 = await createSchool(db, "University of British Columbia", "2023W2", "www.ubc.ca/logo.png");
         subject1 = await createSubject(db, school1.school_id, "CPSC");
-
-        await loginUser(testSession, user1Username, user1Password);
     });
 
     afterAll(async () => {
