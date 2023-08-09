@@ -411,8 +411,11 @@ const updateStudent = async (req, res, next) => {
         // Dynamically construct query based on fields in payload
         const condition = pgp.as.format("WHERE student_id = $1", studentId);
         const query = `${pgp.helpers.update(payload, null, "students")} ${condition} RETURNING *`;
-
         const student = await db.one(query);
+
+        // Update session data
+        req.session.passport.user = student;
+
         return res.status(200).json(student);
     } catch (err) {
         return next(err); // unexpected error

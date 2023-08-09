@@ -194,6 +194,22 @@ const createStudent = async (db, userId, schoolId, firstName, lastName, year, fa
 };
 
 /**
+ * Creates a user
+ *
+ * @param {object} db - the database connection
+ * @param {string} username - the user's username
+ * @param {string} password - the user's password
+ *
+ * @returns {object} the created user
+ */
+const createUser = async (db, username, password) => {
+    const salt = crypto.randomBytes(16);
+    const hashedPassword = crypto.pbkdf2Sync(password, salt, 1024, 32, "sha256");
+
+    return await db.one(queries.users.createUser, [username, hashedPassword, salt]);
+};
+
+/**
  * Signs a user up
  *
  * @param {object} app - a supertest request
@@ -358,6 +374,7 @@ module.exports = {
     createSocialMedia,
     createSubject,
     createStudent,
+    createUser,
     signUpUser,
     updateFriendship,
     updateStudent,

@@ -21,12 +21,25 @@ const {
     createSubject,
     createUser,
     cleanUpDatabase,
+    createStudent,
 } = require("../../test/utils/helpers");
 
 const init = async () => {
     await cleanUpDatabase(db);
-    await createUser(db, "won.tyler1@gmail.com", "password");
+    const user1 = await createUser(db, "won.tyler1@gmail.com", "password");
     const school1 = await createSchool(db, "University of British Columbia", "2023W1", "www.ubc.ca/logo.png");
+    const student1 = await createStudent(
+        db,
+        user1.user_id,
+        school1.school_id,
+        "Tyler",
+        "Won",
+        "4",
+        "Science",
+        "Computer Science",
+        "www.tylerwon.com/profile_photo.jpg",
+        "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
+    );
     const subject1 = await createSubject(db, school1.school_id, "CPSC");
     const subject2 = await createSubject(db, school1.school_id, "ENGL");
     const course1 = await createCourse(db, subject1.subject_id, "110", "Computation, Programs, and Programming");
