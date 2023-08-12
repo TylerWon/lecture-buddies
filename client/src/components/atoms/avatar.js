@@ -7,5 +7,5 @@ export function BigProfilePhoto(props) {
 
 // ProfilePhoto component
 export function SmallProfilePhoto(props) {
-    return <Avatar sx={{ width: "50px", height: "50px" }} {...props} />;
+    return <Avatar sx={{ width: "35px", height: "35px" }} {...props} />;
 }

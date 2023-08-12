@@ -2,9 +2,13 @@ import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } 
 
 import Auth from "./components/auth/Auth";
 import AutoLogin from "./components/auth/AutoLogin";
+import Buddies from "./pages/Buddies";
 import Courses from "./pages/Courses";
 import Home from "./pages/Home";
+import Messages from "./pages/Messages";
+import Navbar from "./components/navbar/Navbar";
 import NoAuth from "./components/auth/NoAuth";
+import Profile from "./pages/Profile";
 
 // React Router setup
 const router = createBrowserRouter(
@@ -14,7 +18,12 @@ const router = createBrowserRouter(
                 <Route path="/" element={<Home />} />
             </Route>
             <Route element={<Auth />}>
-                <Route path="/courses" element={<Courses />} />
+                <Route element={<Navbar />}>
+                    <Route path="/courses" element={<Courses />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/buddies" element={<Buddies />} />
+                    <Route path="/messages" element={<Messages />} />
+                </Route>
             </Route>
         </Route>
     )
