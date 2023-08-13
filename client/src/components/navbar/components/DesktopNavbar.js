@@ -1,4 +1,4 @@
-import { Drawer, Stack, Typography } from "@mui/material";
+import { Drawer, Stack, Typography, useTheme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useContext } from "react";
 import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
@@ -47,27 +47,22 @@ const SettingsIconContainer = styled(Stack)(({ theme }) => ({
 // Custom Link component
 const CustomLink = styled(Link)(({ theme }) => ({
     textDecoration: "none",
+    color: theme.palette.common.white,
 }));
-
-// Styles for navbar item icon
-const iconStyle = {
-    color: "white",
-    width: "35px",
-    height: "35px",
-};
 
 // NavbarItem component
 function NavbarItem(props) {
     // Props
     const { icon, path, text } = props;
 
+    // Hooks
+    const theme = useTheme();
+
     return (
         <CustomLink to={path}>
             <NavbarItemContainer>
                 {icon}
-                <Typography color="white" variant="body1">
-                    {text}
-                </Typography>
+                <Typography variant="body1">{text}</Typography>
             </NavbarItemContainer>
         </CustomLink>
     );
@@ -76,11 +71,19 @@ function NavbarItem(props) {
 // DesktopNavbar component
 export default function DesktopNavbar() {
     // Hooks
+    const theme = useTheme();
     const { student } = useContext(StudentContext);
+
+    // Styles for navbar item icon
+    const iconStyle = {
+        color: theme.palette.common.white,
+        width: "35px",
+        height: "35px",
+    };
 
     return (
         <Drawer
-            PaperProps={{ sx: { backgroundColor: "black", width: "125px", height: "100vh" } }}
+            PaperProps={{ sx: { backgroundColor: theme.palette.common.black, width: "125px", height: "100vh" } }}
             variant="permanent"
             anchor="left"
         >
