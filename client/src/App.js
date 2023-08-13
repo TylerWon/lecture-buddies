@@ -6,7 +6,7 @@ import Buddies from "./pages/Buddies";
 import Courses from "./pages/Courses";
 import Home from "./pages/Home";
 import Messages from "./pages/Messages";
-import Navbar from "./components/navbar/Navbar";
+import Navbar from "./components/Navbar";
 import NoAuth from "./components/auth/NoAuth";
 import Profile from "./pages/Profile";
 

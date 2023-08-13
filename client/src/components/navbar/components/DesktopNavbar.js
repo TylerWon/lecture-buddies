@@ -6,9 +6,9 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 
-import { StudentContext } from "../../contexts/StudentContext";
+import { StudentContext } from "../../../contexts/StudentContext";
 
-import { SmallProfilePhoto } from "../atoms/avatar";
+import { SmallProfilePhoto } from "../../atoms/avatar";
 import { Link } from "react-router-dom";
 
 // Container for content
@@ -73,8 +73,8 @@ function NavbarItem(props) {
     );
 }
 
-// Navbar component
-export default function Navbar() {
+// DesktopNavbar component
+export default function DesktopNavbar() {
     // Hooks
     const { student } = useContext(StudentContext);
 
