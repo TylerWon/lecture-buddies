@@ -248,6 +248,20 @@ export const login = async (values) => {
 };
 
 /**
+ * Logs a user out
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const logout = async () => {
+    const response = await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
  * Registers a user
  *
  * @param {string} values.username - The user's email

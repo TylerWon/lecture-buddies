@@ -17,7 +17,7 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
 }));
 
 // Container for navbar items

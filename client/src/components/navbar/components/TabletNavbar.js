@@ -1,18 +1,18 @@
-import { AppBar, Drawer, IconButton, Stack, Toolbar, Typography, useTheme } from "@mui/material";
+import { AppBar, Divider, IconButton, Menu, MenuItem, Stack, Toolbar, Typography, useTheme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+import { StudentContext } from "../../../contexts/StudentContext";
+import { logout } from "../../../utils/apiRequests";
 
 // Container for navbar items
 const NavbarItemsContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    alignItems: "center",
-    gap: theme.spacing(2),
-    padding: theme.spacing(2),
+    alignItems: "stretch",
 }));
 
 // Custom Link component
@@ -32,9 +32,11 @@ function NavbarItem(props) {
     };
 
     return (
-        <CustomLink to={path} onClick={handleItemClick}>
-            <Typography variant="body1">{text}</Typography>
-        </CustomLink>
+        <MenuItem>
+            <CustomLink to={path} onClick={handleItemClick}>
+                <Typography variant="body1">{text}</Typography>
+            </CustomLink>
+        </MenuItem>
     );
 }
 
@@ -42,43 +44,66 @@ function NavbarItem(props) {
 export default function TabletNavbar() {
     // Hooks
     const theme = useTheme();
+    const { setStudent, setIsLoggedIn } = useContext(StudentContext);
+    const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
-    // Handler for when menu icon is clicked
-    const handleMenuClick = () => {
+    // Handler for when menu is opened
+    const handleOpenMenu = (event) => {
+        setMenuAnchorEl(event.currentTarget);
         setIsMenuOpen(true);
     };
 
-    // Handler for when close icon is clicked
-    const handleCloseClick = () => {
+    // Handler for when menu is closed
+    const handleCloseMenu = () => {
+        setMenuAnchorEl(null);
         setIsMenuOpen(false);
+    };
+
+    // Handler for when logout navbar item is clicked
+    const handleLogoutClick = async () => {
+        try {
+            // Log user out
+            await logout();
+
+            // Update student context
+            setStudent(null);
+            setIsLoggedIn(false);
+
+            // Navigate to home page
+            navigate("/");
+        } catch (err) {
+            console.log(err); // unexpected server error
+        }
     };
 
     return (
         <>
             <AppBar sx={{ backgroundColor: theme.palette.common.black }}>
                 <Toolbar>
-                    {isMenuOpen ? (
-                        <IconButton onClick={handleCloseClick}>
-                            <CloseOutlinedIcon sx={{ color: theme.palette.common.white }} />
-                        </IconButton>
-                    ) : (
-                        <IconButton onClick={handleMenuClick}>
-                            <MenuOutlinedIcon sx={{ color: theme.palette.common.white }} />
-                        </IconButton>
-                    )}
+                    <IconButton onClick={handleOpenMenu}>
+                        <MenuOutlinedIcon sx={{ color: theme.palette.common.white }} />
+                    </IconButton>
+                    <Menu
+                        PaperProps={{ sx: { width: "125px" } }}
+                        anchorEl={menuAnchorEl}
+                        open={isMenuOpen}
+                        onClose={handleCloseMenu}
+                    >
+                        <NavbarItemsContainer>
+                            <NavbarItem path="/profile" text="Profile" setIsMenuOpen={setIsMenuOpen} />
+                            <NavbarItem path="/courses" text="Courses" setIsMenuOpen={setIsMenuOpen} />
+                            <NavbarItem path="/buddies" text="Buddies" setIsMenuOpen={setIsMenuOpen} />
+                            <NavbarItem path="/messages" text="Messages" setIsMenuOpen={setIsMenuOpen} />
+                            <Divider />
+                            <MenuItem onClick={handleLogoutClick}>
+                                <Typography variant="body1">Logout</Typography>
+                            </MenuItem>
+                        </NavbarItemsContainer>
+                    </Menu>
                 </Toolbar>
             </AppBar>
-            <Toolbar />
-            <Drawer PaperProps={{ sx: { zIndex: 1 } }} open={isMenuOpen} anchor="top" variant="persistent">
-                <Toolbar />
-                <NavbarItemsContainer>
-                    <NavbarItem path="/profile" text="Profile" setIsMenuOpen={setIsMenuOpen} />
-                    <NavbarItem path="/courses" text="Courses" setIsMenuOpen={setIsMenuOpen} />
-                    <NavbarItem path="/buddies" text="Buddies" setIsMenuOpen={setIsMenuOpen} />
-                    <NavbarItem path="/messages" text="Messages" setIsMenuOpen={setIsMenuOpen} />
-                </NavbarItemsContainer>
-            </Drawer>
         </>
     );
 }
