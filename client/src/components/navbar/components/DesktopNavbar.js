@@ -69,7 +69,10 @@ function NavbarItem(props) {
 }
 
 // DesktopNavbar component
-export default function DesktopNavbar() {
+export default function DesktopNavbar(props) {
+    // Props
+    const { navbarWidth } = props;
+
     // Hooks
     const theme = useTheme();
     const { student } = useContext(StudentContext);
@@ -83,7 +86,7 @@ export default function DesktopNavbar() {
 
     return (
         <Drawer
-            PaperProps={{ sx: { backgroundColor: theme.palette.common.black, width: "125px", height: "100vh" } }}
+            PaperProps={{ sx: { width: navbarWidth, backgroundColor: theme.palette.common.black } }}
             variant="permanent"
             anchor="left"
         >

@@ -104,6 +104,7 @@ export default function TabletNavbar() {
                     </Menu>
                 </Toolbar>
             </AppBar>
+            <Toolbar />
         </>
     );
 }

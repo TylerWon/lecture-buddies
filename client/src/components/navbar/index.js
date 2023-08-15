@@ -1,8 +1,11 @@
-import { useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
 
 import DesktopNavbar from "./components/DesktopNavbar";
 import TabletNavbar from "./components/TabletNavbar";
+
+// Constants
+const DESKTOP_NAVBAR_WIDTH = "115px";
 
 // Navbar component
 export default function Navbar() {
@@ -12,8 +15,10 @@ export default function Navbar() {
 
     return (
         <>
-            {isTablet ? <TabletNavbar /> : <DesktopNavbar />}
-            <Outlet />
+            {isTablet ? <TabletNavbar /> : <DesktopNavbar navbarWidth={DESKTOP_NAVBAR_WIDTH} />}
+            <Box sx={{ paddingLeft: isTablet ? "0px" : DESKTOP_NAVBAR_WIDTH }}>
+                <Outlet />
+            </Box>
         </>
     );
 }
