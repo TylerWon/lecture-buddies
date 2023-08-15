@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, IconButton, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
+import ClearIcon from "@mui/icons-material/Clear";
 import { styled } from "@mui/material/styles";
 
 import { deleteEnrolment, getSchool } from "../../../../../utils/apiRequests";
@@ -93,7 +94,14 @@ export default function SignUpStep3(props) {
             <Grid sx={{ justifyContent: "space-evenly" }} container spacing={2}>
                 {coursesAdded.map((course) => (
                     <Grid sx={{ display: "flex" }} key={course.section_id} xs="auto">
-                        <CourseCardWithDelete course={course} onDelete={() => handleCourseDelete(course.section_id)} />
+                        <CourseCardWithDelete
+                            course={course}
+                            deleteButton={
+                                <IconButton size="small" onClick={() => handleCourseDelete(course.section_id)}>
+                                    <ClearIcon />
+                                </IconButton>
+                            }
+                        />
                     </Grid>
                 ))}
             </Grid>

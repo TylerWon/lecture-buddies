@@ -1,5 +1,4 @@
-import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
-import ClearIcon from "@mui/icons-material/Clear";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 // Background for course card
@@ -30,18 +29,14 @@ const CourseCardContentContainer = styled(Stack)(({ theme }) => ({
     padding: theme.spacing(2),
 }));
 
-// CourseCardWithDelete component
-export function CourseCardWithDelete(props) {
+// BaseCourseCard component
+function BaseCourseCard(props) {
     // Props
-    const { course, onDelete } = props;
+    const { course, deleteButton } = props;
 
     return (
         <CourseCardBackground>
-            <CourseCardDeleteButtonContainer>
-                <IconButton size="small" onClick={onDelete}>
-                    <ClearIcon />
-                </IconButton>
-            </CourseCardDeleteButtonContainer>
+            {deleteButton && <CourseCardDeleteButtonContainer>{deleteButton}</CourseCardDeleteButtonContainer>}
             <CourseCardContentContainer>
                 <Typography variant="h5">{`${course.subject_name} ${course.course_number} ${course.section_number}`}</Typography>
                 <Typography sx={{ textAlign: "center" }} variant="body1">
@@ -50,4 +45,20 @@ export function CourseCardWithDelete(props) {
             </CourseCardContentContainer>
         </CourseCardBackground>
     );
+}
+
+// CourseCard component
+export function CourseCard(props) {
+    // Props
+    const { course } = props;
+
+    return <BaseCourseCard course={course} deleteButton={null} />;
+}
+
+// CourseCardWithDelete component
+export function CourseCardWithDelete(props) {
+    // Props
+    const { course, deleteButton } = props;
+
+    return <BaseCourseCard course={course} deleteButton={deleteButton} />;
 }
