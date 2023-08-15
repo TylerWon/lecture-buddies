@@ -826,20 +826,28 @@ describe("student routes tests", () => {
         });
 
         test("GET - should return the course history for a student (order by name)", async () => {
+            const expected = {};
+            expected[section3.section_term] = [courseDetails3];
+            expected[section1.section_term] = [courseDetails1, courseDetails2];
+
             await verifyGetRequestResponse(
                 testSession,
                 `/students/${student1.student_id}/course-history?order_by=name`,
                 200,
-                [courseDetails1, courseDetails2, courseDetails3]
+                expected
             );
         });
 
         test("GET - should return the course history for a student (order by -name)", async () => {
+            const expected = {};
+            expected[section3.section_term] = [courseDetails3];
+            expected[section1.section_term] = [courseDetails2, courseDetails1];
+
             await verifyGetRequestResponse(
                 testSession,
                 `/students/${student1.student_id}/course-history?order_by=-name`,
                 200,
-                [courseDetails3, courseDetails2, courseDetails1]
+                expected
             );
         });
 

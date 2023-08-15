@@ -22,6 +22,7 @@ const {
     createUser,
     cleanUpDatabase,
     createStudent,
+    createEnrolment,
 } = require("../../test/utils/helpers");
 
 const init = async () => {
@@ -37,7 +38,7 @@ const init = async () => {
         "4",
         "Science",
         "Computer Science",
-        "www.tylerwon.com/profile_photo.jpg",
+        "https://lecture-buddies-media-files-test.s3.us-east-2.amazonaws.com/2",
         "Hello. I'm Tyler. I'm a 4th year computer science student at UBC."
     );
     const subject1 = await createSubject(db, school1.school_id, "CPSC");
@@ -49,6 +50,14 @@ const init = async () => {
     const section2 = await createSection(db, course1.course_id, "002", "2023W1");
     const section3 = await createSection(db, course2.course_id, "001", "2023W1");
     const section4 = await createSection(db, course3.course_id, "001", "2023W1");
+    const section5 = await createSection(db, course1.course_id, "001", "2023W2");
+    const section6 = await createSection(db, course2.course_id, "001", "2023W2");
+    await createEnrolment(db, student1.student_id, section1.section_id);
+    await createEnrolment(db, student1.student_id, section2.section_id);
+    await createEnrolment(db, student1.student_id, section3.section_id);
+    await createEnrolment(db, student1.student_id, section4.section_id);
+    await createEnrolment(db, student1.student_id, section5.section_id);
+    await createEnrolment(db, student1.student_id, section6.section_id);
 };
 
 init();

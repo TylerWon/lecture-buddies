@@ -165,8 +165,8 @@ const getConversationsForStudent = async (req, res, next) => {
 };
 
 /**
- * Gets the course history for a student. The course history is all the courses a student has taken. Information about
- * the subject, course, and section is included.
+ * Gets the course history for a student. The course history is all the courses a student has taken, grouped by term
+ * (but not in any specific order with regards to term). Information about the subject, course, and section is included.
  *
  * @param {number} req.params.student_id - The student's ID
  * @param {string} req.query.order_by - the field to order the response by (options: name, -name)
@@ -199,7 +199,16 @@ const getCourseHistoryForStudent = async (req, res, next) => {
                 break;
         }
 
-        return res.status(200).json(courseHistory);
+        // Group courses by term
+        const courseHistoryGroupedByTerm = {};
+        for (const course of courseHistory) {
+            if (!courseHistoryGroupedByTerm[course.section_term]) {
+                courseHistoryGroupedByTerm[course.section_term] = [];
+            }
+            courseHistoryGroupedByTerm[course.section_term].push(course);
+        }
+
+        return res.status(200).json(courseHistoryGroupedByTerm);
     } catch (err) {
         return next(err); // unexpected error
     }
