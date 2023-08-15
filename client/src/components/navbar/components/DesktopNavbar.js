@@ -86,7 +86,7 @@ export default function DesktopNavbar(props) {
 
     return (
         <Drawer
-            PaperProps={{ sx: { width: navbarWidth, backgroundColor: theme.palette.common.black } }}
+            PaperProps={{ sx: { width: `${navbarWidth}px`, backgroundColor: theme.palette.common.black } }}
             variant="permanent"
             anchor="left"
         >
