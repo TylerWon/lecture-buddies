@@ -15,7 +15,7 @@ const NavbarItemsContainer = styled(Stack)(({ theme }) => ({
     alignItems: "stretch",
 }));
 
-// Custom Link component
+// Custom React Router DOM Link component
 const CustomLink = styled(Link)(({ theme }) => ({
     textDecoration: "none",
     color: theme.palette.common.black,

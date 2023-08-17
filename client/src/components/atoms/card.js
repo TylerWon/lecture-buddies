@@ -30,8 +30,8 @@ const CourseCardContentContainer = styled(Stack)(({ theme }) => ({
     padding: theme.spacing(2),
 }));
 
-// Link with no styling
-const NoStyleLink = styled(Link)(({ theme }) => ({
+// Custom React Router DOM Link component
+const CustomLink = styled(Link)(({ theme }) => ({
     textDecoration: "none",
 }));
 
@@ -75,8 +75,8 @@ export function CourseCardWithLink(props) {
     const { course, path } = props;
 
     return (
-        <NoStyleLink to={path}>
+        <CustomLink to={path}>
             <BaseCourseCard course={course} deleteButton={null} />
-        </NoStyleLink>
+        </CustomLink>
     );
 }

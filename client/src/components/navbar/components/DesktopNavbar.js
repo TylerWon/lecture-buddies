@@ -44,7 +44,7 @@ const SettingsIconContainer = styled(Stack)(({ theme }) => ({
     bottom: theme.spacing(3),
 }));
 
-// Custom Link component
+// Custom React Router DOM Link component
 const CustomLink = styled(Link)(({ theme }) => ({
     textDecoration: "none",
     color: theme.palette.common.white,
