@@ -14,7 +14,7 @@ import { styled } from "@mui/material/styles";
 import { useContext, useState } from "react";
 
 import { StudentContext } from "../../../contexts/StudentContext";
-import { deleteUser } from "../../../utils/apiRequests";
+import { deleteUser, logout } from "../../../utils/apiRequests";
 
 import SignUpStep1 from "./components/SignUpStep1";
 import SignUpStep2 from "./components/SignUpStep2";
@@ -49,7 +49,7 @@ export default function SignUp(props) {
     const { showSignUp, setShowSignUp } = props;
 
     // Hooks
-    const { student } = useContext(StudentContext);
+    const { student, setStudent, setIsLoggedIn } = useContext(StudentContext);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const [activeStep, setActiveStep] = useState(0);
@@ -57,7 +57,7 @@ export default function SignUp(props) {
 
     // Handler for when sign up is closed
     const handleSignUpClose = async () => {
-        // Delete user if created
+        // If user was created
         if (student) {
             try {
                 // Delete user
@@ -66,6 +66,13 @@ export default function SignUp(props) {
                 if (deleteUserResponse === 400) {
                     throw new Error(deleteUserData.message);
                 }
+
+                // Reset student context
+                setStudent(null);
+                setIsLoggedIn(false);
+
+                // Log user out
+                await logout();
             } catch (err) {
                 console.log(err); // unexpected server error
             }
