@@ -44,7 +44,7 @@ function NavbarItem(props) {
 export default function TabletNavbar() {
     // Hooks
     const theme = useTheme();
-    const { setStudent, setIsLoggedIn } = useContext(StudentContext);
+    const { resetContext } = useContext(StudentContext);
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -67,9 +67,8 @@ export default function TabletNavbar() {
             // Log user out
             await logout();
 
-            // Update student context
-            setStudent(null);
-            setIsLoggedIn(false);
+            // Reset student context
+            resetContext();
 
             // Navigate to home page
             navigate("/");

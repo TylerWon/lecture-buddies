@@ -49,7 +49,7 @@ export default function SignUp(props) {
     const { showSignUp, setShowSignUp } = props;
 
     // Hooks
-    const { student, setStudent, setIsLoggedIn } = useContext(StudentContext);
+    const { student, resetContext } = useContext(StudentContext);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const [activeStep, setActiveStep] = useState(0);
@@ -68,8 +68,7 @@ export default function SignUp(props) {
                 }
 
                 // Reset student context
-                setStudent(null);
-                setIsLoggedIn(false);
+                resetContext();
 
                 // Log user out
                 await logout();
