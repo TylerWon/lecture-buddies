@@ -22,6 +22,27 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     width: "100%",
 }));
 
+// Container for course cards
+const CourseCardsContainer = styled(Grid)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    rowGap: theme.spacing(3),
+    width: "100%",
+    [theme.breakpoints.down("sm")]: {
+        flexDirection: "column",
+    },
+}));
+
+// Container for course card
+const CourseCardContainer = styled(Grid)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+}));
+
 // SignUpStep3 component
 export default function SignUpStep3(props) {
     // Props
@@ -91,9 +112,9 @@ export default function SignUpStep3(props) {
     return (
         <ContentContainer>
             <Typography variant="h5">Current term - {school?.current_term}</Typography>
-            <Grid sx={{ justifyContent: "space-evenly" }} container spacing={2}>
+            <CourseCardsContainer container>
                 {coursesAdded.map((course) => (
-                    <Grid sx={{ display: "flex" }} key={course.section_id} xs="auto">
+                    <CourseCardContainer key={course.section_id} xs="auto" sm={4}>
                         <CourseCardWithDelete
                             course={course}
                             deleteButton={
@@ -102,9 +123,9 @@ export default function SignUpStep3(props) {
                                 </IconButton>
                             }
                         />
-                    </Grid>
+                    </CourseCardContainer>
                 ))}
-            </Grid>
+            </CourseCardsContainer>
             {showAddCourseForm ? (
                 <AddCourseForm
                     selectedSchoolId={selectedSchoolId}
