@@ -1,4 +1,5 @@
 import { Box, Paper, Stack, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 
 // Background for course card
@@ -27,6 +28,11 @@ const CourseCardContentContainer = styled(Stack)(({ theme }) => ({
     alignItems: "center",
     height: "100%",
     padding: theme.spacing(2),
+}));
+
+// Link with no styling
+const NoStyleLink = styled(Link)(({ theme }) => ({
+    textDecoration: "none",
 }));
 
 // BaseCourseCard component
@@ -61,4 +67,16 @@ export function CourseCardWithDelete(props) {
     const { course, deleteButton } = props;
 
     return <BaseCourseCard course={course} deleteButton={deleteButton} />;
+}
+
+// CourseCardWithLink componentt
+export function CourseCardWithLink(props) {
+    // Props
+    const { course, path } = props;
+
+    return (
+        <NoStyleLink to={path}>
+            <BaseCourseCard course={course} deleteButton={null} />
+        </NoStyleLink>
+    );
 }

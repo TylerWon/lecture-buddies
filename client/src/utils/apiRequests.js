@@ -151,12 +151,29 @@ export const deleteSocialMedia = async (socialMediaId) => {
 /**
  * Gets the courses for a subject
  *
- * @param {number} subjectId - The subject's ID
+ * @param {number} subjectId - the subject's ID
  *
  * @returns {Promise<Response>} response from the API
  */
 export const getCoursesForSubject = async (subjectId) => {
     const response = await fetch(`${API_URL}/subjects/${subjectId}/courses`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
+ * Gets the course history for a student
+ *
+ * @param {number} studentId - the student's ID
+ * @param {string} orderBy - the field to order the response by (options: name, -name)
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const getCourseHistoryForStudent = async (studentId, orderBy) => {
+    const response = await fetch(`${API_URL}/students/${studentId}/course-history?order_by=${orderBy}`, {
         method: "GET",
         credentials: "include",
     });
