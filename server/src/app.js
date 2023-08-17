@@ -19,6 +19,7 @@ const schoolRouter = require("./routes/school.route");
 const socialMediaRouter = require("./routes/socialMedia.route");
 const subjectRouter = require("./routes/subject.route");
 const studentRouter = require("./routes/student.route");
+const userRouter = require("./routes/user.route");
 
 const CLIENT_URL = process.env.CLIENT_URL;
 const SESSION_SECRET = process.env.SESSION_SECRET;
@@ -74,5 +75,6 @@ app.use("/schools", schoolRouter);
 app.use("/social-medias", socialMediaRouter);
 app.use("/subjects", subjectRouter);
 app.use("/students", studentRouter);
+app.use("/users", userRouter);
 
 module.exports = app;

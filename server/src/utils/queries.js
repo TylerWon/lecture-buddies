@@ -243,6 +243,10 @@ const queries = {
             VALUES ($1, $2, $3) 
             RETURNING *
         `,
+        deleteUser: `
+            DELETE FROM users
+            WHERE user_id = $1
+        `,
     },
 };
 
