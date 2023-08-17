@@ -149,6 +149,22 @@ export const deleteSocialMedia = async (socialMediaId) => {
 };
 
 /**
+ * Deletes a user
+ *
+ * @param {number} userId - the user's ID
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const deleteUser = async (userId) => {
+    const response = await fetch(`${API_URL}/users/${userId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
  * Gets the courses for a subject
  *
  * @param {number} subjectId - the subject's ID

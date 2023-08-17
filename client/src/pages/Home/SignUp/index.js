@@ -11,7 +11,10 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
+import { useContext, useState } from "react";
+
+import { StudentContext } from "../../../contexts/StudentContext";
+import { deleteUser } from "../../../utils/apiRequests";
 
 import SignUpStep1 from "./components/SignUpStep1";
 import SignUpStep2 from "./components/SignUpStep2";
@@ -46,14 +49,33 @@ export default function SignUp(props) {
     const { showSignUp, setShowSignUp } = props;
 
     // Hooks
+    const { student } = useContext(StudentContext);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const [activeStep, setActiveStep] = useState(0);
     const [selectedSchoolId, setSelectedSchoolId] = useState(null);
 
     // Handler for when sign up is closed
-    const handleSignUpClose = () => {
+    const handleSignUpClose = async () => {
+        // Delete user if created
+        if (student) {
+            try {
+                // Delete user
+                const deleteUserResponse = await deleteUser(student.student_id);
+                const deleteUserData = await deleteUserResponse.json();
+                if (deleteUserResponse === 400) {
+                    throw new Error(deleteUserData.message);
+                }
+            } catch (err) {
+                console.log(err); // unexpected server error
+            }
+        }
+
+        // Close sign up dialog
         setShowSignUp(false);
+
+        // Reset sign up to step 1
+        setActiveStep(0);
     };
 
     return (
