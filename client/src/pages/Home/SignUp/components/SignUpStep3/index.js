@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, IconButton, Stack, Typography } from "@mui/material";
+import { Button, FormHelperText, IconButton, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import ClearIcon from "@mui/icons-material/Clear";
 import { styled } from "@mui/material/styles";
@@ -20,6 +20,15 @@ const ContentContainer = styled(Stack)(({ theme }) => ({
     alignItems: "stretch",
     gap: theme.spacing(2),
     width: "100%",
+}));
+
+// Container for header
+const HeaderContainer = styled(Stack)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "start",
+    alignItems: "end",
+    gap: theme.spacing(1),
 }));
 
 // Container for course cards
@@ -54,6 +63,7 @@ export default function SignUpStep3(props) {
     const [school, setSchool] = useState(null);
     const [showAddCourseForm, setShowAddCourseForm] = useState(false);
     const [coursesAdded, setCoursesAdded] = useState([]);
+    const [minCourseError, setMinCourseError] = useState(false);
 
     // Handler for when add course button is clicked
     const handleAddCourseClick = () => {
@@ -80,6 +90,12 @@ export default function SignUpStep3(props) {
 
     // Handler for when done button is clicked
     const handleDoneClick = () => {
+        // Check if at least one course has been added
+        if (coursesAdded.length < 1) {
+            setMinCourseError(true);
+            return;
+        }
+
         // Set isLoggedIn in the user context
         setIsLoggedIn(true);
 
@@ -111,7 +127,12 @@ export default function SignUpStep3(props) {
 
     return (
         <ContentContainer>
-            <Typography variant="h5">Current term - {school?.current_term}</Typography>
+            <HeaderContainer>
+                <Typography variant="h5">Current term - {school?.current_term}</Typography>
+                <FormHelperText sx={{ paddingBottom: "2px", display: minCourseError ? "block" : "none" }} error>
+                    Add at least one course
+                </FormHelperText>
+            </HeaderContainer>
             <CourseCardsContainer container>
                 {coursesAdded.map((course) => (
                     <CourseCardContainer key={course.section_id} xs="auto" sm={4}>
@@ -131,6 +152,7 @@ export default function SignUpStep3(props) {
                     school={school}
                     setCoursesAdded={setCoursesAdded}
                     setShowAddCourseForm={setShowAddCourseForm}
+                    setMinCourseError={setMinCourseError}
                 />
             ) : (
                 <AddButtonWithLabel label="Add course" onClick={handleAddCourseClick} />

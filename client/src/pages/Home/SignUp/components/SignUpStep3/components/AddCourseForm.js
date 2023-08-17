@@ -33,7 +33,7 @@ const FormContentContainer = styled(Grid)(({ theme }) => ({
 // AddCourseForm component
 export default function AddCourseForm(props) {
     // Props
-    const { school, setCoursesAdded, setShowAddCourseForm } = props;
+    const { school, setCoursesAdded, setShowAddCourseForm, setMinCourseError } = props;
 
     // Hooks
     const { student } = useContext(StudentContext);
@@ -76,6 +76,9 @@ export default function AddCourseForm(props) {
                 ...prevCoursesAdded,
                 { ...values.subject, ...values.course, ...values.section },
             ]);
+
+            // Remove min course error
+            setMinCourseError(false);
 
             // Close add course form
             handleCancelAddCourseClick();
