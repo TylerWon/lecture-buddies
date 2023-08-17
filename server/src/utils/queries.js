@@ -45,7 +45,7 @@ const queries = {
         getSectionsForCourse: `
             SELECT * 
             FROM sections 
-            WHERE course_id = $1
+            WHERE course_id = $1 AND section_term = $2
         `,
     },
     enrolments: {

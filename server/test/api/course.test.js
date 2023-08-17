@@ -39,19 +39,49 @@ describe("course routes tests", () => {
 
     describe("/courses/{course_id}/sections", () => {
         test("GET - should return the sections for a course", async () => {
-            await verifyGetRequestResponse(testSession, `/courses/${course1.course_id}/sections`, 200, [section1]);
+            await verifyGetRequestResponse(
+                testSession,
+                `/courses/${course1.course_id}/sections?term=${section1.section_term}`,
+                200,
+                [section1]
+            );
+        });
+
+        test("GET - should return nothing when there are no sections for a course in the term", async () => {
+            await verifyGetRequestResponse(testSession, `/courses/${course1.course_id}/sections?term=1000W1`, 200, []);
         });
 
         test("GET - should return error message when the course_id path parameter does not correspond to a course", async () => {
-            await verifyGetRequestResponse(testSession, `/courses/${course1.course_id + 100}/sections`, 400, {
-                message: `course with id ${course1.course_id + 100} does not exist`,
-            });
+            await verifyGetRequestResponse(
+                testSession,
+                `/courses/${course1.course_id + 100}/sections?term=${section1.section_term}`,
+                400,
+                {
+                    message: `course with id ${course1.course_id + 100} does not exist`,
+                }
+            );
+        });
+
+        test("GET - should return error message when missing the term query parameter", async () => {
+            await verifyGetRequestResponse(testSession, `/courses/${course1.course_id}/sections`, 400, [
+                {
+                    type: "field",
+                    location: "query",
+                    path: "term",
+                    msg: "term is required",
+                },
+            ]);
         });
 
         test("GET - should return error message when request is unauthenticated", async () => {
-            await verifyGetRequestResponse(request(app), `/courses/${course1.course_id}/sections`, 401, {
-                message: "unauthenticated",
-            });
+            await verifyGetRequestResponse(
+                request(app),
+                `/courses/${course1.course_id}/sections?term=${section1.section_term}`,
+                401,
+                {
+                    message: "unauthenticated",
+                }
+            );
         });
     });
 });

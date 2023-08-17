@@ -5,6 +5,7 @@ const queries = require("../utils/queries");
  * Gets the sections for a course
  *
  * @param {number} req.params.course_id - The course's ID
+ * @param {string} req.query.term - The term to get sections for
  *
  * @returns
  * - 200 OK if successful
@@ -13,6 +14,7 @@ const queries = require("../utils/queries");
  */
 const getSectionsForCourse = async (req, res, next) => {
     const courseId = req.params.course_id;
+    const term = req.query.term;
 
     // Check if course exists
     try {
@@ -23,7 +25,7 @@ const getSectionsForCourse = async (req, res, next) => {
 
     // Get sections
     try {
-        const sections = await db.any(queries.courses.getSectionsForCourse, [courseId]);
+        const sections = await db.any(queries.courses.getSectionsForCourse, [courseId, term]);
         return res.status(200).json(sections);
     } catch (err) {
         return next(err); // unexpected error

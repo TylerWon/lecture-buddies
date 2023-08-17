@@ -54,6 +54,19 @@ const createConversationValidationSchema = () =>
         ["body"]
     );
 
+// Courses
+const getSectionsForCourseValidationSchema = () =>
+    checkSchema(
+        {
+            term: {
+                exists: {
+                    errorMessage: "term is required",
+                },
+            },
+        },
+        ["query"]
+    );
+
 // Enrolments
 const createEnrolmentValidationSchema = () =>
     checkSchema(
@@ -389,6 +402,7 @@ const sortingAndPaginationValidationSchema = (orderByOptions, orderByMessage) =>
 module.exports = {
     authValidationSchema,
     createConversationValidationSchema,
+    getSectionsForCourseValidationSchema,
     createEnrolmentValidationSchema,
     createFriendshipValidationSchema,
     updateFriendshipValidationSchema,
