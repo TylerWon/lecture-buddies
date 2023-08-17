@@ -128,7 +128,7 @@ export default function SignUpStep3(props) {
             </CourseCardsContainer>
             {showAddCourseForm ? (
                 <AddCourseForm
-                    selectedSchoolId={selectedSchoolId}
+                    school={school}
                     setCoursesAdded={setCoursesAdded}
                     setShowAddCourseForm={setShowAddCourseForm}
                 />

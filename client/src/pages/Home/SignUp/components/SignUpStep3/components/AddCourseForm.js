@@ -33,7 +33,7 @@ const FormContentContainer = styled(Grid)(({ theme }) => ({
 // AddCourseForm component
 export default function AddCourseForm(props) {
     // Props
-    const { selectedSchoolId, setCoursesAdded, setShowAddCourseForm } = props;
+    const { school, setCoursesAdded, setShowAddCourseForm } = props;
 
     // Hooks
     const { student } = useContext(StudentContext);
@@ -152,7 +152,7 @@ export default function AddCourseForm(props) {
 
         try {
             // Get sections for course
-            const getSectionsForCourseResponse = await getSectionsForCourse(course.course_id);
+            const getSectionsForCourseResponse = await getSectionsForCourse(course.course_id, school.current_term);
             const getSectionsForCourseData = await getSectionsForCourseResponse.json();
             if (getSectionsForCourseResponse.status !== 200) {
                 throw new Error(getSectionsForCourseData.message);
@@ -172,7 +172,7 @@ export default function AddCourseForm(props) {
     const initSubjects = async () => {
         try {
             // Get subjects for school
-            const getSubjectsForSchoolResponse = await getSubjectsForSchool(selectedSchoolId);
+            const getSubjectsForSchoolResponse = await getSubjectsForSchool(school.school_id);
             const getSubjectsForSchoolData = await getSubjectsForSchoolResponse.json();
             if (getSubjectsForSchoolResponse.status !== 200) {
                 throw new Error(getSubjectsForSchoolData.message);

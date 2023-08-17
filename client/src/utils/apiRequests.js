@@ -214,12 +214,13 @@ export const getSchool = async (schoolId) => {
 /**
  * Gets the sections for a course
  *
- * @param {number} courseId - The course's ID
+ * @param {number} courseId - the course's ID
+ * @param {string} term - he term to get sections for
  *
  * @returns {Promise<Response>} response from the API
  */
-export const getSectionsForCourse = async (courseId) => {
-    const response = await fetch(`${API_URL}/courses/${courseId}/sections`, {
+export const getSectionsForCourse = async (courseId, term) => {
+    const response = await fetch(`${API_URL}/courses/${courseId}/sections?term=${term}`, {
         method: "GET",
         credentials: "include",
     });
