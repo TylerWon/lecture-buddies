@@ -121,6 +121,13 @@ const queries = {
             FROM sections
             WHERE section_id = $1
         `,
+        getSectionDetails: `
+            SELECT subjects.school_id, subjects.subject_id, subjects.subject_name, courses.course_id, courses.course_number, courses.course_name, sections.section_id, sections.section_number, sections.section_term
+            FROM sections
+            JOIN courses ON sections.course_id = courses.course_id 
+            JOIN subjects ON courses.subject_id = subjects.subject_id 
+            WHERE section_id = $1
+        `,
     },
     socialMedias: {
         createSocialMedia: `
