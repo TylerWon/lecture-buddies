@@ -11,7 +11,7 @@ const queries = require("../utils/queries");
  */
 const cleanUpDatabase = async (db) => {
     await db.none(
-        "TRUNCATE schools, subjects, courses, sections, users, students, enrolments, interests, social_medias, conversations, conversation_members, messages, friendships RESTART IDENTITY CASCADE"
+        "TRUNCATE schools, subjects, courses, sections, users, students, enrolments, interests, social_medias, conversations, messages, friendships RESTART IDENTITY CASCADE"
     );
 };
 
@@ -33,25 +33,13 @@ const createFriendship = async (db, requestorId, requesteeId, friendshipStatus) 
  * Creates a conversation
  *
  * @param {object} db - the database connection
- * @param {string} conversationName - the conversation's name
+ * @param {number} studentId1 - the ID of the first student in the conversation
+ * @param {number} studentId2 - the ID of the second student in the conversation
  *
  * @returns {object} the created conversation
  */
-const createConversation = async (db, conversationName) => {
-    return await db.one(queries.conversations.createConversation, [conversationName]);
-};
-
-/**
- * Creates a conversation member (i.e. adds a student to a conversation)
- *
- * @param {object} db - the database connection
- * @param {number} conversationId - the ID of the conversation to add the student to
- * @param {number} studentId - the ID of the student to add to the conversation
- *
- * @returns {object} the created conversation member
- */
-const createConversationMember = async (db, conversationId, studentId) => {
-    return await db.one(queries.conversationMembers.createConversationMember, [conversationId, studentId]);
+const createConversation = async (db, studentId1, studentId2) => {
+    return await db.one(queries.conversations.createConversation, [studentId1, studentId2]);
 };
 
 /**
@@ -365,7 +353,6 @@ module.exports = {
     createFriendship,
     createCourse,
     createConversation,
-    createConversationMember,
     createEnrolment,
     createInterest,
     createMessage,

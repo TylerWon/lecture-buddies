@@ -21,14 +21,7 @@ const queries = {
     },
     conversations: {
         createConversation: `
-            INSERT INTO conversations (conversation_name) 
-            VALUES ($1) 
-            RETURNING *
-        `,
-    },
-    conversationMembers: {
-        createConversationMember: `
-            INSERT INTO conversation_members (conversation_id, student_id) 
+            INSERT INTO conversations (student_id_1, student_id_2) 
             VALUES ($1, $2) 
             RETURNING *
         `,

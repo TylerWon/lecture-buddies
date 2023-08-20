@@ -7,7 +7,6 @@ const {
     createFriendship,
     createCourse,
     createConversation,
-    createConversationMember,
     createEnrolment,
     createInterest,
     createMessage,
@@ -143,12 +142,8 @@ describe("student routes tests", () => {
         await createEnrolment(db, student3.student_id, section1.section_id);
         friendship1 = await createFriendship(db, student1.student_id, student2.student_id, "pending");
         friendship2 = await createFriendship(db, student1.student_id, student3.student_id, "pending");
-        conversation1 = await createConversation(db, "DM");
-        conversation2 = await createConversation(db, "DM");
-        await createConversationMember(db, conversation1.conversation_id, student1.student_id);
-        await createConversationMember(db, conversation1.conversation_id, student2.student_id);
-        await createConversationMember(db, conversation2.conversation_id, student1.student_id);
-        await createConversationMember(db, conversation2.conversation_id, student3.student_id);
+        conversation1 = await createConversation(db, student1.student_id, student2.student_id);
+        conversation2 = await createConversation(db, student1.student_id, student3.student_id);
         message1 = await createMessage(
             db,
             conversation1.conversation_id,
@@ -595,21 +590,17 @@ describe("student routes tests", () => {
             message3.sent_datetime = message3.sent_datetime.toJSON();
 
             conversationDetails1 = {
-                conversation_id: conversation1.conversation_id,
-                conversation_name: conversation1.conversation_name,
-                conversation_members: [student1, student2],
+                ...conversation1,
                 most_recent_message: message2,
             };
 
             conversationDetails2 = {
-                conversation_id: conversation2.conversation_id,
-                conversation_name: conversation2.conversation_name,
-                conversation_members: [student1, student3],
+                ...conversation2,
                 most_recent_message: message3,
             };
         });
 
-        test("GET - should return the conversation history for a student (order by date)", async () => {
+        test("GET - should return the conversations for a student (order by date)", async () => {
             await verifyGetRequestResponse(
                 testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=2`,
@@ -618,7 +609,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return the conversation history for a student (order by -date)", async () => {
+        test("GET - should return the conversations for a student (order by -date)", async () => {
             await verifyGetRequestResponse(
                 testSession,
                 `/students/${student1.student_id}/conversations?order_by=-date&offset=0&limit=2`,
@@ -627,7 +618,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return the conversation history for a student (0 < offset < total number of results)", async () => {
+        test("GET - should return the conversations for a student (0 < offset < total number of results)", async () => {
             await verifyGetRequestResponse(
                 testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=1&limit=1`,
@@ -636,7 +627,7 @@ describe("student routes tests", () => {
             );
         });
 
-        test("GET - should return the conversation history for a student (limit >= total number of results)", async () => {
+        test("GET - should return the conversations for a student (limit >= total number of results)", async () => {
             await verifyGetRequestResponse(
                 testSession,
                 `/students/${student1.student_id}/conversations?order_by=date&offset=0&limit=10`,

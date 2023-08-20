@@ -28,26 +28,22 @@ const authValidationSchema = () =>
 const createConversationValidationSchema = () =>
     checkSchema(
         {
-            conversation_name: {
+            student_id_1: {
                 exists: {
-                    errorMessage: "conversation_name is required",
+                    errorMessage: "student_id_1 is required",
                 },
-                isString: {
-                    errorMessage: "conversation_name must be a string",
-                },
-            },
-            conversation_members: {
-                exists: {
-                    errorMessage: "conversation_members is required",
-                },
-                isArray: {
-                    errorMessage: "conversation_members must be an array",
-                },
-            },
-            "conversation_members.*": {
                 isInt: {
                     options: { gt: -1 },
-                    errorMessage: "conversation_members items must be positive integers",
+                    errorMessage: "student_id_1 must be a positive integer",
+                },
+            },
+            student_id_2: {
+                exists: {
+                    errorMessage: "student_id_2 is required",
+                },
+                isInt: {
+                    options: { gt: -1 },
+                    errorMessage: "student_id_2 must be a positive integer",
                 },
             },
         },

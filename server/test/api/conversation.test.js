@@ -6,7 +6,6 @@ const db = require("../../src/configs/db.config");
 const {
     cleanUpDatabase,
     createConversation,
-    createConversationMember,
     createMessage,
     signUpUser,
     verifyGetRequestResponse,
@@ -18,6 +17,7 @@ describe("conversation routes tests", () => {
 
     let student1;
     let student2;
+    let student3;
     let conversation1;
     let message1;
     let message2;
@@ -26,13 +26,14 @@ describe("conversation routes tests", () => {
     const user1Password = "password1";
     const user2Username = "won.tyler2@gmail.com";
     const user2Password = "password2";
+    const user3Username = "won.tyler3@gmail.com";
+    const user3Password = "password3";
 
     beforeAll(async () => {
         student1 = await signUpUser(testSession, user1Username, user1Password);
         student2 = await signUpUser(testSession, user2Username, user2Password);
-        conversation1 = await createConversation(db, "DM");
-        await createConversationMember(db, conversation1.conversation_id, student1.student_id);
-        await createConversationMember(db, conversation1.conversation_id, student2.student_id);
+        student3 = await signUpUser(testSession, user3Username, user3Password);
+        conversation1 = await createConversation(db, student1.student_id, student2.student_id);
         message1 = await createMessage(
             db,
             conversation1.conversation_id,
@@ -59,50 +60,50 @@ describe("conversation routes tests", () => {
 
         beforeEach(() => {
             payload = {
-                conversation_name: "DM",
-                conversation_members: [student1.student_id, student2.student_id],
+                student_id_1: student1.student_id,
+                student_id_2: student3.student_id,
             };
         });
 
         test("POST - should create a conversation", async () => {
             const response = await testSession.post("/conversations").send(payload);
             expect(response.statusCode).toEqual(201);
-            expect(response.body.conversation_name).toEqual(payload.conversation_name);
-            expect(response.body.conversation_members).toEqual(payload.conversation_members);
+            expect(response.body.student_id_1).toEqual(payload.student_id_1);
+            expect(response.body.student_id_2).toEqual(payload.student_id_2);
         });
 
         test("POST - should not create a conversation when missing some body parameters", async () => {
-            delete payload.conversation_members;
+            delete payload.student_id_1;
 
             await verifyPostRequestResponse(testSession, "/conversations", payload, 400, [
                 {
                     type: "field",
                     location: "body",
-                    path: "conversation_members",
-                    msg: "conversation_members is required",
+                    path: "student_id_1",
+                    msg: "student_id_1 is required",
                 },
             ]);
         });
 
         test("POST - should not create a conversation when some body parameters are the wrong type", async () => {
-            payload.conversation_members = { id1: student1.student_id, id2: student2.student_id };
+            payload.student_id_2 = false;
 
             await verifyPostRequestResponse(testSession, "/conversations", payload, 400, [
                 {
                     type: "field",
                     location: "body",
-                    path: "conversation_members",
-                    value: payload.conversation_members,
-                    msg: "conversation_members must be an array",
+                    path: "student_id_2",
+                    value: payload.student_id_2,
+                    msg: "student_id_2 must be a positive integer",
                 },
             ]);
         });
 
         test("POST - should not create a conversation when a student does not exist", async () => {
-            payload.conversation_members = [student1.student_id + 100, student2.student_id];
+            payload.student_id_1 = payload.student_id_1 + 100;
 
             await verifyPostRequestResponse(testSession, "/conversations", payload, 400, {
-                message: `student with id '${payload.conversation_members[0]}' does not exist`,
+                message: `student with id '${payload.student_id_1}' does not exist`,
             });
         });
 

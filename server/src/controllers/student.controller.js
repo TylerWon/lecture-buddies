@@ -6,7 +6,7 @@ const queries = require("../utils/queries");
 /********** CONTROLLERS **********/
 /**
  * Gets the classmates for a student in a section. Information about each classmate and their interests, social medias,
- * and mutual courses with the student for the term the section is in is included.
+ * and mutual courses and friendship status with the student for the term the section is in is included.
  *
  * @param {number} req.params.student_id - The student's ID
  * @param {number} req.params.section_id - The section's ID
@@ -110,8 +110,8 @@ const getClassmatesForStudentInSection = async (req, res, next) => {
 };
 
 /**
- * Gets the conversations for a student. Information about the conversation, members of the conversation, and the most
- * recent message in the conversation is included.
+ * Gets the conversations for a student. Information about the conversation and the most recent message in the
+ * conversation is included.
  *
  * @param {number} req.params.student_id - The student's ID
  * @param {string} req.query.order_by - the field to order the response by (options: date, -date)
@@ -137,9 +137,6 @@ const getConversationsForStudent = async (req, res, next) => {
     try {
         // Get conversations
         let conversations = await db.any(queries.students.getConversationsForStudent, [studentId]);
-
-        // Get members of each conversation
-        await getMembersForConversations(conversations);
 
         // Get most recent message for each conversation
         await getMostRecentMessageForConversations(conversations);
@@ -458,19 +455,6 @@ const getFriendshipStatusForStudents = async (studentId, students) => {
 const getInterestsForStudents = async (students) => {
     for (const student of students) {
         student.interests = await db.any(queries.students.getInterestsForStudent, [student.student_id]);
-    }
-};
-
-/**
- * Gets the members of a conversation for every conversation in an array of conversations
- *
- * @param {object[]} conversations - the array of conversations to get members for
- */
-const getMembersForConversations = async (conversations) => {
-    for (const conversation of conversations) {
-        conversation.conversation_members = await db.any(queries.conversations.getMembersForConversation, [
-            conversation.conversation_id,
-        ]);
     }
 };
 

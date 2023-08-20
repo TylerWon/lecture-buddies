@@ -7,15 +7,9 @@ const queries = {
             ORDER BY sent_datetime DESC
             LIMIT 1
         `,
-        getMembersForConversation: `
-            SELECT students.student_id, students.school_id, students.first_name, students.last_name, students.year, students.faculty, students.major, students.profile_photo_url, students.bio
-            FROM conversation_members
-            JOIN students ON conversation_members.student_id = students.student_id
-            WHERE conversation_members.conversation_id = $1
-        `,
         createConversation: `
-            INSERT INTO conversations (conversation_name)
-            VALUES ($1)
+            INSERT INTO conversations (student_id_1, student_id_2)
+            VALUES ($1, $2)
             RETURNING *
         `,
         getConversation: `
@@ -27,13 +21,6 @@ const queries = {
             SELECT *
             FROM messages
             WHERE conversation_id = $1
-        `,
-    },
-    conversationMembers: {
-        createConversationMember: `
-            INSERT INTO conversation_members (conversation_id, student_id)
-            VALUES ($1, $2)
-            RETURNING *
         `,
     },
     courses: {
@@ -228,10 +215,9 @@ const queries = {
             WHERE friendships.requestee_id = $1 AND friendships.friendship_status = $2
         `,
         getConversationsForStudent: `
-            SELECT conversations.conversation_id, conversations.conversation_name
-            FROM conversation_members
-            JOIN conversations ON conversation_members.conversation_id = conversations.conversation_id
-            WHERE conversation_members.student_id = $1
+            SELECT *
+            FROM conversations
+            WHERE student_id_1 = $1 OR student_id_2 = $1
         `,
     },
     users: {

@@ -106,18 +106,14 @@ CREATE TABLE social_medias (
 
 CREATE TABLE conversations (
 	conversation_id SERIAL PRIMARY KEY,
-	conversation_name VARCHAR(150)
-);
-
-CREATE TABLE conversation_members (
-	conversation_id INTEGER,
-	student_id INTEGER,
-	PRIMARY KEY (conversation_id, student_id),
-    FOREIGN KEY (conversation_id) REFERENCES conversations
-	    ON DELETE CASCADE
+	student_id_1 INTEGER,
+	student_id_2 INTEGER,
+	UNIQUE (student_id_1, student_id_2),
+	FOREIGN KEY (student_id_1) REFERENCES students(student_id)
+		ON DELETE CASCADE
 		ON UPDATE CASCADE,
-	FOREIGN KEY (student_id) REFERENCES students
-	    ON DELETE CASCADE
+	FOREIGN KEY (student_id_2) REFERENCES students(student_id)
+		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
 

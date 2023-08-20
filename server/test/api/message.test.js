@@ -3,13 +3,7 @@ const session = require("supertest-session");
 
 const app = require("../../src/app");
 const db = require("../../src/configs/db.config");
-const {
-    cleanUpDatabase,
-    createConversation,
-    createConversationMember,
-    signUpUser,
-    verifyPostRequestResponse,
-} = require("../utils/helpers");
+const { cleanUpDatabase, createConversation, signUpUser, verifyPostRequestResponse } = require("../utils/helpers");
 
 describe("message routes tests", () => {
     const testSession = session(app);
@@ -26,9 +20,7 @@ describe("message routes tests", () => {
     beforeAll(async () => {
         student1 = await signUpUser(testSession, user1Username, user1Password);
         student2 = await signUpUser(testSession, user2Username, user2Password);
-        conversation1 = await createConversation(db, "DM");
-        await createConversationMember(db, conversation1.conversation_id, student1.student_id);
-        await createConversationMember(db, conversation1.conversation_id, student2.student_id);
+        conversation1 = await createConversation(db, student1.student_id, student2.student_id);
     });
 
     afterAll(async () => {

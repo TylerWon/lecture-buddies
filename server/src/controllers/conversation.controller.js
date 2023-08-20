@@ -4,8 +4,8 @@ const queries = require("../utils/queries");
 /**
  * Creates a conversation
  *
- * @param {number} req.body.conversation_name - the conversation's name
- * @param {number} req.body.conversation_members - the IDs of the students that are members of the conversation
+ * @param {number} req.body.student_id_1 - the ID of the first student in the conversation
+ * @param {number} req.body.student_id_2 - the ID of the second student in the conversation
  *
  * @returns
  * - 201 Created if successful
@@ -16,37 +16,23 @@ const createConversation = async (req, res, next) => {
     const payload = req.body;
 
     // Check if students exist
-    for (const studentId of payload.conversation_members) {
-        try {
-            await db.one(queries.students.getStudent, [studentId]);
-        } catch (err) {
-            return res.status(400).send({ message: `student with id '${studentId}' does not exist` });
-        }
+    if (!(await studentExists(payload.student_id_1))) {
+        return res.status(400).json({ message: `student with id '${payload.student_id_1}' does not exist` });
+    } else if (!(await studentExists(payload.student_id_2))) {
+        return res.status(400).json({ message: `student with id '${payload.student_id_2}' does not exist` });
     }
 
     // Create conversation
-    let conversation;
     try {
-        conversation = await db.one(queries.conversations.createConversation, [payload.conversation_name]);
+        const conversation = await db.one(queries.conversations.createConversation, [
+            payload.student_id_1,
+            payload.student_id_2,
+        ]);
+
+        return res.status(201).json(conversation);
     } catch (err) {
         return next(err); // unexpected error
     }
-
-    // Add students to conversation
-    conversation.conversation_members = [];
-    for (const studentId of payload.conversation_members) {
-        try {
-            const conversationMember = await db.one(queries.conversationMembers.createConversationMember, [
-                conversation.conversation_id,
-                studentId,
-            ]);
-            conversation.conversation_members.push(conversationMember.student_id);
-        } catch (err) {
-            return next(err); // unexpected error
-        }
-    }
-
-    return res.status(201).json(conversation);
 };
 
 /**
@@ -95,6 +81,24 @@ const getMessagesForConversation = async (req, res, next) => {
         return res.status(200).json(messages);
     } catch (err) {
         return next(err); // unexpected error
+    }
+};
+
+/**
+ * Checks if a student exists
+ *
+ * @param {number} studentId - the student's ID
+ *
+ * @returns
+ * - true if the student exists
+ * - false if the student does not exist
+ */
+const studentExists = async (studentId) => {
+    try {
+        await db.one(queries.students.getStudent, [studentId]);
+        return true;
+    } catch (err) {
+        return false;
     }
 };
 
