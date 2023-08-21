@@ -14,6 +14,11 @@ router.post(
     conversationController.createConversation
 );
 router.get(
+    "/:student_id_1(\\d+)/:student_id_2(\\d+)",
+    authMiddleware.authenticateRequest,
+    conversationController.getConversation
+);
+router.get(
     "/:conversation_id(\\d+)/messages",
     validationSchemas.sortingAndPaginationValidationSchema(
         [/^(-?)(date)$/],

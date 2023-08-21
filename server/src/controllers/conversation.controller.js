@@ -36,6 +36,39 @@ const createConversation = async (req, res, next) => {
 };
 
 /**
+ * Gets a conversation
+ *
+ * @param {number} req.params.student_id_1 - the ID of one of the students in the conversation
+ * @param {number} req.params.student_id_2 - the ID of the other student in the conversation
+ *
+ * @returns
+ * - 200 OK if successful
+ * - 400 Bad Request if conversation does not exist
+ * - 500 Internal Server Error if unexpected error
+ */
+const getConversation = async (req, res, next) => {
+    const studentId1 = req.params.student_id_1;
+    const studentId2 = req.params.student_id_2;
+
+    // Check if conversation exists
+    try {
+        await db.one(queries.conversations.getConversationByStudentIds, [studentId1, studentId2]);
+    } catch (err) {
+        return res.status(400).send({
+            message: `conversation between students with ids '${studentId1}' and '${studentId2}' does not exist`,
+        });
+    }
+
+    // Get conversation
+    try {
+        const conversation = await db.one(queries.conversations.getConversationByStudentIds, [studentId1, studentId2]);
+        return res.status(200).json(conversation);
+    } catch (err) {
+        return next(err); // unexpected error
+    }
+};
+
+/**
  * Gets the messages for a conversation
  *
  * @param {number} req.params.conversation_id - the conversation's ID
@@ -104,5 +137,6 @@ const studentExists = async (studentId) => {
 
 module.exports = {
     createConversation,
+    getConversation,
     getMessagesForConversation,
 };

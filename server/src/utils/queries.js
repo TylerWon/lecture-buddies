@@ -17,6 +17,11 @@ const queries = {
             FROM conversations
             WHERE conversation_id = $1
         `,
+        getConversationByStudentIds: `
+            SELECT *
+            FROM conversations
+            WHERE student_id_1 = $1 AND student_id_2 = $2 OR student_id_1 = $2 AND student_id_2 = $1
+        `,
         getMessagesForConversation: `
             SELECT *
             FROM messages

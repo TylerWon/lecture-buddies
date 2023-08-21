@@ -114,6 +114,41 @@ describe("conversation routes tests", () => {
         });
     });
 
+    describe("/conversations/{student_id_1}/{student_id_2}", () => {
+        test("GET - should return a conversation", async () => {
+            await verifyGetRequestResponse(
+                testSession,
+                `/conversations/${student1.student_id}/${student2.student_id}`,
+                200,
+                conversation1
+            );
+        });
+
+        test("GET - should return error message when conversation does not exist", async () => {
+            await verifyGetRequestResponse(
+                testSession,
+                `/conversations/${student1.student_id + 100}/${student2.student_id}`,
+                400,
+                {
+                    message: `conversation between students with ids '${student1.student_id + 100}' and '${
+                        student2.student_id
+                    }' does not exist`,
+                }
+            );
+        });
+
+        test("GET - should return error message when request is unauthenticated", async () => {
+            await verifyGetRequestResponse(
+                request(app),
+                `/conversations/${student1.student_id}/${student2.student_id}`,
+                401,
+                {
+                    message: "unauthenticated",
+                }
+            );
+        });
+    });
+
     describe("/conversations/{conversation_id}/messages", () => {
         test("GET - should return the messages for a conversation (order by date)", async () => {
             await verifyGetRequestResponse(
