@@ -107,6 +107,12 @@ describe("conversation routes tests", () => {
             });
         });
 
+        test("POST - should not create a conversation when the conversation already exists", async () => {
+            await verifyPostRequestResponse(testSession, "/conversations", payload, 400, {
+                message: `conversation between students with ids '${payload.student_id_1}' and '${payload.student_id_2}' already exists`,
+            });
+        });
+
         test("POST - should return error message when request is unauthenticated", async () => {
             await verifyPostRequestResponse(request(app), "/conversations", payload, 401, {
                 message: "unauthenticated",

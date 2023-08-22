@@ -9,7 +9,7 @@ const queries = require("../utils/queries");
  *
  * @returns
  * - 201 Created if successful
- * - 400 Bad Request if students do not exist
+ * - 400 Bad Request if students do not exist or conversation already exists
  * - 500 Internal Server Error if unexpected error
  */
 const createConversation = async (req, res, next) => {
@@ -20,6 +20,15 @@ const createConversation = async (req, res, next) => {
         return res.status(400).json({ message: `student with id '${payload.student_id_1}' does not exist` });
     } else if (!(await studentExists(payload.student_id_2))) {
         return res.status(400).json({ message: `student with id '${payload.student_id_2}' does not exist` });
+    }
+
+    // Check if conversation exists
+    try {
+        await db.none(queries.conversations.getConversationByStudentIds, [payload.student_id_1, payload.student_id_2]);
+    } catch (err) {
+        return res.status(400).json({
+            message: `conversation between students with ids '${payload.student_id_1}' and '${payload.student_id_2}' already exists`,
+        });
     }
 
     // Create conversation
