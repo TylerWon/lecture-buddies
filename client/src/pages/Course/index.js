@@ -36,6 +36,11 @@ const HeaderTextContainer = styled(Stack)(({ theme }) => ({
     justifyContent: "start",
     alignItems: "end",
     gap: theme.spacing(2),
+    [theme.breakpoints.down("md")]: {
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "start",
+    },
 }));
 
 // Container for student cards
@@ -65,6 +70,11 @@ const ClassmateCardContentContainer = styled(Stack)(({ theme }) => ({
     alignItems: "center",
     gap: theme.spacing(2),
     width: "100%",
+    [theme.breakpoints.down("sm")]: {
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+    },
 }));
 
 // Container for classmate card classmate info
@@ -93,6 +103,11 @@ const ClassmateCardHeaderTextContainer = styled(Stack)(({ theme }) => ({
     justifyContent: "center",
     alignItems: "end",
     gap: theme.spacing(1),
+    [theme.breakpoints.down("md")]: {
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "start",
+    },
 }));
 
 // Container for classmate card header buttons
@@ -108,10 +123,9 @@ const ClassmateCardHeaderButtonsContainer = styled(Stack)(({ theme }) => ({
 const ClassmateCardChipsContainer = styled(Grid)(({ theme }) => ({
     display: "flex",
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "start",
     alignItems: "center",
     gap: theme.spacing(2),
-    // width: "100%",
 }));
 
 // ClassmateCard component
@@ -239,7 +253,9 @@ export default function Course() {
             <HeaderContainer>
                 <HeaderTextContainer>
                     <Typography variant="h1">{`${sectionDetails?.subject_name} ${sectionDetails?.course_number} ${sectionDetails?.section_number} (${sectionDetails?.section_term})`}</Typography>
-                    <Typography variant="body1">{sectionDetails?.course_name}</Typography>
+                    <Typography sx={{ paddingBottom: "2px" }} variant="body1">
+                        {sectionDetails?.course_name}
+                    </Typography>
                 </HeaderTextContainer>
             </HeaderContainer>
             <ClassmateCardsContainer>
