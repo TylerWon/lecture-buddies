@@ -1,16 +1,16 @@
 import { Chip } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-// InterestChip component
-export function InterestChip(props) {
+// DefaultChip component
+export function DefaultChip(props) {
     const { ...chipProps } = props;
 
     return <Chip variant="outlined" {...chipProps} />;
 }
 
-// InterestChipWithDelete component
-export function InterestChipWithDelete(props) {
+// ChipWithDelete component
+export function ChipWithDelete(props) {
     const { ...interestChipProps } = props;
 
-    return <InterestChip deleteIcon={<CloseIcon />} {...interestChipProps} />;
+    return <DefaultChip deleteIcon={<CloseIcon />} {...interestChipProps} />;
 }

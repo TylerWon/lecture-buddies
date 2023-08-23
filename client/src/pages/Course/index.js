@@ -9,7 +9,7 @@ import { getClassmatesForStudentInSection, getSectionDetails } from "../../utils
 import { BigProfilePhoto } from "../../components/atoms/avatar";
 import { AddFriendButton, MessageButton } from "../../components/atoms/button";
 import { FriendsIcon } from "../../components/atoms/icon";
-import { InterestChip } from "../../components/atoms/chip";
+import { DefaultChip } from "../../components/atoms/chip";
 
 // Container for content
 const ContentContainer = styled(Stack)(({ theme }) => ({
@@ -172,7 +172,7 @@ function ClassmateCard(props) {
                         </Grid>
                         {classmate.interests.map((interest, index) => (
                             <Grid key={index} xs="auto">
-                                <InterestChip label={interest.interest_name} />
+                                <DefaultChip label={interest.interest_name} />
                             </Grid>
                         ))}
                     </ClassmateCardChipsContainer>
@@ -182,7 +182,7 @@ function ClassmateCard(props) {
                         </Grid>
                         {classmate.mutual_courses_for_term.map((course, index) => (
                             <Grid key={index} xs="auto">
-                                <InterestChip
+                                <DefaultChip
                                     label={`${course.subject_name} ${course.course_number} ${course.section_number}`}
                                 />
                             </Grid>

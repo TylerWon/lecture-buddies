@@ -10,7 +10,7 @@ import { StudentContext } from "../../../../../../contexts/StudentContext";
 
 import { DefaultTextField } from "../../../../../../components/atoms/input";
 import { AcceptAndCancelButtons, AddButtonWithLabel } from "../../../../../../components/atoms/button";
-import { InterestChipWithDelete } from "../../../../../../components/atoms/chip";
+import { ChipWithDelete } from "../../../../../../components/atoms/chip";
 
 // Yup validation schema for form
 const validationSchema = yup.object({
@@ -108,7 +108,7 @@ export default function InterestsSection() {
             <Grid container spacing={2}>
                 {interestsAdded.map((interest) => (
                     <Grid key={interest.interest_id}>
-                        <InterestChipWithDelete
+                        <ChipWithDelete
                             label={interest.interest_name}
                             onDelete={() => handleDeleteInterestClick(interest.interest_id)}
                         />

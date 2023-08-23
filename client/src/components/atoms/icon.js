@@ -5,7 +5,7 @@ import PeopleIcon from "@mui/icons-material/People";
 // FriendsIcon component
 export function FriendsIcon(props) {
     return (
-        <Tooltip title="Friends">
+        <Tooltip title="Friend">
             <PeopleIcon color="primary" size="small" />
         </Tooltip>
     );
