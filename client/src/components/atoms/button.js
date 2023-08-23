@@ -14,9 +14,11 @@ export function AcceptButton(props) {
     const { ...iconButtonProps } = props;
 
     return (
-        <IconButton color="secondary" size="small" {...iconButtonProps}>
-            <CheckCircleIcon />
-        </IconButton>
+        <Tooltip title="Accept">
+            <IconButton color="secondary" size="small" {...iconButtonProps}>
+                <CheckCircleIcon />
+            </IconButton>
+        </Tooltip>
     );
 }
 
@@ -110,9 +112,11 @@ export function CancelButton(props) {
     const { onClick } = props;
 
     return (
-        <IconButton color="grey" size="small" onClick={onClick}>
-            <CancelIcon />
-        </IconButton>
+        <Tooltip title="Cancel">
+            <IconButton color="grey" size="small" onClick={onClick}>
+                <CancelIcon />
+            </IconButton>
+        </Tooltip>
     );
 }
 
