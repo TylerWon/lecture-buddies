@@ -1,5 +1,15 @@
-import { Badge, IconButton, Paper, Typography } from "@mui/material";
+import { Badge, IconButton, Paper, Tooltip, Typography } from "@mui/material";
 import { SocialIcon } from "react-social-icons";
+import PeopleIcon from "@mui/icons-material/People";
+
+// FriendsIcon component
+export function FriendsIcon(props) {
+    return (
+        <Tooltip title="Friends">
+            <PeopleIcon color="primary" size="small" />
+        </Tooltip>
+    );
+}
 
 // SocialMediaIcon component
 export function SocialMediaIcon(props) {

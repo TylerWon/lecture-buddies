@@ -3,6 +3,7 @@ import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } 
 import Auth from "./components/auth/Auth";
 import AutoLogin from "./components/auth/AutoLogin";
 import Buddies from "./pages/Buddies";
+import Conversation from "./pages/Conversation";
 import Course from "./pages/Course";
 import Courses from "./pages/Courses";
 import Home from "./pages/Home";
@@ -20,6 +21,7 @@ const router = createBrowserRouter(
             </Route>
             <Route element={<Auth />}>
                 <Route element={<Navbar />}>
+                    <Route path="/messages/:studentId1/:studentId2" element={<Conversation />} />
                     <Route path="/courses" element={<Courses />} />
                     <Route path="/courses/:sectionId" element={<Course />} />
                     <Route path="/profile" element={<Profile />} />

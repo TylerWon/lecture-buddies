@@ -16,6 +16,27 @@ export const autoLogin = async () => {
 };
 
 /**
+ * Creates a conversation
+ *
+ * @param {number} values.student_id_1 - the ID of the first student in the conversation
+ * @param {number} values.student_id_2 - the ID of the second student in the conversation
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const createConversation = async (values) => {
+    const response = await fetch(`${API_URL}/conversations`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
  * Creates an enrolment
  *
  * @param {number} values.student_id - the ID of the student to enrol in the section
@@ -25,6 +46,28 @@ export const autoLogin = async () => {
  */
 export const createEnrolment = async (values) => {
     const response = await fetch(`${API_URL}/enrolments`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
+ * Creates a friendship
+ *
+ * @param {number} values.requestor_id - the ID of the student that is requesting to be the other student’s friend
+ * @param {number} values.requestee_id - the ID of the student that is receiving the request to be the other
+ * student’s friend
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const createFriendship = async (values) => {
+    const response = await fetch(`${API_URL}/friendships`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -165,6 +208,29 @@ export const deleteUser = async (userId) => {
 };
 
 /**
+ * Gets the classmates for a student in a section
+ *
+ * @param {number} studentId - The student's ID
+ * @param {number} sectionId - The section's ID
+ * @param {string} orderBy - the field to order the response by
+ * @param {number} offset - the position to start returning results from
+ * @param {number} limit - the number of results to return
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const getClassmatesForStudentInSection = async (studentId, sectionId, orderBy, offset, limit) => {
+    const response = await fetch(
+        `${API_URL}/students/${studentId}/sections/${sectionId}/classmates?order_by=${orderBy}&offset=${offset}&limit=${limit}`,
+        {
+            method: "GET",
+            credentials: "include",
+        }
+    );
+
+    return response;
+};
+
+/**
  * Gets the courses for a subject
  *
  * @param {number} subjectId - the subject's ID
@@ -220,6 +286,22 @@ export const getSchools = async () => {
  */
 export const getSchool = async (schoolId) => {
     const response = await fetch(`${API_URL}/schools/${schoolId}`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    return response;
+};
+
+/**
+ * Gets the details for a section
+ *
+ * @param {number} sectionId - the section's ID
+ *
+ * @returns {Promise<Response>} response from the API
+ */
+export const getSectionDetails = async (sectionId) => {
+    const response = await fetch(`${API_URL}/sections/${sectionId}/details`, {
         method: "GET",
         credentials: "include",
     });

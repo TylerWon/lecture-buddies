@@ -2,7 +2,7 @@ import { Avatar } from "@mui/material";
 
 // ProfilePhoto component
 export function BigProfilePhoto(props) {
-    return <Avatar sx={{ width: "125px", height: "125px" }} {...props} />;
+    return <Avatar sx={{ width: "150px", height: "150px" }} {...props} />;
 }
 
 // ProfilePhoto component
