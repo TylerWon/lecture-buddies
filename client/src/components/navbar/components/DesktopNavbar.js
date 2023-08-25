@@ -95,7 +95,7 @@ export default function DesktopNavbar(props) {
                     <NavbarItem
                         icon={<SmallProfilePhoto src={student.profile_photo_url} />}
                         path="/profile"
-                        text={`${student.first_name} ${student.last_name}`}
+                        text="Account"
                     />
                     <NavbarItem icon={<LibraryBooksOutlinedIcon sx={iconStyle} />} path="/courses" text="Courses" />
                     <NavbarItem icon={<PeopleOutlinedIcon sx={iconStyle} />} path="/buddies" text="Buddies" />

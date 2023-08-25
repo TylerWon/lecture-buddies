@@ -6,7 +6,7 @@ import DesktopNavbar from "./components/DesktopNavbar";
 import TabletNavbar from "./components/TabletNavbar";
 
 // Constants
-const DESKTOP_NAVBAR_WIDTH = 115;
+const DESKTOP_NAVBAR_WIDTH = 100;
 const PADDING = 24;
 
 // Navbar component
