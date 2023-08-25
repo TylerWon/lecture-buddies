@@ -251,18 +251,24 @@ export default function Course() {
     return (
         <ContentContainer>
             <HeaderContainer>
-                <HeaderTextContainer>
-                    <Typography variant="h1">{`${sectionDetails?.subject_name} ${sectionDetails?.course_number} ${sectionDetails?.section_number} (${sectionDetails?.section_term})`}</Typography>
-                    <Typography sx={{ paddingBottom: "2px" }} variant="body1">
-                        {sectionDetails?.course_name}
-                    </Typography>
-                </HeaderTextContainer>
+                {sectionDetails && (
+                    <HeaderTextContainer>
+                        <Typography variant="h1">
+                            {`${sectionDetails.subject_name} ${sectionDetails.course_number} ${sectionDetails.section_number} (${sectionDetails.section_term})`}
+                        </Typography>
+                        <Typography sx={{ paddingBottom: "2px" }} variant="body1">
+                            {sectionDetails.course_name}
+                        </Typography>
+                    </HeaderTextContainer>
+                )}
             </HeaderContainer>
-            <ClassmateCardsContainer>
-                {classmates.map((classmate, index) => (
-                    <ClassmateCard key={index} classmate={classmate} />
-                ))}
-            </ClassmateCardsContainer>
+            {classmates.length > 0 && (
+                <ClassmateCardsContainer>
+                    {classmates.map((classmate, index) => (
+                        <ClassmateCard key={index} classmate={classmate} />
+                    ))}
+                </ClassmateCardsContainer>
+            )}
         </ContentContainer>
     );
 }

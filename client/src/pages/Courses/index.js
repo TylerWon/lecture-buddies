@@ -40,7 +40,7 @@ const CourseCardsContainer = styled(Grid)(({ theme }) => ({
 export default function Courses() {
     // Hooks
     const { student } = useContext(StudentContext);
-    const [courseHistory, setCourseHistory] = useState([]);
+    const [courseHistory, setCourseHistory] = useState(null);
     const [terms, setTerms] = useState([]);
     const [selectedTerm, setSelectedTerm] = useState("");
 
@@ -94,15 +94,17 @@ export default function Courses() {
         <ContentContainer>
             <HeaderContainer>
                 <Typography variant="h1">Courses</Typography>
-                <Select value={selectedTerm} onChange={handleTermChange}>
-                    {terms.map((term, index) => (
-                        <MenuItem key={index} value={term}>
-                            {term}
-                        </MenuItem>
-                    ))}
-                </Select>
+                {terms.length > 0 && (
+                    <Select value={selectedTerm} onChange={handleTermChange}>
+                        {terms.map((term, index) => (
+                            <MenuItem key={index} value={term}>
+                                {term}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                )}
             </HeaderContainer>
-            {courseHistory[selectedTerm] && (
+            {courseHistory && (
                 <CourseCardsContainer container>
                     {courseHistory[selectedTerm].map((course) => (
                         <Grid key={course.section_id} xs="auto">
