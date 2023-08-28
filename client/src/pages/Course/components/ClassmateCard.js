@@ -8,6 +8,7 @@ import { BigProfilePhoto } from "../../../components/atoms/avatar";
 import { AddFriendButton, MessageButton } from "../../../components/atoms/button";
 import { FriendsIcon } from "../../../components/atoms/icon";
 import { DefaultChip } from "../../../components/atoms/chip";
+import StudentInfoModal from "./StudentInfoModal";
 
 // Background for student card
 const ClassmateCardBackground = styled(Paper)(({ theme }) => ({
@@ -87,65 +88,83 @@ const ClassmateCardChipsContainer = styled(Grid)(({ theme }) => ({
 // ClassmateCard component
 export default function ClassmateCard(props) {
     // Props
-    const { classmate } = props;
+    const { classmate, classmates, setClassmates } = props;
 
     // Hooks
     const { student } = useContext(StudentContext);
-    const [friendshipStatus, setFriendshipStatus] = useState(classmate.friendship_status);
+    const [showStudentInfoModal, setShowStudentInfoModal] = useState(false);
 
-    // Updates the friendship status of the classmate with the student (DOESN'T WORK)
+    // Updates the friendship status of the classmate with the student
     const updateFriendshipStatus = () => {
-        setFriendshipStatus("pending");
+        const updatedClassmates = classmates.map((c) => {
+            if (c.student_id === classmate.student_id) {
+                return { ...c, friendship_status: "pending" };
+            }
+            return c;
+        });
+        setClassmates(updatedClassmates);
+    };
+
+    // Handler for when classmate card is clicked
+    const handleClassmateCardClick = () => {
+        setShowStudentInfoModal(true);
+    };
+
+    // Handler for when the student info modal is closed
+    const handleStudentInfoModalClose = () => {
+        setShowStudentInfoModal(false);
     };
 
     return (
-        <ClassmateCardBackground>
-            <ClassmateCardContentContainer>
-                <BigProfilePhoto src={classmate.profile_photo_url} />
-                <ClassmateCardClassmateInfoContainer>
-                    <ClassmateCardHeaderContainer>
-                        <ClassmateCardHeaderTextContainer>
-                            <Typography variant="h4">{`${classmate.first_name} ${classmate.last_name}`}</Typography>
-                            <Typography sx={{ paddingBottom: "2px" }} variant="body1">
-                                {`${classmate.year} year, ${classmate.major} major`}
-                            </Typography>
-                        </ClassmateCardHeaderTextContainer>
-                        <ClassmateCardHeaderButtonsContainer>
-                            <MessageButton studentId1={student.student_id} studentId2={classmate.student_id} />
-                            {friendshipStatus === "none" && (
-                                <AddFriendButton
-                                    requestorId={student.student_id}
-                                    requesteeId={classmate.student_id}
-                                    onSuccess={updateFriendshipStatus}
-                                />
-                            )}
-                            {friendshipStatus === "accepted" && <FriendsIcon />}
-                        </ClassmateCardHeaderButtonsContainer>
-                    </ClassmateCardHeaderContainer>
-                    <ClassmateCardChipsContainer container>
-                        <Grid xs="auto">
-                            <Typography variant="body1">Interests</Typography>
-                        </Grid>
-                        {classmate.interests.map((interest, index) => (
-                            <Grid key={index} xs="auto">
-                                <DefaultChip label={interest.interest_name} />
+        <>
+            <ClassmateCardBackground onClick={handleClassmateCardClick}>
+                <ClassmateCardContentContainer>
+                    <BigProfilePhoto src={classmate.profile_photo_url} />
+                    <ClassmateCardClassmateInfoContainer>
+                        <ClassmateCardHeaderContainer>
+                            <ClassmateCardHeaderTextContainer>
+                                <Typography variant="h4">{`${classmate.first_name} ${classmate.last_name}`}</Typography>
+                                <Typography sx={{ paddingBottom: "2px" }} variant="body1">
+                                    {`${classmate.year} year, ${classmate.major} major`}
+                                </Typography>
+                            </ClassmateCardHeaderTextContainer>
+                            <ClassmateCardHeaderButtonsContainer>
+                                <MessageButton studentId1={student.student_id} studentId2={classmate.student_id} />
+                                {classmate.friendship_status === "none" && (
+                                    <AddFriendButton
+                                        requestorId={student.student_id}
+                                        requesteeId={classmate.student_id}
+                                        onSuccess={updateFriendshipStatus}
+                                    />
+                                )}
+                                {classmate.friendship_status === "accepted" && <FriendsIcon />}
+                            </ClassmateCardHeaderButtonsContainer>
+                        </ClassmateCardHeaderContainer>
+                        <ClassmateCardChipsContainer container>
+                            <Grid xs="auto">
+                                <Typography variant="body1">Interests</Typography>
                             </Grid>
-                        ))}
-                    </ClassmateCardChipsContainer>
-                    <ClassmateCardChipsContainer container>
-                        <Grid xs="auto">
-                            <Typography variant="body1">Mutual courses</Typography>
-                        </Grid>
-                        {classmate.mutual_courses_for_term.map((course, index) => (
-                            <Grid key={index} xs="auto">
-                                <DefaultChip
-                                    label={`${course.subject_name} ${course.course_number} ${course.section_number}`}
-                                />
+                            {classmate.interests.map((interest, index) => (
+                                <Grid key={index} xs="auto">
+                                    <DefaultChip label={interest.interest_name} />
+                                </Grid>
+                            ))}
+                        </ClassmateCardChipsContainer>
+                        <ClassmateCardChipsContainer container>
+                            <Grid xs="auto">
+                                <Typography variant="body1">Mutual courses</Typography>
                             </Grid>
-                        ))}
-                    </ClassmateCardChipsContainer>
-                </ClassmateCardClassmateInfoContainer>
-            </ClassmateCardContentContainer>
-        </ClassmateCardBackground>
+                            {classmate.mutual_courses_for_term.map((course, index) => (
+                                <Grid key={index} xs="auto">
+                                    <DefaultChip
+                                        label={`${course.subject_name} ${course.course_number} ${course.section_number}`}
+                                    />
+                                </Grid>
+                            ))}
+                        </ClassmateCardChipsContainer>
+                    </ClassmateCardClassmateInfoContainer>
+                </ClassmateCardContentContainer>
+            </ClassmateCardBackground>
+        </>
     );
 }

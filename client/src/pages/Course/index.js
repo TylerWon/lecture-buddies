@@ -120,7 +120,12 @@ export default function Course() {
             {classmates.length > 0 && (
                 <ClassmateCardsContainer>
                     {classmates.map((classmate, index) => (
-                        <ClassmateCard key={index} classmate={classmate} />
+                        <ClassmateCard
+                            key={index}
+                            classmate={classmate}
+                            classmates={classmates}
+                            setClassmates={setClassmates}
+                        />
                     ))}
                 </ClassmateCardsContainer>
             )}
