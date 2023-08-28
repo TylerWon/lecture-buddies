@@ -4,14 +4,15 @@ import { styled } from "@mui/material/styles";
 import { useContext, useState } from "react";
 
 import { StudentContext } from "../../../contexts/StudentContext";
+
 import { BigProfilePhoto } from "../../../components/atoms/avatar";
 import { AddFriendButton, MessageButton } from "../../../components/atoms/button";
 import { FriendsIcon } from "../../../components/atoms/icon";
 import { DefaultChip } from "../../../components/atoms/chip";
-import StudentInfoModal from "./StudentInfoModal";
+import ClassmateInfoDialog from "./ClassmateInfoDialog";
 
-// Background for student card
-const ClassmateCardBackground = styled(Paper)(({ theme }) => ({
+// Background for the card
+const CardBackground = styled(Paper)(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -19,8 +20,8 @@ const ClassmateCardBackground = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(2),
 }));
 
-// Container for classmate card content
-const ClassmateCardContentContainer = styled(Stack)(({ theme }) => ({
+// Container for the content
+const ContentContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "row",
     justifyContent: "start",
@@ -34,8 +35,8 @@ const ClassmateCardContentContainer = styled(Stack)(({ theme }) => ({
     },
 }));
 
-// Container for classmate card classmate info
-const ClassmateCardClassmateInfoContainer = styled(Stack)(({ theme }) => ({
+// Container for classmate info
+const ClassmateInfoContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -44,8 +45,8 @@ const ClassmateCardClassmateInfoContainer = styled(Stack)(({ theme }) => ({
     width: "100%",
 }));
 
-// Container for classmate card header
-const ClassmateCardHeaderContainer = styled(Stack)(({ theme }) => ({
+// Container for header
+const HeaderContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -53,8 +54,8 @@ const ClassmateCardHeaderContainer = styled(Stack)(({ theme }) => ({
     width: "100%",
 }));
 
-// Container for classmate card header text
-const ClassmateCardHeaderTextContainer = styled(Stack)(({ theme }) => ({
+// Container for header text
+const HeaderTextContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
@@ -67,8 +68,8 @@ const ClassmateCardHeaderTextContainer = styled(Stack)(({ theme }) => ({
     },
 }));
 
-// Container for classmate card header buttons
-const ClassmateCardHeaderButtonsContainer = styled(Stack)(({ theme }) => ({
+// Container for header buttons
+const HeaderButtonsContainer = styled(Stack)(({ theme }) => ({
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
@@ -76,8 +77,8 @@ const ClassmateCardHeaderButtonsContainer = styled(Stack)(({ theme }) => ({
     gap: theme.spacing(2),
 }));
 
-// Container for classmate card interests
-const ClassmateCardChipsContainer = styled(Grid)(({ theme }) => ({
+// Container for chips
+const ChipsContainer = styled(Grid)(({ theme }) => ({
     display: "flex",
     flexDirection: "row",
     justifyContent: "start",
@@ -92,7 +93,7 @@ export default function ClassmateCard(props) {
 
     // Hooks
     const { student } = useContext(StudentContext);
-    const [showStudentInfoModal, setShowStudentInfoModal] = useState(false);
+    const [showClassmateInfoDialog, setShowClassmateInfoDialog] = useState(false);
 
     // Updates the friendship status of the classmate with the student
     const updateFriendshipStatus = () => {
@@ -107,28 +108,23 @@ export default function ClassmateCard(props) {
 
     // Handler for when classmate card is clicked
     const handleClassmateCardClick = () => {
-        setShowStudentInfoModal(true);
-    };
-
-    // Handler for when the student info modal is closed
-    const handleStudentInfoModalClose = () => {
-        setShowStudentInfoModal(false);
+        setShowClassmateInfoDialog(true);
     };
 
     return (
         <>
-            <ClassmateCardBackground onClick={handleClassmateCardClick}>
-                <ClassmateCardContentContainer>
+            <CardBackground onClick={handleClassmateCardClick}>
+                <ContentContainer>
                     <BigProfilePhoto src={classmate.profile_photo_url} />
-                    <ClassmateCardClassmateInfoContainer>
-                        <ClassmateCardHeaderContainer>
-                            <ClassmateCardHeaderTextContainer>
+                    <ClassmateInfoContainer>
+                        <HeaderContainer>
+                            <HeaderTextContainer>
                                 <Typography variant="h4">{`${classmate.first_name} ${classmate.last_name}`}</Typography>
                                 <Typography sx={{ paddingBottom: "2px" }} variant="body1">
                                     {`${classmate.year} year, ${classmate.major} major`}
                                 </Typography>
-                            </ClassmateCardHeaderTextContainer>
-                            <ClassmateCardHeaderButtonsContainer>
+                            </HeaderTextContainer>
+                            <HeaderButtonsContainer>
                                 <MessageButton studentId1={student.student_id} studentId2={classmate.student_id} />
                                 {classmate.friendship_status === "none" && (
                                     <AddFriendButton
@@ -138,9 +134,9 @@ export default function ClassmateCard(props) {
                                     />
                                 )}
                                 {classmate.friendship_status === "accepted" && <FriendsIcon />}
-                            </ClassmateCardHeaderButtonsContainer>
-                        </ClassmateCardHeaderContainer>
-                        <ClassmateCardChipsContainer container>
+                            </HeaderButtonsContainer>
+                        </HeaderContainer>
+                        <ChipsContainer container>
                             <Grid xs="auto">
                                 <Typography variant="body1">Interests</Typography>
                             </Grid>
@@ -149,8 +145,8 @@ export default function ClassmateCard(props) {
                                     <DefaultChip label={interest.interest_name} />
                                 </Grid>
                             ))}
-                        </ClassmateCardChipsContainer>
-                        <ClassmateCardChipsContainer container>
+                        </ChipsContainer>
+                        <ChipsContainer container>
                             <Grid xs="auto">
                                 <Typography variant="body1">Mutual courses</Typography>
                             </Grid>
@@ -161,10 +157,15 @@ export default function ClassmateCard(props) {
                                     />
                                 </Grid>
                             ))}
-                        </ClassmateCardChipsContainer>
-                    </ClassmateCardClassmateInfoContainer>
-                </ClassmateCardContentContainer>
-            </ClassmateCardBackground>
+                        </ChipsContainer>
+                    </ClassmateInfoContainer>
+                </ContentContainer>
+            </CardBackground>
+            <ClassmateInfoDialog
+                showClassmateInfoDialog={showClassmateInfoDialog}
+                setShowClassmateInfoDialog={setShowClassmateInfoDialog}
+                classmate={classmate}
+            />
         </>
     );
 }
